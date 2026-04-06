@@ -69,7 +69,7 @@
         <div class="nav-tab" onclick="showTab('satisfaction')">Patient Survey</div>
         <div class="nav-tab" onclick="showTab('switching')">Switching</div>
         <div class="nav-tab" onclick="showTab('nodata')">No Data Audit</div>
-        <div class="nav-tab" onclick="showTab('data')">Data &amp; Method</div>
+        <div class="nav-tab" onclick="showTab('data')">About</div>
     </div>
 
     <!-- OVERVIEW -->
@@ -347,12 +347,35 @@
         <div class="table-card" style="max-height:600px;overflow-y:auto"><div id="table-nd-practices"></div></div>
     </div>
 
-    <!-- DATA & METHOD -->
+    <!-- ABOUT -->
     <div id="tab-data" class="tab-content">
-        <h2 class="section-title">Data Source &amp; Methodology</h2>
+        <h2 class="section-title">About this site</h2>
         <div class="callout">
-            <strong>Source:</strong> "Submissions via Online Consultation Systems in General Practice", NHS England Digital (experimental statistics). February 2026 publication. Practice-level CSV covering August 2024 – February 2026. <a href="https://digital.nhs.uk/data-and-information/publications/statistical/submissions-via-online-consultation-systems-in-general-practice/february-2026" target="_blank">Publication page</a>
+            <strong>What this is:</strong> An interactive dashboard analysing the online consultation (OC) platform market in English general practice, plus a searchable lookup of all ~6,100 active GP practices with a concise data-driven pen portrait of each. It reuses publicly available NHS data to make patterns in OC adoption, utilisation and patient experience easier to see.
         </div>
+        <div class="callout">
+            <strong>Author:</strong> Anne Marie Cunningham, GP. Built with assistance from Claude (Anthropic). The analysis and any errors are mine.
+        </div>
+        <div class="callout warn">
+            <strong>Disclaimer:</strong> This site is for information only. It is <em>not</em> a recommendation, ranking or endorsement of any GP practice or software supplier. Figures reflect the state of NHS published data at the time of the most recent refresh and may contain errors or omissions in the underlying source data. Nothing on this site should be interpreted as clinical, regulatory or commercial advice.
+        </div>
+        <h3 style="margin-top:24px">Data sources</h3>
+        <div class="callout">
+            <strong>OC submissions:</strong> "Submissions via Online Consultation Systems in General Practice", NHS England Digital (experimental statistics). February 2026 publication, practice-level CSV covering August 2024 – February 2026. <a href="https://digital.nhs.uk/data-and-information/publications/statistical/submissions-via-online-consultation-systems-in-general-practice/february-2026" target="_blank">Publication page</a>
+        </div>
+        <div class="callout">
+            <strong>GP Patient Survey:</strong> Ipsos for NHS England, 2024 and 2025 practice-level (weighted) results. <a href="https://gp-patient.co.uk/" target="_blank">gp-patient.co.uk</a>
+        </div>
+        <div class="callout">
+            <strong>Deprivation:</strong> Index of Multiple Deprivation 2019 practice-level scores from OHID Fingertips (indicator 93553). Quintiles calculated across all practices in the dataset.
+        </div>
+        <div class="callout">
+            <strong>Age profile and list size:</strong> NHS Digital, "Patients Registered at a GP Practice", March 2026 release.
+        </div>
+        <div class="callout">
+            <strong>Practice metadata:</strong> NHS Digital ePraccur (active practices only).
+        </div>
+        <h3 style="margin-top:24px">Method notes</h3>
         <div class="callout">
             <strong>Deprivation data:</strong> Practice-level IMD 2019 scores from Public Health England Fingertips (indicator 93553). Quintiles calculated across all practices in the dataset.
         </div>
