@@ -69,7 +69,7 @@
         <div class="nav-tab" onclick="showTab('ageprofile')">Age Profile</div>
         <div class="nav-tab" onclick="showTab('satisfaction')">Patient Survey</div>
         <div class="nav-tab" onclick="showTab('ratedist')">Practice spread</div>
-        <div class="nav-tab" onclick="showTab('timeofday')">Time of Day</div>
+        <div class="nav-tab" onclick="showTab('timeofday')">Time/Day</div>
         <div class="nav-tab" onclick="showTab('switching')">Switching</div>
         <div class="nav-tab" onclick="showTab('nodata')">No Data Audit</div>
         <div class="nav-tab" onclick="showTab('data')">About</div>
@@ -399,7 +399,7 @@
         </div>
 
         <div class="grid grid-2">
-            <div class="chart-card full-width"><h3>8–10am share by supplier</h3><div class="subtitle">Each practice's % of February 2026 submissions arriving 8–10am, summarised by supplier. Median = the typical practice; weighted = % of all submissions in that supplier's footprint. Sole-supplier practices only, with ≥50 submissions and list size ≥1,000.</div><canvas id="chart-tod-supplier"></canvas></div>
+            <div class="chart-card full-width"><h3>8–10am share by supplier</h3><div class="subtitle">Each practice's % of February 2026 submissions arriving 8–10am, summarised by supplier. Median = the typical practice's 8–10am share. Weighted mean weights each practice by its total submission volume, so it is equivalent to taking every submission in the supplier's footprint and asking what proportion arrived 8–10am. The two can differ when larger and smaller practices behave differently. Sole-supplier practices only, with ≥50 submissions and list size ≥1,000.</div><canvas id="chart-tod-supplier"></canvas></div>
         </div>
 
         <div class="grid grid-2">
@@ -411,9 +411,18 @@
             <div class="chart-card full-width"><h3>By IMD 2019 deprivation quintile</h3><div class="subtitle">Q1 = most deprived, Q5 = least deprived. February 2026.</div><canvas id="chart-tod-imd"></canvas></div>
         </div>
 
-        <div class="callout">
-            <strong>What stands out.</strong> The 8–10am rush is <em>not</em> over. Comparing winter to winter (the only fair read given the strong seasonality), the peak pre-mandate month was December 2024 at 43.7%; the latest post-mandate winter months sit at 38–40%. That is a real but modest reduction of around 4–5 percentage points. About two in five submissions still arrive in the first two hours of the day. Across all 5,469 practices in scope, the typical practice has 32.7% of its February 2026 submissions arrive 8–10am (median). The supplier matters far more than list size or deprivation: Silicon Practice (Footfall) practices have a median 8–10am share of just 22.6%, while Evergreen Life practices sit at 42.6% — a 20-point spread. Total-triage practices (≥300 submissions per 1,000 patients/month) do have a peakier morning than the rest on a typical-practice basis (median 36.7% vs 32.4%), though on a weighted basis the very busiest non-TT practices are slightly peakier than the busiest TT ones.
+        <h3 style="margin-top:28px">And by day of the week?</h3>
+
+        <div class="grid grid-2">
+            <div class="chart-card"><h3>Submissions by day of the week</h3><div class="subtitle">% of all February 2026 submissions arriving on each weekday. February 2026 contained exactly four of each weekday so the raw percentages are directly comparable.</div><canvas id="chart-tod-day"></canvas></div>
+            <div class="chart-card"><h3>Weekend share by supplier</h3><div class="subtitle">Median % of each practice's February 2026 submissions arriving on Saturday or Sunday. Sole-supplier practices only.</div><canvas id="chart-tod-weekend"></canvas></div>
         </div>
+
+        <div class="callout">
+            <strong>What stands out.</strong> The 8–10am rush is <em>not</em> over. Comparing winter to winter (the only fair read given the strong seasonality), the peak pre-mandate month was December 2024 at 43.7%; the latest post-mandate winter months sit at 38–40%. That is a real but modest reduction of around 4–5 percentage points. About two in five submissions still arrive in the first two hours of the day. Across all 5,469 practices in scope, the typical practice has 32.7% of its February 2026 submissions arrive 8–10am (median). The supplier matters far more than list size or deprivation: Silicon Practice (Footfall) practices have a median 8–10am share of just 22.6%, while Evergreen Life practices sit at 42.6% — a 20-point spread. Total-triage practices (≥300 submissions per 1,000 patients/month) do have a peakier morning than the rest on a typical-practice basis (median 36.7% vs 32.4%). Their weighted mean is almost the same as their median (37.0%), meaning TT practices are fairly homogeneous — most sit close to the middle. The non-TT group is more spread out: its median is 32.4% but its weighted mean is 38.7%, so a long tail of higher-volume non-TT practices with sharper 8–10am peaks pulls the overall submission-weighted figure well above the typical practice.
+        </div>
+        <div class="callout">
+            <strong>And the weekend.</strong> Monday is by far the busiest day (27.5% of all February 2026 submissions), followed by Tuesday (19.6%) and a gentle taper through the rest of the working week. Saturday and Sunday combined account for just 1.0% of all submissions. But this is really a story about what practices leave switched on: Silicon Practice (Footfall) is the only supplier where the typical practice takes a meaningful weekend share (median 6.5% on Saturday + Sunday). For every other supplier in the dataset the median is 0.0%, meaning more than half of practices using those tools accept no weekend submissions at all.        </div>
     </div>
 
     <!-- SWITCHING -->
@@ -1289,7 +1298,7 @@ fetch('practice_portraits.json').then(r=>r.json()).then(data => {
 
 <script>
 (function(){
-  const TOD = {"labels": ["Aug 24", "Sep 24", "Oct 24", "Nov 24", "Dec 24", "Jan 25", "Feb 25", "Mar 25", "Apr 25", "Jun 25", "Jul 25", "Aug 25", "Sep 25", "Oct 25", "Nov 25", "Dec 25", "Jan 26", "Feb 26"], "rushSeries": [28.4, 27.7, 30.4, 42.3, 43.7, 41.4, 42.3, 40.2, 28.7, 27.9, 28.0, 27.8, 28.4, 31.0, 38.8, 39.6, 37.7, 38.3], "buckets": ["00:00\u201305:59", "06:00\u201307:59", "08:00\u201309:59", "10:00\u201311:59", "12:00\u201313:59", "14:00\u201315:59", "16:00\u201317:59", "18:00\u201323:59"], "preDist": [0.6, 6.2, 43.7, 20.2, 12.3, 9.8, 4.5, 2.7], "postDist": [0.3, 3.3, 38.3, 20.7, 14.3, 12.2, 8.2, 2.7], "suppliers": [{"name": "Silicon Practice", "n": 147, "median": 22.6, "mean": 25.2, "wmean": 31.0}, {"name": "PATCHS", "n": 461, "median": 30.1, "mean": 32.3, "wmean": 38.1}, {"name": "Engage", "n": 35, "median": 31.2, "mean": 34.3, "wmean": 30.9}, {"name": "eConsult", "n": 797, "median": 31.4, "mean": 32.5, "wmean": 35.1}, {"name": "Rapid Health", "n": 106, "median": 32.1, "mean": 33.3, "wmean": 33.3}, {"name": "TPP", "n": 331, "median": 32.5, "mean": 34.6, "wmean": 37.0}, {"name": "Accurx", "n": 2491, "median": 32.6, "mean": 34.2, "wmean": 39.1}, {"name": "Klinik", "n": 108, "median": 33.7, "mean": 36.1, "wmean": 35.6}, {"name": "Blinx", "n": 94, "median": 36.6, "mean": 38.3, "wmean": 40.7}, {"name": "Anima", "n": 241, "median": 41.1, "mean": 42.2, "wmean": 41.6}, {"name": "Evergreen Life", "n": 174, "median": 42.6, "mean": 43.6, "wmean": 43.0}], "tt": {"tt": {"n": 390, "median": 36.7, "mean": 37.4, "wmean": 37.0}, "ntt": {"n": 5079, "median": 32.4, "mean": 34.2, "wmean": 38.7}}, "sizes": [{"label": "<5k", "n": 644, "median": 30.1, "mean": 31.8, "wmean": 36.5}, {"label": "5\u201310k", "n": 2330, "median": 32.1, "mean": 33.9, "wmean": 39.1}, {"label": "10\u201315k", "n": 1492, "median": 33.8, "mean": 35.8, "wmean": 39.2}, {"label": "15\u201325k", "n": 808, "median": 33.2, "mean": 35.3, "wmean": 37.8}, {"label": "25k+", "n": 195, "median": 32.8, "mean": 35.1, "wmean": 36.7}], "imd": [{"label": "Q1", "n": 1135, "median": 32.8, "mean": 34.4, "wmean": 37.5}, {"label": "Q2", "n": 1143, "median": 32.7, "mean": 34.3, "wmean": 38.4}, {"label": "Q3", "n": 1104, "median": 32.6, "mean": 34.4, "wmean": 38.4}, {"label": "Q4", "n": 1064, "median": 32.4, "mean": 34.1, "wmean": 38.1}, {"label": "Q5", "n": 1011, "median": 32.8, "mean": 34.8, "wmean": 39.8}], "all": {"n": 5469, "median": 32.7, "mean": 34.4, "wmean": 38.4}};
+  const TOD = {"labels": ["Aug 24", "Sep 24", "Oct 24", "Nov 24", "Dec 24", "Jan 25", "Feb 25", "Mar 25", "Apr 25", "Jun 25", "Jul 25", "Aug 25", "Sep 25", "Oct 25", "Nov 25", "Dec 25", "Jan 26", "Feb 26"], "rushSeries": [28.4, 27.7, 30.4, 42.3, 43.7, 41.4, 42.3, 40.2, 28.7, 27.9, 28.0, 27.8, 28.4, 31.0, 38.8, 39.6, 37.7, 38.3], "buckets": ["00:00\u201305:59", "06:00\u201307:59", "08:00\u201309:59", "10:00\u201311:59", "12:00\u201313:59", "14:00\u201315:59", "16:00\u201317:59", "18:00\u201323:59"], "preDist": [0.6, 6.2, 43.7, 20.2, 12.3, 9.8, 4.5, 2.7], "postDist": [0.3, 3.3, 38.3, 20.7, 14.3, 12.2, 8.2, 2.7], "suppliers": [{"name": "Silicon Practice", "n": 147, "median": 22.6, "mean": 25.2, "wmean": 31.0}, {"name": "PATCHS", "n": 461, "median": 30.1, "mean": 32.3, "wmean": 38.1}, {"name": "Engage", "n": 35, "median": 31.2, "mean": 34.3, "wmean": 30.9}, {"name": "eConsult", "n": 797, "median": 31.4, "mean": 32.5, "wmean": 35.1}, {"name": "Rapid Health", "n": 106, "median": 32.1, "mean": 33.3, "wmean": 33.3}, {"name": "TPP", "n": 331, "median": 32.5, "mean": 34.6, "wmean": 37.0}, {"name": "Accurx", "n": 2491, "median": 32.6, "mean": 34.2, "wmean": 39.1}, {"name": "Klinik", "n": 108, "median": 33.7, "mean": 36.1, "wmean": 35.6}, {"name": "Blinx", "n": 94, "median": 36.6, "mean": 38.3, "wmean": 40.7}, {"name": "Anima", "n": 241, "median": 41.1, "mean": 42.2, "wmean": 41.6}, {"name": "Evergreen Life", "n": 174, "median": 42.6, "mean": 43.6, "wmean": 43.0}], "tt": {"tt": {"n": 390, "median": 36.7, "mean": 37.4, "wmean": 37.0}, "ntt": {"n": 5079, "median": 32.4, "mean": 34.2, "wmean": 38.7}}, "sizes": [{"label": "<5k", "n": 644, "median": 30.1, "mean": 31.8, "wmean": 36.5}, {"label": "5\u201310k", "n": 2330, "median": 32.1, "mean": 33.9, "wmean": 39.1}, {"label": "10\u201315k", "n": 1492, "median": 33.8, "mean": 35.8, "wmean": 39.2}, {"label": "15\u201325k", "n": 808, "median": 33.2, "mean": 35.3, "wmean": 37.8}, {"label": "25k+", "n": 195, "median": 32.8, "mean": 35.1, "wmean": 36.7}], "imd": [{"label": "Q1", "n": 1135, "median": 32.8, "mean": 34.4, "wmean": 37.5}, {"label": "Q2", "n": 1143, "median": 32.7, "mean": 34.3, "wmean": 38.4}, {"label": "Q3", "n": 1104, "median": 32.6, "mean": 34.4, "wmean": 38.4}, {"label": "Q4", "n": 1064, "median": 32.4, "mean": 34.1, "wmean": 38.1}, {"label": "Q5", "n": 1011, "median": 32.8, "mean": 34.8, "wmean": 39.8}], "all": {"n": 5469, "median": 32.7, "mean": 34.4, "wmean": 38.4}, "days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], "natDayDist": [27.5, 19.6, 18.1, 17.3, 16.4, 0.4, 0.6], "daySup": [{"name": "Silicon Practice", "n": 147, "mon": 25.8, "we": 6.5}, {"name": "Blinx", "n": 94, "mon": 25.8, "we": 0.3}, {"name": "TPP", "n": 331, "mon": 27.5, "we": 0.0}, {"name": "eConsult", "n": 797, "mon": 27.9, "we": 0.0}, {"name": "Accurx", "n": 2491, "mon": 27.7, "we": 0.0}, {"name": "Evergreen Life", "n": 174, "mon": 27.7, "we": 0.0}, {"name": "PATCHS", "n": 461, "mon": 27.6, "we": 0.0}, {"name": "Rapid Health", "n": 106, "mon": 28.6, "we": 0.0}, {"name": "Anima", "n": 241, "mon": 27.9, "we": 0.0}, {"name": "Klinik", "n": 108, "mon": 28.3, "we": 0.0}, {"name": "Engage", "n": 35, "mon": 26.4, "we": 0.0}]};
   function todInit(){
     if (!window.Chart) return;
     if (todInit.done) return; todInit.done = true;
@@ -1346,10 +1355,24 @@ fetch('practice_portraits.json').then(r=>r.json()).then(data => {
       type:'bar',
       data:{labels:TOD.imd.map(x=>x.label),datasets:[
         {label:'Median',data:TOD.imd.map(x=>x.median),backgroundColor:'#2563eb'},
-        {label:'Mean',data:TOD.imd.map(x=>x.mean),backgroundColor:'#cbd5e1'},
-        {label:'Weighted',data:TOD.imd.map(x=>x.wmean),backgroundColor:'#94a3b8'}
+        {label:'Weighted mean',data:TOD.imd.map(x=>x.wmean),backgroundColor:'#94a3b8'}
       ]},
       options:{responsive:true,maintainAspectRatio:false,scales:{y:{title:{display:true,text:'% 8–10am'}}}}
+    });
+
+    // 7. National weekday distribution Feb 2026
+    new Chart(document.getElementById('chart-tod-day'),{
+      type:'bar',
+      data:{labels:TOD.days,datasets:[{label:'% of submissions',data:TOD.natDayDist,backgroundColor:'#2563eb'}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{title:{display:true,text:'% of February 2026 submissions'}}}}
+    });
+
+    // 8. Weekend share by supplier (median)
+    const daySupSorted = [...TOD.daySup].sort((a,b)=>b.we-a.we);
+    new Chart(document.getElementById('chart-tod-weekend'),{
+      type:'bar',
+      data:{labels:daySupSorted.map(s=>s.name+' (n='+s.n+')'),datasets:[{label:'Median % weekend',data:daySupSorted.map(s=>s.we),backgroundColor:'#2563eb'}]},
+      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Median % of submissions on Sat + Sun'}}}}
     });
   }
   const _orig = window.showTab;
