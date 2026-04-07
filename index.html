@@ -68,7 +68,7 @@
         <div class="nav-tab" onclick="showTab('ageprofile')">Age Profile</div>
         <div class="nav-tab" onclick="showTab('satisfaction')">Patient Survey</div>
         <div class="nav-tab" onclick="showTab('ratedist')">Rate Distribution</div>
-        <div class="nav-tab" onclick="showTab('icb')">ICB Change</div>
+        <div class="nav-tab" onclick="showTab('icb')">ICB</div>
         <div class="nav-tab" onclick="showTab('switching')">Switching</div>
         <div class="nav-tab" onclick="showTab('nodata')">No Data Audit</div>
         <div class="nav-tab" onclick="showTab('data')">About</div>
@@ -372,6 +372,10 @@
         <div class="chart-card full-width"><h3>OC submissions per 1,000 registered patients by ICB</h3><div class="subtitle">Sort by clicking headers. Aug 2024 vs Feb 2026.</div><div id="table-icb-wrap"></div></div>
         <div class="callout warn">
             <strong>Three different rankings tell three different stories.</strong> By <em>highest current rate</em>, Surrey Heartlands (239/1k), Bedfordshire/Luton/Milton Keynes (214) and Lincolnshire (198) lead. By <em>fold change</em> since August 2024, the steepest movers are Shropshire (4.9×), Norfolk &amp; Waveney (4.8×), Derby &amp; Derbyshire (4.7×) and Sussex (4.5×) — all started from a low base. By <em>proportion of practices at 300+/1k</em>, Suffolk &amp; North East Essex (27.8%), Lincolnshire (27.2%) and Surrey Heartlands (26.5%) are the most saturated. Mid &amp; South Essex and the Black Country are notable movers but not the most extreme on any single measure.
+        </div>
+        <div class="chart-card full-width"><h3>Practices within an ICB</h3><div class="subtitle">Choose an ICB to see all its practices, sortable by rate, list size, supplier, deprivation or patient survey score.</div>
+            <div style="margin:10px 0"><label for="icb-select" style="font-weight:600;margin-right:8px">ICB:</label><select id="icb-select" style="padding:6px 10px;font-size:1em;min-width:300px"></select> <span id="icb-prac-count" style="margin-left:12px;color:#666"></span></div>
+            <div id="icb-prac-table" style="max-height:600px;overflow-y:auto"></div>
         </div>
     </div>
 
@@ -1182,6 +1186,66 @@ function renderICB(){
 }
 window.sortICB = function(col){ if (icbSort===col) icbDir=-icbDir; else { icbSort=col; icbDir=(col==='name'?1:-1); } renderICB(); };
 renderICB();
+})();
+
+// ICB → practice drill-down
+(function(){
+let practices = null;
+let pSort = 'rate', pDir = -1;
+const cleanIcb = s => s.replace(/^Nhs /,'').replace(/ Integrated Care Board$/,'').replace(/ Icb$/,'').replace(/\b\w/g,c=>c.toUpperCase()).replace(/ And /g,' & ');
+
+function renderTable(rows, icbName){
+    document.getElementById('icb-prac-count').textContent = rows.length + ' practices in ' + icbName;
+    const sorted = [...rows].sort((a,b) => {
+        const va = a[pSort] ?? -1, vb = b[pSort] ?? -1;
+        if (typeof va === 'string') return va.localeCompare(vb) * pDir;
+        return (va > vb ? 1 : -1) * pDir;
+    });
+    const cols = [['name','Practice'],['list','List'],['rate','Rate /1k'],['supTxt','Supplier'],['iq','IMD Q'],['gOverall','GPPS overall %']];
+    let h = '<table style="width:100%;border-collapse:collapse;font-size:0.85em"><thead><tr style="background:#f5f5f5;text-align:left;position:sticky;top:0">';
+    cols.forEach(c => h += '<th style="padding:8px;cursor:pointer;border-bottom:2px solid #ddd" onclick="sortPrac(\''+c[0]+'\')">'+c[1]+(pSort===c[0]?(pDir===-1?' ▼':' ▲'):'')+'</th>');
+    h += '</tr></thead><tbody>';
+    sorted.forEach(p => {
+        const hl = p.rate >= 300 ? 'background:#fff5e6;' : '';
+        h += '<tr style="'+hl+'"><td style="padding:6px;border-bottom:1px solid #eee"><strong>'+p.name+'</strong><br><span style="color:#888;font-size:0.85em">'+p.code+'</span></td>'
+          +'<td style="padding:6px;border-bottom:1px solid #eee;text-align:right">'+(p.list?p.list.toLocaleString():'—')+'</td>'
+          +'<td style="padding:6px;border-bottom:1px solid #eee;text-align:right"><strong>'+(p.rate!=null?p.rate.toFixed(0):'—')+'</strong></td>'
+          +'<td style="padding:6px;border-bottom:1px solid #eee">'+(p.supTxt||'—')+'</td>'
+          +'<td style="padding:6px;border-bottom:1px solid #eee;text-align:center">'+(p.iq||'—')+'</td>'
+          +'<td style="padding:6px;border-bottom:1px solid #eee;text-align:right">'+(p.gOverall!=null?p.gOverall.toFixed(0):'—')+'</td></tr>';
+    });
+    h += '</tbody></table>';
+    document.getElementById('icb-prac-table').innerHTML = h;
+}
+
+window.sortPrac = function(col){
+    if (pSort === col) pDir = -pDir;
+    else { pSort = col; pDir = (col==='name'||col==='supTxt') ? 1 : -1; }
+    const sel = document.getElementById('icb-select');
+    const filtered = practices.filter(p => p._icbClean === sel.value);
+    renderTable(filtered, sel.value);
+};
+
+fetch('practice_portraits.json').then(r=>r.json()).then(data => {
+    const ps = data.portraits;
+    practices = Object.values(ps).map(p => ({
+        code: p.code, name: p.name, list: p.list, rate: p.rate,
+        supTxt: Array.isArray(p.sup) ? p.sup.join(' + ') : (p.sup||''),
+        iq: p.iq, gOverall: p.g25 ? p.g25.overall : null,
+        _icbClean: cleanIcb(p.icb || '')
+    }));
+    const icbs = [...new Set(practices.map(p => p._icbClean))].filter(Boolean).sort();
+    const sel = document.getElementById('icb-select');
+    sel.innerHTML = icbs.map(i => '<option value="'+i+'"'+(i==='Black Country'?' selected':'')+'>'+i+'</option>').join('');
+    sel.addEventListener('change', () => {
+        const filtered = practices.filter(p => p._icbClean === sel.value);
+        renderTable(filtered, sel.value);
+    });
+    const init = practices.filter(p => p._icbClean === 'Black Country');
+    renderTable(init, 'Black Country');
+}).catch(e => {
+    document.getElementById('icb-prac-table').innerHTML = '<p style="color:#888">Could not load practice data: '+e.message+'</p>';
+});
 })();
 
 </script>
