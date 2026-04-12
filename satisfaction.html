@@ -175,7 +175,7 @@ td:first-child, th:first-child { text-align: left; }
 
 <div class="grid">
 <div class="card">
-<h3>IMD 2019 deprivation score</h3>
+<h3>IMD 2025 deprivation score</h3>
 <p class="note">Higher = more deprived · practice population-weighted mean</p>
 <canvas id="confIMD"></canvas>
 </div>
@@ -188,7 +188,7 @@ td:first-child, th:first-child { text-align: left; }
 
 <div class="card">
 <div class="blurb" style="margin:0 -24px -20px; border-top:none; border-radius:10px;">
-<strong>Deprivation:</strong> Low-OC practices are slightly <em>more</em> deprived (mean IMD 25.1) than high-OC (21.9). Deprivation does not explain the satisfaction gap &mdash; it runs the other way. <strong>List size</strong> is a stronger confounder: high-OC practices are much larger (12,551 vs 7,959 patients). Bigger practices independently predict lower satisfaction (r&nbsp;=&nbsp;&minus;0.21).
+<strong>Deprivation:</strong> Low-OC practices are slightly <em>more</em> deprived (mean IMD 25.5) than high-OC (22.0). Deprivation does not explain the satisfaction gap &mdash; it runs the other way. <strong>List size</strong> is a stronger confounder: high-OC practices are much larger (12,565 vs 7,960 patients). Bigger practices independently predict lower satisfaction.
 </div>
 </div>
 
@@ -216,16 +216,16 @@ td:first-child, th:first-child { text-align: left; }
 <p class="note">Does the OC gradient persist after stratifying by IMD?</p>
 <canvas id="confStratified" style="max-height:360px;"></canvas>
 <div class="blurb">
-<strong>Reading:</strong> Even within the same deprivation band, high-OC practices have lower satisfaction in every quintile. The gap is widest in the least-deprived practices (85% vs 77%) and narrowest in the most deprived (76% vs 71%). Deprivation does not explain away the OC&ndash;satisfaction gradient &mdash; it persists after stratification.
+<strong>Reading:</strong> Even within the same deprivation band, high-OC practices have lower satisfaction in every quintile. The gap is widest in the least-deprived practices (85% vs 77%) and narrowest in the most deprived (76% vs 70%). Deprivation does not explain away the OC&ndash;satisfaction gradient &mdash; it persists after stratification.
 </div>
 </div>
 
 <div class="card">
 <h3>Multiple regression: what predicts satisfaction?</h3>
-<p class="note">Standardised coefficients (&beta;) &middot; n = 6,002 practices &middot; R&sup2; = 0.17</p>
+<p class="note">Standardised coefficients (&beta;) &middot; n = 6,012 practices &middot; R&sup2; = 0.17</p>
 <canvas id="confRegression" style="max-height:280px;"></canvas>
 <div class="blurb">
-<strong>Reading:</strong> After adjusting for deprivation, list size, and age profile simultaneously, OC rate remains the strongest negative predictor of satisfaction (&beta;&nbsp;=&nbsp;&minus;0.22). Older populations predict higher satisfaction (&beta;&nbsp;=&nbsp;0.25) and deprivation the weakest effect (&beta;&nbsp;=&nbsp;&minus;0.16). R&sup2;&nbsp;=&nbsp;0.17 means these four factors together explain only 17% of the variation &mdash; most of what drives satisfaction lies elsewhere (staff, premises, culture, continuity). But OC rate is independently associated with lower satisfaction even after controlling for the obvious confounders.
+<strong>Reading:</strong> After adjusting for deprivation, list size, and age profile simultaneously, OC rate remains a strong negative predictor of satisfaction (&beta;&nbsp;=&nbsp;&minus;0.20). Older populations predict higher satisfaction (&beta;&nbsp;=&nbsp;0.20), deprivation has a similar-sized effect (&beta;&nbsp;=&nbsp;&minus;0.18), and list size the weakest (&beta;&nbsp;=&nbsp;&minus;0.16). These four factors together explain only a modest share of the variation &mdash; most of what drives satisfaction lies elsewhere (staff, premises, culture, continuity). But OC rate is independently associated with lower satisfaction even after controlling for the obvious confounders.
 </div>
 </div>
 
@@ -234,7 +234,7 @@ td:first-child, th:first-child { text-align: left; }
 
 <div class="highlight">
 <strong>Patients in high-OC practices report worse experience across almost every measure.</strong> Overall satisfaction is 6.5 points lower, phone access is harder, contact experience is poorer, and patients wait longer for next steps. Website ease is much lower in high OC practices (59% vs 87%) where more patients use it. The only stable measure is the proportion contacting by phone (~14% regardless).<br><br>
-<strong>Confounders:</strong> Deprivation does not explain the gap &mdash; low-OC practices are slightly <em>more</em> deprived. Age profiles are near-identical. List size is a genuine confounder: high-OC practices are 58% larger, and larger practices independently predict lower satisfaction. But even after adjusting for deprivation, list size, and age simultaneously, OC rate remains the strongest negative predictor (&beta;&nbsp;=&nbsp;&minus;0.22). The gradient persists within every IMD quintile.<br><br>
+<strong>Confounders:</strong> Deprivation does not explain the gap &mdash; low-OC practices are slightly <em>more</em> deprived. Age profiles are near-identical. List size is a genuine confounder: high-OC practices are 58% larger, and larger practices independently predict lower satisfaction. But even after adjusting for deprivation, list size, and age simultaneously, OC rate remains a strong negative predictor (&beta;&nbsp;=&nbsp;&minus;0.20). The gradient persists within every IMD quintile.<br><br>
 <strong>Causation vs selection:</strong> This is cross-sectional &mdash; we cannot say OC causes lower satisfaction. Practices that adopted OC most aggressively may have had the worst access problems to begin with, and OC may be a response to, rather than a cause of, patient dissatisfaction. The 10-month gap between GPPS fieldwork (early 2025) and OC data (Feb 2026) adds further caution. But at minimum, high OC adoption has not yet delivered better patient experience, and the association is not explained by the usual confounders.
 </div>
 
@@ -367,14 +367,14 @@ new Chart(document.getElementById('contactPoor'), {
 // 6a. IMD deprivation
 new Chart(document.getElementById('confIMD'), {
   type: 'bar',
-  data: { labels: LABELS, datasets: [{ data: [25.1, 23.0, 21.9], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }] },
+  data: { labels: LABELS, datasets: [{ data: [25.5, 23.0, 22.0], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }] },
   options: barOpts('IMD score', 0, 30)
 });
 
 // 6b. List size
 new Chart(document.getElementById('confList'), {
   type: 'bar',
-  data: { labels: LABELS, datasets: [{ data: [7959, 10786, 12551], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }] },
+  data: { labels: LABELS, datasets: [{ data: [7960, 10804, 12565], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }] },
   options: {
     responsive: true, maintainAspectRatio: false, animation: false,
     plugins: { legend: { display: false },
@@ -425,9 +425,9 @@ new Chart(document.getElementById('confStratified'), {
   data: {
     labels: ['Q1\nleast deprived', 'Q2', 'Q3', 'Q4', 'Q5\nmost deprived'],
     datasets: [
-      { label: 'Low OC',  data: [85.3, 83.4, 80.5, 78.2, 76.1], backgroundColor: LOW, borderRadius: 3 },
-      { label: 'Mid OC',  data: [79.6, 79.7, 77.0, 74.6, 73.2], backgroundColor: MID, borderRadius: 3 },
-      { label: 'High OC', data: [76.7, 75.7, 72.5, 71.3, 71.2], backgroundColor: HIGH, borderRadius: 3 }
+      { label: 'Low OC',  data: [84.9, 83.7, 80.6, 78.4, 76.0], backgroundColor: LOW, borderRadius: 3 },
+      { label: 'Mid OC',  data: [79.9, 79.6, 76.9, 74.4, 72.8], backgroundColor: MID, borderRadius: 3 },
+      { label: 'High OC', data: [77.2, 75.5, 72.2, 71.8, 70.2], backgroundColor: HIGH, borderRadius: 3 }
     ]
   },
   options: {
@@ -449,7 +449,7 @@ new Chart(document.getElementById('confRegression'), {
   data: {
     labels: ['% aged 65+', 'OC rate', 'List size', 'IMD deprivation'],
     datasets: [{
-      data: [0.249, -0.222, -0.177, -0.160],
+      data: [0.202, -0.199, -0.164, -0.176],
       backgroundColor: ['#059669', '#2563eb', '#d97706', '#ef4444'],
       borderRadius: 3
     }]
