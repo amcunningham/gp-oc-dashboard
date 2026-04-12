@@ -216,16 +216,82 @@ td:first-child, th:first-child { text-align: left; }
 <p class="note">Does the OC gradient persist after stratifying by IMD?</p>
 <canvas id="confStratified" style="max-height:360px;"></canvas>
 <div class="blurb">
-<strong>Reading:</strong> Even within the same deprivation band, high-OC practices have lower satisfaction in every quintile. The gap is widest in the least-deprived practices (85% vs 77%) and narrowest in the most deprived (76% vs 70%). Deprivation does not explain away the OC&ndash;satisfaction gradient &mdash; it persists after stratification.
+<strong>Reading:</strong> The OC gradient persists within every deprivation band. But the striking finding is the crossover: the least-deprived practices in the high-OC group report the same level of satisfaction (77%) as the most-deprived practices in the low-OC group (76%). Affluent practices with high OC adoption are no more satisfied than deprived practices with low OC.
 </div>
 </div>
 
 <div class="card">
 <h3>Multiple regression: what predicts satisfaction?</h3>
-<p class="note">Standardised coefficients (&beta;) &middot; n = 6,012 practices &middot; R&sup2; = 0.17</p>
+<p class="note">Linear regression on all 6,012 practices (continuous variables, not tertile groups) &middot; R&sup2; = 0.17</p>
 <canvas id="confRegression" style="max-height:280px;"></canvas>
 <div class="blurb">
-<strong>Reading:</strong> After adjusting for deprivation, list size, and age profile simultaneously, OC rate remains a strong negative predictor of satisfaction (&beta;&nbsp;=&nbsp;&minus;0.20). Older populations predict higher satisfaction (&beta;&nbsp;=&nbsp;0.20), deprivation has a similar-sized effect (&beta;&nbsp;=&nbsp;&minus;0.18), and list size the weakest (&beta;&nbsp;=&nbsp;&minus;0.16). These four factors together explain only a modest share of the variation &mdash; most of what drives satisfaction lies elsewhere (staff, premises, culture, continuity). But OC rate is independently associated with lower satisfaction even after controlling for the obvious confounders.
+<strong>Reading:</strong> OC rate, deprivation, list size, and age profile together explain 17% of the variation in satisfaction &mdash; most of what drives satisfaction lies elsewhere (staff, premises, culture, continuity). But we can decompose the 6.5&nbsp;percentage-point gap between the Low and High OC groups:
+</div>
+<table style="width:100%; border-collapse:collapse; font-size:13px; margin:12px 0;">
+<thead>
+<tr style="border-bottom:2px solid #ddd; text-align:left;">
+<th style="padding:8px;">Factor</th>
+<th style="padding:8px; text-align:right;">Low&nbsp;OC mean</th>
+<th style="padding:8px; text-align:right;">High&nbsp;OC mean</th>
+<th style="padding:8px; text-align:right;">b</th>
+<th style="padding:8px; text-align:right;">Effect on gap</th>
+<th style="padding:8px;">Direction</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-bottom:1px solid #eee;">
+<td style="padding:8px;"><strong>OC rate</strong> (per 1,000 patients)</td>
+<td style="padding:8px; text-align:right;">15.1</td>
+<td style="padding:8px; text-align:right;">257.0</td>
+<td style="padding:8px; text-align:right;">&minus;0.020</td>
+<td style="padding:8px; text-align:right; color:#dc2626;"><strong>&minus;4.9pp</strong></td>
+<td style="padding:8px;">Lower satisfaction</td>
+</tr>
+<tr style="border-bottom:1px solid #eee;">
+<td style="padding:8px;">IMD 2025 deprivation</td>
+<td style="padding:8px; text-align:right;">25.5</td>
+<td style="padding:8px; text-align:right;">22.0</td>
+<td style="padding:8px; text-align:right;">&minus;0.171</td>
+<td style="padding:8px; text-align:right; color:#059669;"><strong>+0.6pp</strong></td>
+<td style="padding:8px;">Less deprived &rarr; predicts <em>higher</em> satisfaction</td>
+</tr>
+<tr style="border-bottom:1px solid #eee;">
+<td style="padding:8px;">List size</td>
+<td style="padding:8px; text-align:right;">7,943</td>
+<td style="padding:8px; text-align:right;">12,565</td>
+<td style="padding:8px; text-align:right;">&minus;0.0003</td>
+<td style="padding:8px; text-align:right; color:#dc2626;">&minus;1.2pp</td>
+<td style="padding:8px;">Larger practices &rarr; lower satisfaction</td>
+</tr>
+<tr style="border-bottom:1px solid #eee;">
+<td style="padding:8px;">% aged 65+</td>
+<td style="padding:8px; text-align:right;">18.8</td>
+<td style="padding:8px; text-align:right;">18.7</td>
+<td style="padding:8px; text-align:right;">+0.311</td>
+<td style="padding:8px; text-align:right;">0.0pp</td>
+<td style="padding:8px;">Near-identical</td>
+</tr>
+<tr style="border-top:2px solid #333; font-weight:600;">
+<td style="padding:8px;" colspan="4">Model-predicted gap</td>
+<td style="padding:8px; text-align:right;">&minus;5.5pp</td>
+<td style="padding:8px;"></td>
+</tr>
+<tr>
+<td style="padding:8px;" colspan="4">Actual gap</td>
+<td style="padding:8px; text-align:right;">&minus;6.5pp</td>
+<td style="padding:8px;"></td>
+</tr>
+<tr style="color:#6b7280;">
+<td style="padding:8px;" colspan="4">Unexplained</td>
+<td style="padding:8px; text-align:right;">&minus;1.0pp</td>
+<td style="padding:8px;"></td>
+</tr>
+</tbody>
+</table>
+<div class="blurb">
+<strong>Key point:</strong> OC rate accounts for 4.9 of the 6.5&nbsp;percentage points. List size adds another 1.2pp. Deprivation works in the <em>opposite</em> direction &mdash; the high-OC group is less deprived, which should predict higher satisfaction, not lower. The practices with the highest OC use are less deprived and have similar age profiles &mdash; factors that should, if anything, give them <em>higher</em> satisfaction. Yet they score lower. The gap isn&rsquo;t explained by who these practices serve &mdash; if anything, their populations should give them an advantage.<br><br>
+<strong>R&sup2; in context:</strong> These four variables explain only 17% of the variation between individual practices. The other 83% reflects things we cannot measure here &mdash; staffing, premises, culture, continuity, leadership. Any single practice&rsquo;s satisfaction is shaped mostly by local factors. But when we average across 2,000 practices per tertile, that individual noise cancels out and the systematic differences come through clearly. It is at the population level that policy decisions are made, and at that level the OC signal is strong.<br><br>
+<strong>Method note:</strong> The regression is fitted on all 6,012 individual practices to get the most precise estimate of each coefficient (all t&nbsp;&gt;&nbsp;12, all p&nbsp;&lt;&nbsp;10<sup>&minus;37</sup>). We then multiply each coefficient by the difference in group means to decompose the tertile-level gap. For example: the coefficient for OC rate is &minus;0.020 per submission per 1,000 patients; the high-OC group averages 242 more submissions than the low-OC group; so OC rate accounts for 242&nbsp;&times;&nbsp;0.020&nbsp;=&nbsp;4.9&nbsp;percentage points of the gap. This is a standard approach (Blinder&ndash;Oaxaca decomposition).
 </div>
 </div>
 
@@ -233,9 +299,9 @@ td:first-child, th:first-child { text-align: left; }
 <h2>7. Summary</h2>
 
 <div class="highlight">
-<strong>Patients in high-OC practices report worse experience across almost every measure.</strong> Overall satisfaction is 6.5 points lower, phone access is harder, contact experience is poorer, and patients wait longer for next steps. Website ease is much lower in high OC practices (59% vs 87%) where more patients use it. The only stable measure is the proportion contacting by phone (~14% regardless).<br><br>
-<strong>Confounders:</strong> Deprivation does not explain the gap &mdash; low-OC practices are slightly <em>more</em> deprived. Age profiles are near-identical. List size is a genuine confounder: high-OC practices are 58% larger, and larger practices independently predict lower satisfaction. But even after adjusting for deprivation, list size, and age simultaneously, OC rate remains a strong negative predictor (&beta;&nbsp;=&nbsp;&minus;0.20). The gradient persists within every IMD quintile.<br><br>
-<strong>Causation vs selection:</strong> This is cross-sectional &mdash; we cannot say OC causes lower satisfaction. Practices that adopted OC most aggressively may have had the worst access problems to begin with, and OC may be a response to, rather than a cause of, patient dissatisfaction. The 10-month gap between GPPS fieldwork (early 2025) and OC data (Feb 2026) adds further caution. But at minimum, high OC adoption has not yet delivered better patient experience, and the association is not explained by the usual confounders.
+<strong>Patients in high-OC practices report worse experience across almost every measure.</strong> Overall satisfaction is 6.5 percentage points lower, phone access is harder, contact experience is poorer, and patients wait longer for next steps. Website ease is much lower in high-OC practices (59% vs 87%) where more patients use it.<br><br>
+<strong>Confounders work against the gap, not with it.</strong> High-OC practices are less deprived (IMD 25.5 vs 22.0) and have near-identical age profiles &mdash; both factors that should predict <em>higher</em> satisfaction. A regression on all 6,012 practices shows OC rate accounts for 4.9 of the 6.5pp gap. List size is the one confounder that works in the same direction (high-OC practices are 58% larger, adding 1.2pp). But deprivation adds 0.6pp in the <em>opposite</em> direction. The least-deprived practices in the high-OC group report the same satisfaction (77%) as the most-deprived practices in the low-OC group (76%). The gradient persists within every IMD quintile.<br><br>
+<strong>Causation vs selection:</strong> This is cross-sectional &mdash; we cannot say OC causes lower satisfaction. Practices that adopted OC most aggressively may have had the worst access problems to begin with, and OC may be a response to, rather than a cause of, patient dissatisfaction. The 10-month gap between GPPS fieldwork (early 2025) and OC data (Feb 2026) adds further caution. But at minimum, high OC adoption has not yet delivered better patient experience &mdash; and the usual confounders predict the opposite of what we observe.
 </div>
 
 
