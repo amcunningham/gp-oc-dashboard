@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient satisfaction by OC level</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #1f2937; line-height: 1.6; padding: 24px; }
+.container { max-width: 900px; margin: 0 auto; }
+h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+h2 { font-size: 16px; font-weight: 700; margin: 32px 0 14px; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 4px; }
+.subtitle { font-size: 13px; color: #6b7280; margin-bottom: 24px; }
+p { font-size: 14px; margin-bottom: 12px; }
+
+.method { background: #fff; border-radius: 10px; padding: 16px 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 24px; font-size: 13px; }
+.method strong { color: #111827; }
+
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px; }
+@media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+
+.card { background: #fff; border-radius: 10px; padding: 20px 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 20px; }
+.card h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.card .note { font-size: 11px; color: #6b7280; margin-bottom: 12px; }
+canvas { max-height: 340px; }
+
+.blurb { background: #f9fafb; border-top: 1px solid #e5e7eb; margin: 14px -24px -20px; padding: 14px 24px; border-radius: 0 0 10px 10px; font-size: 12.5px; color: #374151; line-height: 1.6; }
+.blurb strong { color: #1f2937; }
+
+.highlight { background: #eff6ff; border-left: 4px solid #2563eb; padding: 14px 18px; border-radius: 0 8px 8px 0; margin-bottom: 20px; font-size: 13.5px; line-height: 1.65; }
+.highlight strong { color: #1e40af; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 8px; }
+th, td { padding: 7px 10px; text-align: right; border-bottom: 1px solid #e5e7eb; }
+th { font-weight: 600; background: #f9fafb; font-size: 12px; text-transform: uppercase; letter-spacing: 0.3px; color: #6b7280; }
+td:first-child, th:first-child { text-align: left; }
+.dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; vertical-align: middle; margin-right: 4px; }
+.site-nav { background: #1b2838; padding: 0 24px; display: flex; gap: 0; font-size: 13px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+.site-nav a { color: rgba(255,255,255,0.65); text-decoration: none; padding: 10px 16px; transition: color 0.15s, background 0.15s; }
+.site-nav a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.site-nav a.current { color: #fff; background: rgba(255,255,255,0.12); font-weight: 600; }
+</style>
+</head><body>
+<nav class="site-nav">
+<a href="index.html">Dashboard</a>
+<a href="rush_analysis.html">8am Rush</a>
+<a href="workforce_appts.html">Workforce &amp; Appointments</a>
+<a href="satisfaction.html" class="current">Satisfaction</a>
+</nav>
+<div class="container">
+
+<h1>Patient satisfaction by OC level</h1>
+<p class="subtitle">GP Patient Survey 2025 &middot; practice-level results &middot; by OC tertile (Feb 2026)</p>
+
+<div class="method">
+<strong>Tertile design:</strong> 6,018 practices with OC data, grouped by OC submission rate (Feb 2026, per 1,000 patients per working day), matched to GPPS 2025 practice-level results. Same practice set as the workforce &amp; appointments analysis; the <a href="rush_analysis.html">rush analysis</a> uses a smaller subset (4,306) which additionally required telephony data.<br>
+<span style="color:#059669;font-weight:600">Low OC</span> (&lt;1.58/1k/day, n=2,006) &middot;
+<span style="color:#d97706;font-weight:600">Mid OC</span> (1.58&ndash;8.48/1k/day, n=2,006) &middot;
+<span style="color:#2563eb;font-weight:600">High OC</span> (&gt;8.48/1k/day, n=2,006).<br>
+<strong>Source:</strong> GP Patient Survey 2025, practice-level weighted percentages. GPPS fieldwork Jan&ndash;Mar 2025; OC tertiles from Feb 2026 data. The 10-month gap means we are comparing current OC adoption with satisfaction reported roughly a year earlier.
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>1. Overall experience</h2>
+
+<div class="grid">
+<div class="card">
+<h3>Overall experience of GP practice (%)</h3>
+<p class="note">Very good + Fairly good</p>
+<canvas id="overallGood"></canvas>
+</div>
+<div class="card">
+<h3>Overall experience: Poor (%)</h3>
+<p class="note">Fairly poor + Very poor</p>
+<canvas id="overallPoor"></canvas>
+</div>
+</div>
+
+<div class="card">
+<div class="blurb" style="margin:0 -24px -20px; border-top:none; border-radius:10px;">
+<strong>Reading:</strong> Overall satisfaction is 80.2% in Low OC practices but only 73.7% in High OC &mdash; a 6.5 percentage point gap. The proportion reporting poor experience is 9.1% in Low OC and 12.9% in High. This does not mean OC <em>causes</em> lower satisfaction &mdash; the practices that adopted OC most heavily may have had worse access to start with, which is why they adopted it.
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>2. How patients contacted the practice</h2>
+
+<div class="card">
+<h3>How patients made their last contact (%)</h3>
+<p class="note">GPPS 2025</p>
+<canvas id="contactHow" style="max-height:360px;"></canvas>
+<div class="blurb">
+<strong>Reading:</strong> In-person contact is 76% in Low OC but only 53% in High. Online contact is 3% in Low and 22% in High. Phone contact is stable at 13&ndash;14%. The difference is between in-person and online, not between phone and online. This aligns with the CBT data: phone calls are lower in high OC practices, partly replaced by OC, and a substantial proportion of contacts in low OC practices are walk-in or in-person.
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>3. Experience of different access channels</h2>
+
+<div class="grid">
+<div class="card">
+<h3>Phone: Easy to get through (%)</h3>
+<p class="note">Very easy + Fairly easy</p>
+<canvas id="phoneEasy"></canvas>
+</div>
+<div class="card">
+<h3>Phone: Difficult to get through (%)</h3>
+<p class="note">Fairly difficult + Very difficult</p>
+<canvas id="phoneDiff"></canvas>
+</div>
+</div>
+
+<div class="card">
+<div class="blurb" style="margin:0 -24px -20px; border-top:none; border-radius:10px;">
+<strong>Reading:</strong> Phone ease is 38% in Low OC but only 25% in High; phone difficulty is 26% in Low and 36% in High. Patients in high-OC practices find the phone <em>harder</em> to use, not easier. This is consistent with the CBT data showing that answer rates outside rush hour are worse in high-OC practices.
+</div>
+</div>
+
+<div class="grid">
+<div class="card">
+<h3>Website: Easy to use (%)</h3>
+<p class="note">Very easy + Fairly easy</p>
+<canvas id="webEasy"></canvas>
+</div>
+<div class="card">
+<h3>Reception: Helpful (%)</h3>
+<p class="note">Very helpful + Fairly helpful</p>
+<canvas id="reception"></canvas>
+</div>
+</div>
+
+<div class="card">
+<div class="blurb" style="margin:0 -24px -20px; border-top:none; border-radius:10px;">
+<strong>Reading:</strong> Website ease is 87% in Low OC but only 59% in High &mdash; a striking finding. Patients in high-OC practices are much more likely to have <em>used</em> the website, and those who use it rate it less favourably than those in low-OC practices where fewer have tried. Reception helpfulness is also lower in high OC practices (82% vs 87%).
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>4. Speed of response</h2>
+
+<div class="card">
+<h3>When were you told about next steps? (%)</h3>
+<p class="note">GPPS 2025</p>
+<canvas id="nextSteps" style="max-height:360px;"></canvas>
+<div class="blurb">
+<strong>Reading:</strong> Same-day next steps are 74% in Low OC but only 54% in High. Next-working-day is 16% in Low and 32% in High. Patients in high-OC practices wait longer for a response. This is consistent with the OC workflow: a form is submitted, processed, and a response sent &mdash; inherently slower than an immediate phone conversation, even if the form was submitted at 8am.
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>5. Contact experience</h2>
+
+<div class="grid">
+<div class="card">
+<h3>Contact experience: Good (%)</h3>
+<p class="note">Very good + Fairly good</p>
+<canvas id="contactGood"></canvas>
+</div>
+<div class="card">
+<h3>Contact experience: Poor (%)</h3>
+<p class="note">Fairly poor + Very poor</p>
+<canvas id="contactPoor"></canvas>
+</div>
+</div>
+
+<div class="card">
+<div class="blurb" style="margin:0 -24px -20px; border-top:none; border-radius:10px;">
+<strong>Reading:</strong> The experience of making contact is 76% good in Low OC but only 67% in High. Poor contact experience is 12% in Low and 19% in High. This is the sharpest gradient in the survey &mdash; the process of getting through to the practice is notably worse in high-OC practices, even though (or perhaps because) the channel has changed.
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>6. What else predicts satisfaction?</h2>
+
+<p style="font-size:13px; color:#374151; margin-bottom:16px;">Before attributing the satisfaction gradient to OC, we need to ask whether the practices in each tertile differ in ways that independently predict satisfaction. The main candidates: deprivation, list size, age profile, and region.</p>
+
+<div class="grid">
+<div class="card">
+<h3>IMD 2019 deprivation score</h3>
+<p class="note">Higher = more deprived · practice population-weighted mean</p>
+<canvas id="confIMD"></canvas>
+</div>
+<div class="card">
+<h3>Mean list size</h3>
+<p class="note">Registered patients per practice</p>
+<canvas id="confList"></canvas>
+</div>
+</div>
+
+<div class="card">
+<div class="blurb" style="margin:0 -24px -20px; border-top:none; border-radius:10px;">
+<strong>Deprivation:</strong> Low-OC practices are slightly <em>more</em> deprived (mean IMD 25.1) than high-OC (21.9). Deprivation does not explain the satisfaction gap &mdash; it runs the other way. <strong>List size</strong> is a stronger confounder: high-OC practices are much larger (12,551 vs 7,959 patients). Bigger practices independently predict lower satisfaction (r&nbsp;=&nbsp;&minus;0.21).
+</div>
+</div>
+
+<div class="grid">
+<div class="card">
+<h3>% patients aged 65+</h3>
+<p class="note">Feb 2026 workforce census</p>
+<canvas id="confAge65"></canvas>
+</div>
+<div class="card">
+<h3>Region distribution (%)</h3>
+<p class="note">% of each tertile by NHS region</p>
+<canvas id="confRegion" style="max-height:360px;"></canvas>
+</div>
+</div>
+
+<div class="card">
+<div class="blurb" style="margin:0 -24px -20px; border-top:none; border-radius:10px;">
+<strong>Age:</strong> The age profile is virtually identical across tertiles (~18.5&ndash;18.9% over 65). But older populations rate their practice more highly (r&nbsp;=&nbsp;0.28), so age is a confounder for satisfaction generally, though not between these groups. <strong>Region:</strong> Low-OC is concentrated in the North East &amp; Yorkshire (21%) and Midlands (22%); High-OC skews towards East of England (15%) and South East (15%). Regional differences in both OC adoption and satisfaction culture could contribute.
+</div>
+</div>
+
+<div class="card">
+<h3>Satisfaction within deprivation quintiles</h3>
+<p class="note">Does the OC gradient persist after stratifying by IMD?</p>
+<canvas id="confStratified" style="max-height:360px;"></canvas>
+<div class="blurb">
+<strong>Reading:</strong> Even within the same deprivation band, high-OC practices have lower satisfaction in every quintile. The gap is widest in the least-deprived practices (85% vs 77%) and narrowest in the most deprived (76% vs 71%). Deprivation does not explain away the OC&ndash;satisfaction gradient &mdash; it persists after stratification.
+</div>
+</div>
+
+<div class="card">
+<h3>Multiple regression: what predicts satisfaction?</h3>
+<p class="note">Standardised coefficients (&beta;) &middot; n = 6,002 practices &middot; R&sup2; = 0.17</p>
+<canvas id="confRegression" style="max-height:280px;"></canvas>
+<div class="blurb">
+<strong>Reading:</strong> After adjusting for deprivation, list size, and age profile simultaneously, OC rate remains the strongest negative predictor of satisfaction (&beta;&nbsp;=&nbsp;&minus;0.22). Older populations predict higher satisfaction (&beta;&nbsp;=&nbsp;0.25) and deprivation the weakest effect (&beta;&nbsp;=&nbsp;&minus;0.16). R&sup2;&nbsp;=&nbsp;0.17 means these four factors together explain only 17% of the variation &mdash; most of what drives satisfaction lies elsewhere (staff, premises, culture, continuity). But OC rate is independently associated with lower satisfaction even after controlling for the obvious confounders.
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>7. Summary</h2>
+
+<div class="highlight">
+<strong>Patients in high-OC practices report worse experience across almost every measure.</strong> Overall satisfaction is 6.5 points lower, phone access is harder, contact experience is poorer, and patients wait longer for next steps. Website ease is much lower in high OC practices (59% vs 87%) where more patients use it. The only stable measure is the proportion contacting by phone (~14% regardless).<br><br>
+<strong>Confounders:</strong> Deprivation does not explain the gap &mdash; low-OC practices are slightly <em>more</em> deprived. Age profiles are near-identical. List size is a genuine confounder: high-OC practices are 58% larger, and larger practices independently predict lower satisfaction. But even after adjusting for deprivation, list size, and age simultaneously, OC rate remains the strongest negative predictor (&beta;&nbsp;=&nbsp;&minus;0.22). The gradient persists within every IMD quintile.<br><br>
+<strong>Causation vs selection:</strong> This is cross-sectional &mdash; we cannot say OC causes lower satisfaction. Practices that adopted OC most aggressively may have had the worst access problems to begin with, and OC may be a response to, rather than a cause of, patient dissatisfaction. The 10-month gap between GPPS fieldwork (early 2025) and OC data (Feb 2026) adds further caution. But at minimum, high OC adoption has not yet delivered better patient experience, and the association is not explained by the usual confounders.
+</div>
+
+
+</div>
+
+<script>
+const LOW = '#059669';
+const MID = '#d97706';
+const HIGH = '#2563eb';
+const LABELS = ['Low OC', 'Mid OC', 'High OC'];
+
+function barOpts(yLabel, yMin, yMax) {
+  return {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: c => c.raw.toFixed(1) + '%' } }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, max: yMax, title: { display: true, text: yLabel, font: { size: 11 } },
+           ticks: { callback: v => v + '%' } }
+    }
+  };
+}
+
+function stackBarOpts(yLabel, yMax) {
+  return {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: {
+      legend: { position: 'top', labels: { font: { size: 11 } } },
+      tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.raw.toFixed(1) + '%' } }
+    },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, beginAtZero: true, max: yMax, title: { display: true, text: yLabel, font: { size: 11 } },
+           ticks: { callback: v => v + '%' } }
+    }
+  };
+}
+
+// 1a. Overall experience good
+new Chart(document.getElementById('overallGood'), {
+  type: 'bar',
+  data: { labels: LABELS, datasets: [{ data: [80.2, 76.8, 73.7], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }] },
+  options: barOpts('% good', 0, 100)
+});
+
+// 1b. Overall experience poor
+new Chart(document.getElementById('overallPoor'), {
+  type: 'bar',
+  data: { labels: LABELS, datasets: [{ data: [9.1, 10.9, 12.9], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }] },
+  options: barOpts('% poor', 0, 16)
+});
+
+// 2. How patients contacted — stacked
+new Chart(document.getElementById('contactHow'), {
+  type: 'bar',
+  data: {
+    labels: LABELS,
+    datasets: [
+      { label: 'In person',             data: [76.4, 67.2, 53.3], backgroundColor: '#2563eb', borderRadius: 0 },
+      { label: 'Phone',                 data: [14.4, 14.5, 13.4], backgroundColor: '#059669', borderRadius: 0 },
+      { label: 'Online (website/form)', data: [3.2, 10.2, 22.0],  backgroundColor: '#f97316', borderRadius: 0 },
+      { label: 'Through app',           data: [4.0, 5.3, 7.1],    backgroundColor: '#8b5cf6', borderRadius: 0 }
+    ]
+  },
+  options: stackBarOpts('% of patients', 105)
+});
+
+// 3a. Phone easy
+new Chart(document.getElementById('phoneEasy'), {
+  type: 'bar',
+  data: { labels: LABELS, datasets: [{ data: [37.5, 30.8, 25.3], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }] },
+  options: barOpts('% easy', 0, 50)
+});
+
+// 3b. Phone difficult
+new Chart(document.getElementById('phoneDiff'), {
+  type: 'bar',
+  data: { labels: LABELS, datasets: [{ data: [25.6, 30.8, 36.2], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }] },
+  options: barOpts('% difficult', 0, 45)
+});
+
+// 3c. Website easy
+new Chart(document.getElementById('webEasy'), {
+  type: 'bar',
+  data: { labels: LABELS, datasets: [{ data: [86.9, 71.0, 59.2], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }] },
+  options: barOpts('% easy', 0, 100)
+});
+
+// 3d. Reception helpful
+new Chart(document.getElementById('reception'), {
+  type: 'bar',
+  data: { labels: LABELS, datasets: [{ data: [87.1, 84.3, 81.7], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }] },
+  options: barOpts('% helpful', 0, 100)
+});
+
+// 4. Next steps timing — stacked
+new Chart(document.getElementById('nextSteps'), {
+  type: 'bar',
+  data: {
+    labels: LABELS,
+    datasets: [
+      { label: 'Same day',          data: [74.1, 65.9, 54.4], backgroundColor: '#059669', borderRadius: 0 },
+      { label: 'Next working day',  data: [16.3, 21.6, 31.9], backgroundColor: '#d97706', borderRadius: 0 },
+      { label: '2\u20137 days',     data: [3.8, 5.4, 6.1],    backgroundColor: '#f97316', borderRadius: 0 },
+      { label: 'Longer / not told', data: [12.0, 13.6, 14.2], backgroundColor: '#d1d5db', borderRadius: 0 }
+    ]
+  },
+  options: stackBarOpts('% of patients', 110)
+});
+
+// 5a. Contact experience good
+new Chart(document.getElementById('contactGood'), {
+  type: 'bar',
+  data: { labels: LABELS, datasets: [{ data: [76.3, 71.7, 67.4], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }] },
+  options: barOpts('% good', 0, 100)
+});
+
+// 5b. Contact experience poor
+new Chart(document.getElementById('contactPoor'), {
+  type: 'bar',
+  data: { labels: LABELS, datasets: [{ data: [12.4, 15.4, 18.7], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }] },
+  options: barOpts('% poor', 0, 22)
+});
+
+// --- Section 6: Confounders ---
+
+// 6a. IMD deprivation
+new Chart(document.getElementById('confIMD'), {
+  type: 'bar',
+  data: { labels: LABELS, datasets: [{ data: [25.1, 23.0, 21.9], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }] },
+  options: barOpts('IMD score', 0, 30)
+});
+
+// 6b. List size
+new Chart(document.getElementById('confList'), {
+  type: 'bar',
+  data: { labels: LABELS, datasets: [{ data: [7959, 10786, 12551], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }] },
+  options: {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: c => c.raw.toLocaleString() } }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, max: 15000, title: { display: true, text: 'Registered patients', font: { size: 11 } },
+           ticks: { callback: v => (v/1000).toFixed(0) + 'k' } }
+    }
+  }
+});
+
+// 6c. Age 65+
+new Chart(document.getElementById('confAge65'), {
+  type: 'bar',
+  data: { labels: LABELS, datasets: [{ data: [18.8, 18.3, 18.7], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }] },
+  options: barOpts('% aged 65+', 0, 25)
+});
+
+// 6d. Region distribution — grouped bar
+new Chart(document.getElementById('confRegion'), {
+  type: 'bar',
+  data: {
+    labels: ['East of\nEngland', 'London', 'Midlands', 'NE &\nYorkshire', 'North\nWest', 'South\nEast', 'South\nWest'],
+    datasets: [
+      { label: 'Low OC',  data: [6.0, 18.4, 22.3, 21.2, 18.2, 8.1, 5.6], backgroundColor: LOW, borderRadius: 3 },
+      { label: 'Mid OC',  data: [9.6, 20.8, 17.5, 13.7, 14.5, 14.5, 9.3], backgroundColor: MID, borderRadius: 3 },
+      { label: 'High OC', data: [15.3, 16.1, 21.1, 10.4, 12.5, 15.0, 9.7], backgroundColor: HIGH, borderRadius: 3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: { legend: { position: 'top', labels: { font: { size: 11 } } },
+      tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.raw.toFixed(1) + '%' } }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+      y: { beginAtZero: true, max: 25, title: { display: true, text: '% of tertile', font: { size: 11 } },
+           ticks: { callback: v => v + '%' } }
+    }
+  }
+});
+
+// 6e. Stratified by IMD quintile — grouped bar
+new Chart(document.getElementById('confStratified'), {
+  type: 'bar',
+  data: {
+    labels: ['Q1\nleast deprived', 'Q2', 'Q3', 'Q4', 'Q5\nmost deprived'],
+    datasets: [
+      { label: 'Low OC',  data: [85.3, 83.4, 80.5, 78.2, 76.1], backgroundColor: LOW, borderRadius: 3 },
+      { label: 'Mid OC',  data: [79.6, 79.7, 77.0, 74.6, 73.2], backgroundColor: MID, borderRadius: 3 },
+      { label: 'High OC', data: [76.7, 75.7, 72.5, 71.3, 71.2], backgroundColor: HIGH, borderRadius: 3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: { legend: { position: 'top', labels: { font: { size: 11 } } },
+      tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.raw.toFixed(1) + '%' } }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, max: 100, title: { display: true, text: '% good experience', font: { size: 11 } },
+           ticks: { callback: v => v + '%' } }
+    }
+  }
+});
+
+// 6f. Regression coefficients — horizontal bar
+new Chart(document.getElementById('confRegression'), {
+  type: 'bar',
+  data: {
+    labels: ['% aged 65+', 'OC rate', 'List size', 'IMD deprivation'],
+    datasets: [{
+      data: [0.249, -0.222, -0.177, -0.160],
+      backgroundColor: ['#059669', '#2563eb', '#d97706', '#ef4444'],
+      borderRadius: 3
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: c => '\u03B2 = ' + c.raw.toFixed(3) } }
+    },
+    scales: {
+      x: { min: -0.3, max: 0.3, title: { display: true, text: 'Standardised \u03B2 (negative = lower satisfaction)', font: { size: 10 } },
+           grid: { color: ctx => ctx.tick.value === 0 ? '#374151' : '#e5e7eb' } },
+      y: { grid: { display: false } }
+    }
+  }
+});
+</script>
+</body></html>

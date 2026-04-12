@@ -1,45 +1,43 @@
-# gp-oc-dashboard
-Interactive dashboard analysing the online consultation platform market in English general practice, using NHS England, GPPS and IMD data.
-# GP Online Consultation Market Dashboard
+# GP Online Consultation Dashboard & Analysis
 
-An interactive dashboard analysing the online consultation (OC) platform market
-in English general practice, plus a searchable lookup of all ~6,100 active GP
-practices with a concise data-driven pen portrait of each.
+Interactive dashboard analysing the online consultation (OC) platform market in English general practice, plus three deep-dive analyses exploring what higher OC adoption means for the 8am rush, workforce, appointments, and patient satisfaction.
 
 **Live site:** https://amcunningham.github.io/gp-oc-dashboard/
 
-## What it covers
+## Pages
 
-- Supplier market share over time (Accurx, eConsult, PATCHS, Anima, TPP, Footfall, etc.)
-- Submission volumes and utilisation rates
-- Variation by deprivation (IMD 2019 quintile)
-- Variation by practice list size
-- Variation by age profile (% registered patients aged 65+)
-- GP Patient Survey 2024 vs 2025 satisfaction scores linked to OC supplier
-- Practice-level lookup with pen portrait, OC use, GPPS scores and demographic context
+- **[Dashboard](https://amcunningham.github.io/gp-oc-dashboard/)** — Interactive overview of the OC platform market: practice lookup, supplier shares, volume trends, deprivation patterns (~6,100 practices)
+- **[8am Rush](https://amcunningham.github.io/gp-oc-dashboard/rush_analysis.html)** — Does OC end the morning phone rush? Cloud-based telephony and OC submission patterns (4,306 practices)
+- **[Workforce & Appointments](https://amcunningham.github.io/gp-oc-dashboard/workforce_appts.html)** — Staffing, appointment modes, GP workload per session, lead times, DNA rates (6,018 practices)
+- **[Satisfaction](https://amcunningham.github.io/gp-oc-dashboard/satisfaction.html)** — Patient experience by OC intensity, with deprivation stratification and regression (6,018 practices)
 
-## Data sources
+## Data
 
-- **OC submissions** — NHS England experimental statistics, *Submissions via OC Systems in General Practice*, August 2024 – February 2026
-- **GP Patient Survey** — Ipsos for NHS England, 2024 and 2025 practice-level (weighted) results
-- **Deprivation** — Index of Multiple Deprivation 2019, practice-level scores via OHID Fingertips
-- **Age profile and list size** — NHS Digital, *Patients Registered at a GP Practice*, March 2026
-- **Practice metadata** — NHS Digital ePraccur
+The `data/` folder contains derived datasets used in the analysis:
+
+- `full_oc_tertiles.csv` — Tertile assignments for 6,018 practices (GP_CODE, OC rate, tertile, region, supplier)
+- `practice_imd.csv` — Practice-level Index of Multiple Deprivation 2019 scores
+- `practice_feb26.json` — Cloud-based telephony practice-level summary (February 2026)
+
+### Original data sources (not included due to size)
+
+All source data is publicly available from NHS England:
+
+- **OC submissions:** [Submissions via Online Consultation Systems in General Practice, February 2026](https://digital.nhs.uk/data-and-information/publications/statistical/submissions-via-online-consultation-systems-in-general-practice/february-2026)
+- **Appointments:** [Appointments in General Practice, February 2026](https://digital.nhs.uk/data-and-information/publications/statistical/appointments-in-general-practice)
+- **Workforce:** [General Practice Workforce Census, February 2026](https://digital.nhs.uk/data-and-information/publications/statistical/general-and-personal-medical-services)
+- **CBT:** [Cloud Based Telephony, February 2026](https://digital.nhs.uk/data-and-information/publications/statistical/cloud-based-telephony)
+- **GPPS:** [GP Patient Survey 2025](https://gp-patient.co.uk/)
+- **IMD:** [Index of Multiple Deprivation 2019](https://fingertips.phe.org.uk/) (indicator 93553)
+
+## Method
+
+The deep-dive analyses group practices into tertiles by OC submission rate per 1,000 registered patients per day. This is a cross-sectional comparison — it shows differences between practices at different levels of OC use, not changes over time. Association does not imply causation.
 
 ## Disclaimer
 
-This site reuses publicly available NHS data and is intended for information
-only. It is not a recommendation, ranking or endorsement of any GP practice or
-software supplier. Figures reflect the state of NHS published data at the time
-of the most recent refresh and may contain errors or omissions in the
-underlying source data.
-
-## Refresh
-
-The dashboard is refreshed monthly when NHS England publish new OC statistics.
-Each refresh is committed to this repo and deployed automatically via
-GitHub Pages.
+This site reuses publicly available NHS data and is intended for information only. It is not a recommendation, ranking or endorsement of any GP practice or software supplier. Figures reflect the state of NHS published data at the time of the most recent refresh and may contain errors or omissions in the underlying source data.
 
 ## Author
 
-Anne Marie Cunningham, GP. Built with assistance from Claude.
+Anne Marie Cunningham, GP. Built with assistance from Claude (Anthropic). The analysis and any errors are mine.

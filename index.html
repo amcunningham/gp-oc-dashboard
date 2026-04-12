@@ -48,9 +48,19 @@
         footer { text-align: center; padding: 20px; font-size: 11px; color: var(--muted); }
         footer a { color: var(--accent); text-decoration: none; }
         @media (max-width: 768px) { .chart-grid { grid-template-columns: 1fr; } .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+        .site-nav { background: #1b2838; padding: 0 24px; display: flex; gap: 0; font-size: 13px; }
+        .site-nav a { color: rgba(255,255,255,0.65); text-decoration: none; padding: 10px 16px; transition: color 0.15s, background 0.15s; }
+        .site-nav a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .site-nav a.current { color: #fff; background: rgba(255,255,255,0.12); font-weight: 600; }
     </style>
 </head>
 <body>
+<nav class="site-nav">
+<a href="index.html" class="current">Dashboard</a>
+<a href="rush_analysis.html">8am Rush</a>
+<a href="workforce_appts.html">Workforce &amp; Appointments</a>
+<a href="satisfaction.html">Satisfaction</a>
+</nav>
 <div class="container">
     <header>
         <h1>Online Consultations in English General Practice</h1>
@@ -67,7 +77,7 @@
         <div class="nav-tab" onclick="showTab('utilisation')">Rate by supplier</div>
         <div class="nav-tab" onclick="showTab('practicesize')">Practice Size</div>
         <div class="nav-tab" onclick="showTab('ageprofile')">Age Profile</div>
-        <div class="nav-tab" onclick="showTab('satisfaction')">Patient Survey</div>
+        <div class="nav-tab" onclick="showTab('satisfaction')">Survey by supplier</div>
         <div class="nav-tab" onclick="showTab('ratedist')">Practice spread</div>
         <div class="nav-tab" onclick="showTab('timeofday')">Time/Day</div>
         <div class="nav-tab" onclick="showTab('switching')">Switching</div>
@@ -425,6 +435,8 @@
         <div class="callout">
             <strong>And the weekend.</strong> Monday is by far the busiest day (27.5% of all February 2026 submissions), followed by Tuesday (19.6%) and a gentle taper through the rest of the working week. Saturday and Sunday combined account for just 1.0% of all submissions. But this is really a story about what practices leave switched on: Silicon Practice (Footfall) is the only supplier where the typical practice takes a meaningful weekend share (median 6.5% on Saturday + Sunday). For every other supplier in the dataset the median is 0.0%, meaning more than half of practices using those tools accept no weekend submissions at all.        </div>
     </div>
+
+    <!-- RAMP COHORT -->
 
     <!-- SWITCHING -->
     <div id="tab-switching" class="tab-content">
@@ -1388,6 +1400,8 @@ fetch('practice_portraits.json').then(r=>r.json()).then(data => {
   const _orig = window.showTab;
   window.showTab = function(t){ if(_orig) _orig(t); if(t==='timeofday') setTimeout(todInit,30); };
 })();
+
+// ===== Ramp cohort / Contacts→appts / Survey by OC decile =====
 </script>
 
 </body>

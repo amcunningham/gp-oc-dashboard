@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workforce &amp; Appointments by OC tertile</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #1f2937; line-height: 1.6; padding: 24px; }
+.container { max-width: 900px; margin: 0 auto; }
+h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+h2 { font-size: 16px; font-weight: 700; margin: 32px 0 14px; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 4px; }
+.subtitle { font-size: 13px; color: #6b7280; margin-bottom: 24px; }
+p { font-size: 14px; margin-bottom: 12px; }
+
+.method { background: #fff; border-radius: 10px; padding: 16px 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 24px; font-size: 13px; }
+.method strong { color: #111827; }
+
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px; }
+@media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+
+.card { background: #fff; border-radius: 10px; padding: 20px 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 20px; }
+.card h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.card .note { font-size: 11px; color: #6b7280; margin-bottom: 12px; }
+canvas { max-height: 340px; }
+
+.blurb { background: #f9fafb; border-top: 1px solid #e5e7eb; margin: 14px -24px -20px; padding: 14px 24px; border-radius: 0 0 10px 10px; font-size: 12.5px; color: #374151; line-height: 1.6; }
+.blurb strong { color: #1f2937; }
+
+.highlight { background: #eff6ff; border-left: 4px solid #2563eb; padding: 14px 18px; border-radius: 0 8px 8px 0; margin-bottom: 20px; font-size: 13.5px; line-height: 1.65; }
+.highlight strong { color: #1e40af; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 8px; }
+th, td { padding: 7px 10px; text-align: right; border-bottom: 1px solid #e5e7eb; }
+th { font-weight: 600; background: #f9fafb; font-size: 12px; text-transform: uppercase; letter-spacing: 0.3px; color: #6b7280; }
+td:first-child, th:first-child { text-align: left; }
+.dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; vertical-align: middle; margin-right: 4px; }
+.site-nav { background: #1b2838; padding: 0 24px; display: flex; gap: 0; font-size: 13px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+.site-nav a { color: rgba(255,255,255,0.65); text-decoration: none; padding: 10px 16px; transition: color 0.15s, background 0.15s; }
+.site-nav a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.site-nav a.current { color: #fff; background: rgba(255,255,255,0.12); font-weight: 600; }
+</style>
+</head><body>
+<nav class="site-nav">
+<a href="index.html">Dashboard</a>
+<a href="rush_analysis.html">8am Rush</a>
+<a href="workforce_appts.html" class="current">Workforce &amp; Appointments</a>
+<a href="satisfaction.html">Satisfaction</a>
+</nav>
+<div class="container">
+
+<h1>Workforce &amp; Appointments by OC level</h1>
+<p class="subtitle">NHS England &middot; GP Workforce Census, Appointments in General Practice &middot; February 2026</p>
+
+<div class="method">
+<strong>Tertile design:</strong> 6,018 practices with OC data, grouped by OC submission rate (Feb 2026, per 1,000 patients per working day). This uses the full set of practices with OC submission data. The <a href="rush_analysis.html">rush analysis</a> uses a smaller subset (4,306 practices) which additionally required telephony (CBT) data.<br>
+<span style="color:#059669;font-weight:600">Low OC</span> (&lt;1.58/1k/day, n=2,006) &middot;
+<span style="color:#d97706;font-weight:600">Mid OC</span> (1.58&ndash;8.48/1k/day, n=2,006) &middot;
+<span style="color:#2563eb;font-weight:600">High OC</span> (&gt;8.48/1k/day, n=2,006).<br>
+<strong>Sources:</strong> GP Workforce Statistics (Feb 2026, practice-level detailed). Appointments in General Practice (Feb 2026, practice-level crosstab). OC Submissions via OC Systems in General Practice (Feb 2026).
+</div>
+
+<!-- ═══════════ WORKFORCE ═══════════ -->
+<h2>1. Workforce</h2>
+
+<div class="grid">
+<div class="card">
+<h3>Staff FTE per 1,000 patients</h3>
+<p class="note">Monthly snapshot &middot; Feb 2026 GP Workforce Census</p>
+<canvas id="wfFTE"></canvas>
+<div class="blurb">
+<strong>Reading:</strong> Almost identical staffing across all three groups. GP FTE per 1k ranges from 0.58 (Low OC) to 0.61 (High OC). Nurses, DPC, and admin are similarly flat. OC adoption has not led to measurably different staffing levels.
+</div>
+</div>
+<div class="card">
+<h3>Practice size &amp; staff mix</h3>
+<p class="note">Median list size and total clinical FTE per 1k</p>
+<canvas id="wfSize"></canvas>
+<div class="blurb">
+<strong>Reading:</strong> High-OC practices are substantially larger (median 10,880 vs 6,842 patients). Larger practices may find it easier to adopt OC due to infrastructure and admin capacity. Total clinical FTE per 1k is marginally higher in high-OC practices (1.18 vs 1.09).
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>Workforce summary</h3>
+<table>
+<thead>
+<tr><th></th><th>Patients</th><th>Median list</th><th>GP FTE/1k</th><th>GP excl T&amp;L</th><th>Nurse FTE/1k</th><th>DPC FTE/1k</th><th>Admin FTE/1k</th></tr>
+</thead>
+<tbody>
+<tr><td><span class="dot" style="background:#059669"></span>Low OC</td><td>15.9m</td><td>6,842</td><td>0.58</td><td>0.43</td><td>0.25</td><td>0.26</td><td>1.16</td></tr>
+<tr><td><span class="dot" style="background:#d97706"></span>Mid OC</td><td>21.6m</td><td>9,098</td><td>0.60</td><td>0.44</td><td>0.25</td><td>0.27</td><td>1.19</td></tr>
+<tr><td><span class="dot" style="background:#2563eb"></span>High OC</td><td>25.2m</td><td>10,880</td><td>0.61</td><td>0.45</td><td>0.27</td><td>0.30</td><td>1.23</td></tr>
+</tbody>
+</table>
+<div class="blurb">
+<strong>GP excl T&amp;L</strong> = fully qualified GPs excluding trainees and locums. <strong>DPC</strong> = direct patient care (pharmacists, physiotherapists, physician associates, etc.). Workforce is essentially flat across tertiles. The main difference is practice size: high-OC practices serve 59% more patients.
+</div>
+</div>
+
+<!-- ═══════════ APPOINTMENTS ═══════════ -->
+<h2>2. Total appointments</h2>
+
+<div class="card">
+<div style="margin-bottom:10px;">
+<button id="btnRate" onclick="showMode('rate')" style="padding:4px 14px; font-size:12px; border:1px solid #d1d5db; border-radius:6px 0 0 6px; cursor:pointer; background:#2563eb; color:#fff; font-weight:600;">Per 1,000 patients</button><button id="btnPct" onclick="showMode('pct')" style="padding:4px 14px; font-size:12px; border:1px solid #d1d5db; border-left:none; border-radius:0 6px 6px 0; cursor:pointer; background:#fff; color:#374151;">% share</button>
+</div>
+<h3 id="modeTitle">Appointments per 1,000 patients &middot; by mode</h3>
+<p class="note">Monthly totals &middot; Feb 2026 &middot; all appointment types, all staff</p>
+<div id="modeRateWrap"><canvas id="apptTotal" style="max-height:360px;"></canvas></div>
+<div id="modePctWrap" style="display:none;"><canvas id="apptModePct"></canvas></div>
+<div class="blurb" id="modeBlurbRate">
+<strong>Reading:</strong> High-OC practices record <strong>507 appointments per 1k</strong> vs 453 for low-OC &mdash; 55 more per 1k (12% higher). Face-to-face is lower in high OC (285 vs 316/1k). Telephone is higher (127 vs 102/1k). Video/Online is nearly four times higher (76 vs 20/1k) &mdash; though in practice most of this is text-based OC processing rather than video consultations. But 55 extra recorded appointments is a fraction of the input: high-OC practices process ~240 more OC submissions per 1k/month than low-OC. Most of the effort of reviewing and responding to those submissions does not show up here.
+</div>
+<div class="blurb" id="modeBlurbPct" style="display:none;">
+<strong>Reading:</strong> Face-to-face share is 70% in Low OC but 56% in High. Video/online is four times higher (15% vs 4%). Telephone is stable at 22&ndash;26%. Home visits are similar (~1%).
+</div>
+</div>
+
+<!-- ═══════════ APPOINTMENT CATEGORY ═══════════ -->
+<h2>3. What kinds of appointments &mdash; and who delivers them?</h2>
+
+<div class="card" style="background:#fffbeb; border:1px solid #fde68a;">
+<p style="font-size:12.5px; color:#92400e; margin:0; line-height:1.6;">
+<strong>Caveat on appointment categories:</strong> The AIGP data classifies each appointment into a &ldquo;National Category&rdquo; &mdash; General Consultation Routine, General Consultation Acute, Clinical Triage, Planned Clinics, etc. We do not fully understand how practices assign these categories, whether it is done consistently, or how clinical system defaults and OC workflows influence the classification. A rise in &ldquo;Clinical Triage&rdquo; may reflect genuine new triage activity, automatic coding by the system when an OC submission is processed, or simply a change in how existing work is labelled. The numbers below should be read with this uncertainty in mind.
+</p>
+</div>
+
+<div class="card">
+<h3>Appointment category per 1,000 patients &middot; GP vs Other Practice Staff</h3>
+<p class="note">Monthly totals &middot; each category has three bars (Low / Mid / High OC). Darker shade = GP, lighter shade = Other Practice Staff. &middot; Feb 2026</p>
+<canvas id="apptCat" style="max-height:420px;"></canvas>
+<div class="blurb">
+<strong>Reading:</strong> Clinical Triage nearly triples from 33/1k (Low) to 80/1k (High). GP triage work more than doubles (21&rarr;46/1k) and other staff triage nearly triples (12&rarr;34/1k). Meanwhile, GP routine consultations fall from 79 to 63/1k &mdash; so part of what was previously a GP consultation is now a GP triage contact. Acute consultations, planned clinics, and planned procedures are stable across tertiles and have similar staff splits. OC doesn&rsquo;t shift work from GPs to other staff &mdash; it adds a triage layer that loads both.
+</div>
+</div>
+
+<!-- ═══════════ WHAT DOES A GP DO ═══════════ -->
+<h2>4. What does a GP session look like?</h2>
+
+<div class="card" style="background:#fffbeb; border:1px solid #fde68a;">
+<p style="font-size:12.5px; color:#92400e; margin:0; line-height:1.6;">
+<strong>Assumptions &amp; caveats:</strong> This metric is derived, not directly published. We take GP appointments per 1,000 patients (from AIGP) and divide by sessions per 1,000 patients, where 1 FTE = 9 sessions/week and Feb = 4 weeks = 36 sessions per FTE. We use GP FTE <em>excluding</em> trainees &amp; locums from the workforce census. This assumes all sessions are equal (they are not &mdash; some are shorter, some are admin-heavy) and that FTE translates neatly into patient-facing sessions (it does not &mdash; GPs also do paperwork, training, and management). The 2018 baseline uses national totals rather than practice-level data and cannot be split by tertile &mdash; OC barely existed in 2018, so a tertile comparison would not be meaningful. You could retrospectively identify the same practices, but many have merged, changed, or started OC at very different times, making the comparison unreliable.<br><br>
+<strong>Crucially, in mid- and high-OC practices, GPs also spend time processing online consultations.</strong> This work &mdash; reading forms, triaging, messaging patients back &mdash; may not always generate a recorded appointment but still consumes session time. The &ldquo;appointments per session&rdquo; metric therefore <em>understates</em> total GP workload in high-OC practices.
+</p>
+</div>
+
+<div class="card">
+<h3>GP appointments per session &middot; by mode</h3>
+<p class="note">Monthly data (Feb) &middot; 1 FTE = 9 sessions/week = 36 sessions in Feb &middot; GP excl trainees &amp; locums &middot; Feb 2018 national baseline + Feb 2026 by OC tertile</p>
+<canvas id="gpSessMode" style="max-height:360px;"></canvas>
+<div class="blurb">
+<strong>Reading:</strong> In 2018, a GP session was <strong>9.4 face-to-face</strong> and 2.2 telephone &mdash; almost entirely in the room or on the phone (11.8 total). By 2026, even low-OC practices have shifted: fewer face-to-face (8.8), more telephone (3.6), and a small video/online slice (0.6). High-OC practices have moved further: 7.0 face-to-face, 4.3 telephone, 2.3 online. The session has also got busier &mdash; 13.9 recorded appointments vs 11.8 in 2018. But in high-OC practices, GPs are also processing online consultations outside these recorded appointments.
+</div>
+</div>
+
+<div class="card">
+<h3>GP appointments per session &middot; summary</h3>
+<table>
+<thead>
+<tr><th></th><th>Face-to-face</th><th>Telephone</th><th>Video/Online</th><th>Home visit</th><th>Total</th></tr>
+</thead>
+<tbody>
+<tr style="background:#f3f4f6;"><td><span class="dot" style="background:#9ca3af"></span>Feb 2018 (national)</td><td>9.4</td><td>2.2</td><td>0.1</td><td>0.1</td><td>11.8</td></tr>
+<tr><td><span class="dot" style="background:#059669"></span>Low OC (2026)</td><td>8.8</td><td>3.6</td><td>0.6</td><td>0.1</td><td>13.2</td></tr>
+<tr><td><span class="dot" style="background:#d97706"></span>Mid OC (2026)</td><td>7.8</td><td>4.4</td><td>1.4</td><td>0.2</td><td>13.8</td></tr>
+<tr><td><span class="dot" style="background:#2563eb"></span>High OC (2026)</td><td>7.0</td><td>4.3</td><td>2.3</td><td>0.2</td><td>13.9</td></tr>
+</tbody>
+</table>
+<div class="blurb">
+<strong>Key point:</strong> The GP&rsquo;s session has got busier (+2 recorded appointments) and the channel mix has shifted dramatically. In 2018, 80% of a session was face-to-face. By 2026, even without OC it&rsquo;s down to 67%; with high OC it&rsquo;s 50%. The extra appointments per session are phone and online contacts &mdash; the face-to-face count has actually fallen. These figures count only recorded appointments; time spent reading and responding to OC submissions is additional unrecorded workload.<br>
+<strong>Sources:</strong> Feb 2018 baseline from AIGP national totals + GP Workforce Census Mar 2018 (27,892 FTE excl registrars &amp; locums). Feb 2026 from practice-level data.
+</div>
+</div>
+
+<!-- ═══════════ TRIAGE MODE ═══════════ -->
+<h2>5. Exploring appointment mode</h2>
+
+<p style="font-size:13px; color:#374151; margin-bottom:16px;">Appointment mode (face-to-face, telephone, video/online) shows the largest variation between OC tertiles. Here we break it down by National Category to see where the shift is happening. The same caveats about category classification apply.</p>
+
+<div class="card">
+<h3>Triage appointments by mode &middot; per 1,000 patients</h3>
+<p class="note">Monthly totals &middot; Feb 2026</p>
+<canvas id="triageMode" style="max-height:340px;"></canvas>
+<div class="blurb">
+<strong>Reading:</strong> In Low-OC practices, triage is mainly by telephone (19/1k, 57%). In High-OC practices, triage is dominated by Video/Online (41/1k, 51%). Total Video/Online appointments across all categories are 76/1k for High OC &mdash; so <strong>triage alone accounts for over half</strong> of all online appointments. The &ldquo;digital shift&rdquo; in the appointment data is largely a triage phenomenon.
+</div>
+</div>
+
+<div class="card">
+<h3>Routine consultations by mode &middot; per 1,000 patients</h3>
+<p class="note">Monthly totals &middot; Feb 2026</p>
+<canvas id="routineMode" style="max-height:340px;"></canvas>
+<div class="blurb">
+<strong>Reading:</strong> Routine consultations barely shift mode. Face-to-face dominates at 66&ndash;74% regardless of OC level. Video/Online is 2&ndash;3/1k &mdash; trivial. Telephone is modestly higher in high OC practices (37 vs 35/1k). The actual consultations still happen face-to-face; the digital channel is used for the triage step that precedes them.
+</div>
+</div>
+
+<!-- ═══════════ LEAD TIME ═══════════ -->
+<h2>6. How quickly are patients seen?</h2>
+
+<div class="card">
+<h3>Time from booking to appointment (%)</h3>
+<p class="note">Monthly data &middot; Feb 2026</p>
+<canvas id="leadTime"></canvas>
+<div class="blurb">
+<strong>Reading:</strong> Same-day appointments: 42% (Low) to 46% (High). Within one week: 69% to 71%. The differences are modest. High-OC practices are marginally quicker to see patients, but the gap is small.
+</div>
+</div>
+
+<!-- ═══════════ DNA ═══════════ -->
+<h2>7. DNA rate</h2>
+
+<div class="card">
+<h3>Did Not Attend rate (%)</h3>
+<p class="note">Monthly data &middot; Feb 2026 &middot; as proportion of attended + DNA</p>
+<canvas id="dna"></canvas>
+<div class="blurb">
+<strong>Reading:</strong> DNA rate is virtually identical: 4.3% (Low), 4.1% (Mid), 3.9% (High). The marginal improvement in high-OC practices may reflect higher same-day appointment rates (patients less likely to DNA a same-day slot) rather than OC itself.
+</div>
+</div>
+
+<!-- ═══════════ CLINICAL SYSTEM (collapsible footnote) ═══════════ -->
+<div style="margin-top:32px; border-top:2px solid #e5e7eb; padding-top:16px;">
+<button id="footnoteToggle" onclick="toggleFootnote()" style="background:none; border:1px solid #d1d5db; padding:6px 16px; border-radius:6px; cursor:pointer; font-size:13px; color:#6b7280; width:100%; text-align:left;">Show clinical system detail &#9660;</button>
+<div id="footnoteBody" style="display:none;">
+<h2>Appendix: The triage count is driven by the clinical system</h2>
+
+<div class="card">
+<h3>Triage appointments per 1,000 patients &middot; EMIS vs TPP &times; OC tertile</h3>
+<p class="note">Clinical system from GPAD supplier field &middot; Feb 2026</p>
+<canvas id="sysTriageTertile" style="max-height:360px;"></canvas>
+<div class="blurb">
+<strong>Reading:</strong> TPP (SystmOne) practices record more triage at <em>every</em> OC level: 37/1k (Low) vs 31/1k on EMIS, and 108/1k (High) vs 61/1k on EMIS. The clinical system roughly doubles the triage count at high OC levels. The gap between systems is wider at higher OC levels &mdash; suggesting the way SystmOne records OC processing amplifies the triage count more than EMIS does.
+</div>
+</div>
+
+<div class="card">
+<h3>Total appointments per 1,000 patients &middot; EMIS vs TPP &times; OC tertile</h3>
+<p class="note">Feb 2026</p>
+<canvas id="sysTotalTertile" style="max-height:360px;"></canvas>
+<div class="blurb">
+<strong>Reading:</strong> TPP practices record substantially more appointments overall at every OC level (490&ndash;562/1k vs 425&ndash;465/1k on EMIS). The gap grows with OC adoption, driven by triage inflation. This means the earlier finding that &ldquo;high-OC practices record 12% more appointments&rdquo; is partly a clinical system artefact: TPP practices are over-represented in the high-OC tertile.
+</div>
+</div>
+
+<!-- ═══════════ OC SUPPLIER WITHIN SYSTEM ═══════════ -->
+<h2>Appendix (cont.): Does the OC supplier matter within the same clinical system?</h2>
+
+<div class="grid">
+<div class="card">
+<h3>Triage/1k &middot; TPP (SystmOne) practices</h3>
+<p class="note">By OC supplier &middot; single-OC-supplier only &middot; n&ge;15</p>
+<canvas id="tppByOC"></canvas>
+<div class="blurb">
+<strong>Reading:</strong> On TPP, most OC suppliers produce similar triage (51&ndash;57/1k). The outlier is <strong>TPP&rsquo;s own integrated OC</strong> at 165/1k &mdash; three times higher. This is the workflow where SystmOne&rsquo;s OC and appointment book are fully integrated, auto-generating a triage entry for each submission. Continuum is also higher (99/1k).
+</div>
+</div>
+<div class="card">
+<h3>Triage/1k &middot; EMIS practices</h3>
+<p class="note">By OC supplier &middot; single-OC-supplier only &middot; n&ge;15</p>
+<canvas id="emisByOC"></canvas>
+<div class="blurb">
+<strong>Reading:</strong> On EMIS, OC supplier variation is more modest. Engage is highest (77/1k), Blinx next (70/1k), Continuum (69/1k), with Accurx, eConsult, Klinik, and PATCHS clustering at 46&ndash;49/1k. Evergreen and Silicon Practice are lowest (28&ndash;39/1k).
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>Summary table &middot; clinical system &times; OC tertile</h3>
+<table>
+<thead>
+<tr><th>System</th><th>Tertile</th><th>Practices</th><th>Total/1k</th><th>Triage/1k</th><th>Routine/1k</th><th>Acute/1k</th></tr>
+</thead>
+<tbody>
+<tr><td rowspan="3" style="font-weight:600;">EMIS</td><td>Low</td><td>1,153</td><td>425.1</td><td>30.9</td><td>143.7</td><td>80.0</td></tr>
+<tr><td>Mid</td><td>1,217</td><td>448.6</td><td>50.6</td><td>126.6</td><td>84.2</td></tr>
+<tr><td>High</td><td>1,149</td><td>465.4</td><td>60.8</td><td>120.8</td><td>87.6</td></tr>
+<tr><td rowspan="3" style="font-weight:600;">TPP</td><td>Low</td><td>850</td><td>490.3</td><td>36.6</td><td>134.0</td><td>91.6</td></tr>
+<tr><td>Mid</td><td>789</td><td>528.6</td><td>66.8</td><td>116.7</td><td>91.7</td></tr>
+<tr><td>High</td><td>856</td><td>562.3</td><td>107.5</td><td>104.7</td><td>88.5</td></tr>
+</tbody>
+</table>
+<div class="blurb">
+<strong>Key point:</strong> On both systems, triage is higher and routine is lower in high OC practices. But TPP records 50&ndash;80% more triage than EMIS at the same OC level. Total appointments are 65&ndash;97/1k higher on TPP. This is a recording difference, not a workload difference. Acute consultations are stable across all cells. EMIS covers 3,519 of 6,014 practices (59%); TPP covers 2,495 (41%).
+</div>
+</div>
+
+</div><!-- end footnoteBody -->
+</div><!-- end collapsible wrapper -->
+
+<!-- ═══════════ SUMMARY ═══════════ -->
+<h2>8. Summary</h2>
+
+<div class="highlight">
+<strong>Workforce:</strong> Essentially identical across OC tertiles. GP, nurse, DPC, and admin staffing per 1,000 patients shows no meaningful variation. The main structural difference is practice size: high-OC practices are 59% larger (median 10.9k vs 6.8k).<br><br>
+<strong>Appointments:</strong> High-OC practices record 507 appointments per 1k vs 453 for low-OC. Face-to-face appointments are lower (285 vs 316/1k) and telephone higher (127 vs 102/1k). The &ldquo;video/online&rdquo; category nearly quadruples (20&rarr;76/1k) &mdash; but this is largely text-based OC processing rather than video consultations. Routine consultations fall; acute, planned clinics, and planned procedures are stable. Wait times are marginally shorter (46% same-day vs 42%). DNA rates are similar.<br><br>
+<strong>OC processing effort:</strong> High-OC practices process ~12.9 OC submissions per 1k patients per working day, compared with 0.8 in low-OC. The effort of reviewing and responding to those submissions &mdash; reading forms, triaging, messaging patients back &mdash; is extremely unlikely to be fully captured in the appointment data. The recorded appointments show the output; the input effort is largely invisible.<br><br>
+<strong>The clinical system effect</strong> (see <a href="javascript:void(0)" onclick="toggleFootnote();window.scrollTo({top:document.getElementById('footnoteToggle').offsetTop-20,behavior:'smooth'})" style="color:#1e40af;">appendix</a>): TPP (SystmOne) practices record 50&ndash;80% more triage than EMIS practices at the same OC level. We don&rsquo;t fully understand why. <em>If you use SystmOne and have a view on what drives this, we&rsquo;d welcome your feedback.</em><br><br>
+<strong>Implication:</strong> The argument for OC-driven triage is not that it reduces total clinical workload &mdash; it is that it ensures the right clinician sees each patient, and that GPs do only the work that requires a GP. The appointment data cannot tell us whether that is happening. What we can see is that in medium- and high-OC practices, there is significant work associated with managing OC that is not recorded in the appointment data. Whether that unmeasured effort is offset by more efficient use of GP time remains an open question.
+</div>
+
+
+</div>
+
+<script>
+const LOW = '#059669';
+const MID = '#d97706';
+const HIGH = '#2563eb';
+const LABELS = ['Low OC', 'Mid OC', 'High OC'];
+
+function barOpts(yLabel, yMax, pct) {
+  return {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: {
+      legend: { position: 'top', labels: { font: { size: 11 } } },
+      tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.raw.toFixed(pct ? 1 : 2) + (pct ? '%' : '') } }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, max: yMax, title: { display: true, text: yLabel, font: { size: 11 } },
+           ticks: pct ? { callback: v => v + '%' } : {} }
+    }
+  };
+}
+
+function stackBarOpts(yLabel, yMax, pct) {
+  return {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: {
+      legend: { position: 'top', labels: { font: { size: 11 } } },
+      tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.raw.toFixed(1) + (pct ? '%' : '/1k') } }
+    },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, beginAtZero: true, max: yMax, title: { display: true, text: yLabel, font: { size: 11 } } }
+    }
+  };
+}
+
+// ── 1. Workforce FTE/1k
+new Chart(document.getElementById('wfFTE'), {
+  type: 'bar',
+  data: {
+    labels: LABELS,
+    datasets: [
+      { label: 'GP FTE',    data: [0.58, 0.60, 0.61], backgroundColor: '#2563eb', borderRadius: 4 },
+      { label: 'Nurse FTE',  data: [0.25, 0.25, 0.27], backgroundColor: '#059669', borderRadius: 4 },
+      { label: 'DPC FTE',    data: [0.26, 0.27, 0.30], backgroundColor: '#d97706', borderRadius: 4 },
+      { label: 'Admin FTE',  data: [1.16, 1.19, 1.23], backgroundColor: '#9ca3af', borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: {
+      legend: { position: 'top', labels: { font: { size: 11 } } },
+      tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.raw.toFixed(2) + '/1k' } }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, max: 1.5, title: { display: true, text: 'FTE per 1,000 patients', font: { size: 11 } } }
+    }
+  }
+});
+
+// ── 1b. Practice size
+new Chart(document.getElementById('wfSize'), {
+  type: 'bar',
+  data: {
+    labels: LABELS,
+    datasets: [
+      { label: 'Median list size', data: [6842, 9098, 10880], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, max: 14000, title: { display: true, text: 'Median registered patients', font: { size: 11 } },
+           ticks: { callback: v => (v/1000).toFixed(0) + 'k' } }
+    }
+  }
+});
+
+// ── 2. Total appointments per 1k — stacked by mode
+new Chart(document.getElementById('apptTotal'), {
+  type: 'bar',
+  data: {
+    labels: LABELS,
+    datasets: [
+      { label: 'Face-to-Face',    data: [316.3, 295.1, 284.8], backgroundColor: '#2563eb', borderRadius: 0 },
+      { label: 'Telephone',        data: [101.6, 123.1, 126.8], backgroundColor: '#059669', borderRadius: 0 },
+      { label: 'Video/Online',     data: [20.3, 45.9, 76.3],    backgroundColor: '#f97316', borderRadius: 0 },
+      { label: 'Home Visit',       data: [4.9, 5.5, 6.1],       backgroundColor: '#8b5cf6', borderRadius: 0 },
+      { label: 'Unknown',          data: [9.5, 11.6, 13.4],     backgroundColor: '#d1d5db', borderRadius: 0 }
+    ]
+  },
+  options: stackBarOpts('Per 1,000 patients', 540, false)
+});
+
+// ── 3. Category per 1k — grouped by category, stacked GP / Other within each bar
+new Chart(document.getElementById('apptCat'), {
+  type: 'bar',
+  data: {
+    labels: ['Routine', 'Acute', 'Triage', 'Planned Clinics', 'Planned Proc.'],
+    datasets: [
+      // Low OC stack
+      { label: 'Low OC – GP',    data: [78.9, 58.8, 20.8, 18.9, 2.4], backgroundColor: '#047857', stack: 'low', borderRadius: 0 },
+      { label: 'Low OC – Other', data: [59.7, 25.8, 11.7, 54.0, 42.2], backgroundColor: '#a7f3d0', stack: 'low', borderRadius: 0 },
+      // Mid OC stack
+      { label: 'Mid OC – GP',    data: [71.1, 59.9, 35.2, 18.2, 3.0], backgroundColor: '#b45309', stack: 'mid', borderRadius: 0 },
+      { label: 'Mid OC – Other', data: [51.2, 27.1, 20.6, 56.0, 44.3], backgroundColor: '#fde68a', stack: 'mid', borderRadius: 0 },
+      // High OC stack
+      { label: 'High OC – GP',    data: [62.8, 59.4, 46.3, 17.5, 2.6], backgroundColor: '#1d4ed8', stack: 'high', borderRadius: 0 },
+      { label: 'High OC – Other', data: [50.7, 28.4, 34.0, 57.5, 47.7], backgroundColor: '#bfdbfe', stack: 'high', borderRadius: 0 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: {
+      legend: { position: 'top', labels: { font: { size: 10 }, boxWidth: 14 } },
+      tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.raw.toFixed(1) + '/1k' } }
+    },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, beginAtZero: true, max: 160, title: { display: true, text: 'Per 1,000 patients', font: { size: 11 } } }
+    }
+  }
+});
+
+// ── 4. GP session — appointments per session by mode (stacked)
+new Chart(document.getElementById('gpSessMode'), {
+  type: 'bar',
+  data: {
+    labels: ['Feb 2018\n(national)', 'Low OC\n(2026)', 'Mid OC\n(2026)', 'High OC\n(2026)'],
+    datasets: [
+      { label: 'Face-to-Face',  data: [9.4, 8.8, 7.8, 7.0], backgroundColor: '#2563eb', borderRadius: 0 },
+      { label: 'Telephone',     data: [2.2, 3.6, 4.4, 4.3], backgroundColor: '#059669', borderRadius: 0 },
+      { label: 'Video/Online',  data: [0.1, 0.6, 1.4, 2.3], backgroundColor: '#f97316', borderRadius: 0 },
+      { label: 'Home Visit',    data: [0.1, 0.1, 0.2, 0.2], backgroundColor: '#8b5cf6', borderRadius: 0 }
+    ]
+  },
+  options: stackBarOpts('Appointments per session', 16, false)
+});
+
+// ── 2b. Mode % (stacked) — toggled from section 2
+new Chart(document.getElementById('apptModePct'), {
+  type: 'bar',
+  data: {
+    labels: LABELS,
+    datasets: [
+      { label: 'Face-to-Face', data: [69.9, 61.3, 56.1], backgroundColor: '#2563eb', borderRadius: 0 },
+      { label: 'Telephone',     data: [22.4, 25.6, 25.0], backgroundColor: '#059669', borderRadius: 0 },
+      { label: 'Video/Online',  data: [4.5, 9.5, 15.0],   backgroundColor: '#f97316', borderRadius: 0 },
+      { label: 'Home Visit',    data: [1.1, 1.1, 1.2],    backgroundColor: '#8b5cf6', borderRadius: 0 },
+      { label: 'Unknown',       data: [2.1, 2.4, 2.6],    backgroundColor: '#d1d5db', borderRadius: 0 }
+    ]
+  },
+  options: stackBarOpts('% of appointments', 105, true)
+});
+
+// ── 5. Triage by mode (stacked)
+new Chart(document.getElementById('triageMode'), {
+  type: 'bar',
+  data: {
+    labels: LABELS,
+    datasets: [
+      { label: 'Video/Online', data: [3.4, 17.6, 41.1],  backgroundColor: '#f97316', borderRadius: 0 },
+      { label: 'Telephone',     data: [18.9, 24.7, 25.5], backgroundColor: '#059669', borderRadius: 0 },
+      { label: 'Face-to-Face',  data: [10.7, 14.5, 13.7], backgroundColor: '#2563eb', borderRadius: 0 },
+      { label: 'Other',         data: [0.3, 0.4, 0.8],    backgroundColor: '#d1d5db', borderRadius: 0 }
+    ]
+  },
+  options: stackBarOpts('Per 1,000 patients', 90, false)
+});
+
+// ── 5b. Routine consultations by mode (stacked)
+new Chart(document.getElementById('routineMode'), {
+  type: 'bar',
+  data: {
+    labels: LABELS,
+    datasets: [
+      { label: 'Face-to-Face',  data: [102.8, 82.9, 74.9], backgroundColor: '#2563eb', borderRadius: 0 },
+      { label: 'Telephone',     data: [34.6, 36.9, 35.4],  backgroundColor: '#059669', borderRadius: 0 },
+      { label: 'Video/Online',  data: [1.6, 2.6, 3.1],     backgroundColor: '#f97316', borderRadius: 0 },
+      { label: 'Other',         data: [0.2, 0.1, 0.3],     backgroundColor: '#d1d5db', borderRadius: 0 }
+    ]
+  },
+  options: stackBarOpts('Per 1,000 patients', 160, false)
+});
+
+// ── 6. Lead time
+new Chart(document.getElementById('leadTime'), {
+  type: 'bar',
+  data: {
+    labels: ['Same day', '1 day', '2\u20137 days', '8\u201314 days', '15\u201321 days', '22\u201328 days', '>28 days'],
+    datasets: [
+      { label: 'Low OC',  data: [41.7, 7.7, 19.1, 14.2, 7.9, 4.9, 4.5], backgroundColor: LOW, borderRadius: 3 },
+      { label: 'Mid OC',  data: [44.0, 7.9, 17.8, 13.2, 7.8, 4.8, 4.3], backgroundColor: MID, borderRadius: 3 },
+      { label: 'High OC', data: [46.3, 7.2, 17.1, 12.9, 7.5, 4.8, 4.1], backgroundColor: HIGH, borderRadius: 3 }
+    ]
+  },
+  options: barOpts('% of appointments', 52, true)
+});
+
+// ── 7. DNA rate
+new Chart(document.getElementById('dna'), {
+  type: 'bar',
+  data: {
+    labels: LABELS,
+    datasets: [
+      { label: 'DNA rate', data: [4.3, 4.1, 3.9], backgroundColor: [LOW, MID, HIGH], borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: c => c.raw.toFixed(1) + '%' } }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, max: 8, title: { display: true, text: '% DNA', font: { size: 11 } },
+           ticks: { callback: v => v + '%' } }
+    }
+  }
+});
+
+// ── Clinical system x OC tertile — triage
+const SYS_EMIS = '#6366f1';
+const SYS_TPP  = '#e11d48';
+new Chart(document.getElementById('sysTriageTertile'), {
+  type: 'bar',
+  data: {
+    labels: ['Low OC', 'Mid OC', 'High OC'],
+    datasets: [
+      { label: 'EMIS',  data: [30.9, 50.6, 60.8],  backgroundColor: SYS_EMIS, borderRadius: 4 },
+      { label: 'TPP',   data: [36.6, 66.8, 107.5],  backgroundColor: SYS_TPP,  borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: {
+      legend: { position: 'top', labels: { font: { size: 11 } } },
+      tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.raw.toFixed(1) + '/1k' } }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, max: 120, title: { display: true, text: 'Triage appts per 1,000 patients', font: { size: 11 } } }
+    }
+  }
+});
+
+// ── Clinical system x OC tertile — total
+new Chart(document.getElementById('sysTotalTertile'), {
+  type: 'bar',
+  data: {
+    labels: ['Low OC', 'Mid OC', 'High OC'],
+    datasets: [
+      { label: 'EMIS',  data: [425.1, 448.6, 465.4], backgroundColor: SYS_EMIS, borderRadius: 4 },
+      { label: 'TPP',   data: [490.3, 528.6, 562.3], backgroundColor: SYS_TPP,  borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: {
+      legend: { position: 'top', labels: { font: { size: 11 } } },
+      tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.raw.toFixed(1) + '/1k' } }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, max: 600, title: { display: true, text: 'Total appts per 1,000 patients', font: { size: 11 } } }
+    }
+  }
+});
+
+// ── OC supplier within clinical system — triage per 1k
+// TPP system by OC supplier
+new Chart(document.getElementById('tppByOC'), {
+  type: 'bar',
+  data: {
+    labels: ['TPP\n(integrated)', 'Continuum', 'Engage', 'Accurx', 'Silicon', 'eConsult'],
+    datasets: [
+      { label: 'Triage/1k', data: [165.3, 99.1, 71.5, 57.1, 55.2, 51.0], backgroundColor: [SYS_TPP, SYS_TPP+'99', SYS_TPP+'99', SYS_TPP+'99', SYS_TPP+'99', SYS_TPP+'99'], borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: c => c.raw.toFixed(1) + '/1k' } }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, max: 190, title: { display: true, text: 'Triage per 1,000', font: { size: 11 } } }
+    }
+  }
+});
+
+// EMIS system by OC supplier
+new Chart(document.getElementById('emisByOC'), {
+  type: 'bar',
+  data: {
+    labels: ['Engage', 'Blinx', 'Continuum', 'Rapid\nHealth', 'Accurx', 'eConsult', 'Klinik', 'PATCHS'],
+    datasets: [
+      { label: 'Triage/1k', data: [77.0, 69.6, 68.9, 49.1, 48.9, 46.8, 46.4, 46.3], backgroundColor: SYS_EMIS, borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: c => c.raw.toFixed(1) + '/1k' } }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, max: 190, title: { display: true, text: 'Triage per 1,000', font: { size: 11 } } }
+    }
+  }
+});
+
+// ── Toggle for section 2 mode chart
+function showMode(which) {
+  const rateWrap = document.getElementById('modeRateWrap');
+  const pctWrap = document.getElementById('modePctWrap');
+  const rateBlurb = document.getElementById('modeBlurbRate');
+  const pctBlurb = document.getElementById('modeBlurbPct');
+  const title = document.getElementById('modeTitle');
+  const btnR = document.getElementById('btnRate');
+  const btnP = document.getElementById('btnPct');
+  if (which === 'rate') {
+    rateWrap.style.display = ''; pctWrap.style.display = 'none';
+    rateBlurb.style.display = ''; pctBlurb.style.display = 'none';
+    title.textContent = 'Appointment mode per 1,000 patients';
+    btnR.style.background = '#2563eb'; btnR.style.color = '#fff'; btnR.style.fontWeight = '600';
+    btnP.style.background = '#fff'; btnP.style.color = '#374151'; btnP.style.fontWeight = '400';
+  } else {
+    rateWrap.style.display = 'none'; pctWrap.style.display = '';
+    rateBlurb.style.display = 'none'; pctBlurb.style.display = '';
+    title.textContent = 'Appointment mode (% share)';
+    btnP.style.background = '#2563eb'; btnP.style.color = '#fff'; btnP.style.fontWeight = '600';
+    btnR.style.background = '#fff'; btnR.style.color = '#374151'; btnR.style.fontWeight = '400';
+  }
+}
+
+// ── Footnote toggle
+function toggleFootnote() {
+  var el = document.getElementById('footnoteBody');
+  var btn = document.getElementById('footnoteToggle');
+  if (el.style.display === 'none') { el.style.display = ''; btn.textContent = 'Hide clinical system detail \u25B2'; }
+  else { el.style.display = 'none'; btn.textContent = 'Show clinical system detail \u25BC'; }
+}
+</script>
+</body></html>
