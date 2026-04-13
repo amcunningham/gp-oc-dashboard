@@ -107,8 +107,10 @@ These are propositions, not conclusions. Each one could be wrong, and I'd welcom
 
 What the data suggests is this: digital triage solves a narrow problem well — it eases phone congestion — but it creates new pressures that the policy debate has not yet reckoned with. It expands the total demand landing on the practice. It generates a layer of clinical work that is invisible to the systems we use to measure general practice activity. And it is associated with lower patient satisfaction in a way that cannot be explained by the populations these practices serve. It is not a neutral change at system level.
 
-General practice is under enormous pressure, and the tools we give it deserve to be evaluated with the same rigour we'd apply to any other intervention in healthcare. Digital triage may well have a valuable role — but the evidence should shape that judgement, not the other way round.
+General practice is under enormous pressure, and "Modern General Practice Access" represents a serious attempt to address it. But the model was adopted as national policy before the evidence base was established. The data presented here suggests a more mixed picture than the policy assumes — and that matters, because the 10 Year Plan depends on getting this right. These propositions are offered in that spirit: not as a case against digital triage, but as questions that deserve answers before the model is treated as settled.
 
 ---
+
+*The views expressed here are my own and do not represent those of my employer. This work was carried out in my own time. I have no commercial conflicts of interest.*
 
 *Data sources: NHS Digital Appointments in General Practice (February 2026), General Practice Workforce Census (February 2026), Online Consultation submissions (February 2026), Cloud-Based Telephony inbound calls (February 2026), GP Patient Survey 2025, English Indices of Multiple Deprivation 2025, National Diabetes Audit 2024–25, Fingertips Cancer Services (2020/21–24/25). Satisfaction and outcomes analysis covers ~6,000 practices; rush analysis covers ~4,300 practices with both CBT and OC data.*
