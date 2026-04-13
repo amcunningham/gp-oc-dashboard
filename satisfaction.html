@@ -297,7 +297,137 @@ td:first-child, th:first-child { text-align: left; }
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
-<h2>7. Summary</h2>
+<h2>7. Does the timing of OC adoption matter?</h2>
+
+<p style="font-size:13px; color:#374151; margin-bottom:16px;">The regression above uses February 2026 OC rates &mdash; a snapshot taken 10 months after the GPPS fieldwork. But OC adoption has accelerated rapidly: nearly half of practices in every tertile had zero OC submissions in August 2024. Using <a href="https://digital.nhs.uk/data-and-information/publications/statistical/submissions-via-online-consultation-systems-in-general-practice">NHS England OC data</a> from August 2024 and March 2025 (contemporaneous with GPPS fieldwork), we can ask: among practices that are now high-OC, does how long they&rsquo;ve been using OC relate to satisfaction?</p>
+
+<div class="card">
+<h3>Satisfaction by history of OC adoption</h3>
+<p class="note">Current high-OC practices (Feb 2026 top tertile), grouped by their Aug 2024 OC rate. Zero group = no OC submissions in Aug 2024; Q1&ndash;Q5 = quintiles of non-zero practices.</p>
+<table style="width:100%; border-collapse:collapse; font-size:13px; margin:12px 0;">
+<thead>
+<tr style="border-bottom:2px solid #ddd; text-align:left;">
+<th style="padding:8px;">Group</th>
+<th style="padding:8px; text-align:right;">N</th>
+<th style="padding:8px; text-align:right;">OC rate<br>Aug 2024</th>
+<th style="padding:8px; text-align:right;">OC rate<br>Feb 2026</th>
+<th style="padding:8px; text-align:right;">List size</th>
+<th style="padding:8px; text-align:right;">% Good</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-bottom:1px solid #eee; background:#fff8e1;">
+<td style="padding:8px;">Zero in Aug 2024</td>
+<td style="padding:8px; text-align:right;">733</td>
+<td style="padding:8px; text-align:right;">0.0</td>
+<td style="padding:8px; text-align:right;">13.1</td>
+<td style="padding:8px; text-align:right;">13,748</td>
+<td style="padding:8px; text-align:right;">73.5%</td>
+</tr>
+<tr style="border-bottom:1px solid #eee;">
+<td style="padding:8px;">Q1 (lowest non-zero)</td>
+<td style="padding:8px; text-align:right;">255</td>
+<td style="padding:8px; text-align:right;">0.2</td>
+<td style="padding:8px; text-align:right;">12.3</td>
+<td style="padding:8px; text-align:right;">9,748</td>
+<td style="padding:8px; text-align:right;">72.0%</td>
+</tr>
+<tr style="border-bottom:1px solid #eee; background:#f9fafb;">
+<td style="padding:8px;">Q2</td>
+<td style="padding:8px; text-align:right;">254</td>
+<td style="padding:8px; text-align:right;">1.4</td>
+<td style="padding:8px; text-align:right;">12.2</td>
+<td style="padding:8px; text-align:right;">11,580</td>
+<td style="padding:8px; text-align:right;">74.2%</td>
+</tr>
+<tr style="border-bottom:1px solid #eee;">
+<td style="padding:8px;">Q3</td>
+<td style="padding:8px; text-align:right;">255</td>
+<td style="padding:8px; text-align:right;">4.2</td>
+<td style="padding:8px; text-align:right;">12.1</td>
+<td style="padding:8px; text-align:right;">12,956</td>
+<td style="padding:8px; text-align:right;">71.9%</td>
+</tr>
+<tr style="border-bottom:1px solid #eee; background:#f9fafb;">
+<td style="padding:8px;">Q4</td>
+<td style="padding:8px; text-align:right;">254</td>
+<td style="padding:8px; text-align:right;">8.4</td>
+<td style="padding:8px; text-align:right;">12.0</td>
+<td style="padding:8px; text-align:right;">12,355</td>
+<td style="padding:8px; text-align:right;">73.5%</td>
+</tr>
+<tr style="border-bottom:1px solid #eee; background:#fce4e4;">
+<td style="padding:8px;"><strong>Q5 (most established)</strong></td>
+<td style="padding:8px; text-align:right;">255</td>
+<td style="padding:8px; text-align:right;">11.7</td>
+<td style="padding:8px; text-align:right;">15.1</td>
+<td style="padding:8px; text-align:right;">12,667</td>
+<td style="padding:8px; text-align:right;"><strong>77.6%</strong></td>
+</tr>
+<tr style="border-top:2px solid #333; background:#d5e8d4;">
+<td style="padding:8px;"><em>Low OC tertile (reference)</em></td>
+<td style="padding:8px; text-align:right;"><em>2,005</em></td>
+<td style="padding:8px; text-align:right;">&mdash;</td>
+<td style="padding:8px; text-align:right;">&mdash;</td>
+<td style="padding:8px; text-align:right;"><em>7,949</em></td>
+<td style="padding:8px; text-align:right;"><em>80.2%</em></td>
+</tr>
+</tbody>
+</table>
+<div class="blurb">
+<strong>Reading:</strong> There is no smooth gradient from Q1 to Q4 (all cluster at 72&ndash;74%). But Q5 &mdash; practices with the longest, most intensive OC history (mean rate 11.7 in Aug 2024) &mdash; stand out at 77.6%, roughly 4pp above the rest of the high-OC group. 733 practices went from zero OC in Aug 2024 to the top tertile by Feb 2026; their satisfaction (73.5%) is no worse than practices that ramped up more gradually.<br><br>
+<strong>Interpretation:</strong> The Q5 result is consistent with a transition effect (disruption eases with longer exposure), but it could equally reflect organisational competence &mdash; practices that adopted early and went all-in may simply be better-run. Even Q5 remains 2.6pp below the Low OC reference (80.2%), and much of that residual gap is likely explained by list size (Q5 averages 12,667 vs 7,949). ANOVA across all groups: F&nbsp;=&nbsp;9.1, p&nbsp;&lt;&nbsp;0.001.
+</div>
+</div>
+
+<div class="card">
+<h3>Temporal regression: does the cross-sectional OC rate overstate the effect?</h3>
+<p class="note">Replacing Feb 2026 OC rate with Aug 2024 baseline + change to Mar 2025 (contemporaneous with GPPS)</p>
+<table style="width:100%; border-collapse:collapse; font-size:13px; margin:12px 0;">
+<thead>
+<tr style="border-bottom:2px solid #ddd; text-align:left;">
+<th style="padding:8px;">Model</th>
+<th style="padding:8px; text-align:right;">R&sup2;</th>
+<th style="padding:8px; text-align:right;">OC contribution<br>to 6.5pp gap</th>
+<th style="padding:8px; text-align:right;">List size</th>
+<th style="padding:8px; text-align:right;">IMD</th>
+<th style="padding:8px; text-align:right;">Unexplained</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-bottom:1px solid #eee; background:#eff6ff;">
+<td style="padding:8px;"><strong>A: Feb 2026 OC rate</strong><br><span style="font-size:11px; color:#6b7280;">(published model)</span></td>
+<td style="padding:8px; text-align:right;"><strong>0.17</strong></td>
+<td style="padding:8px; text-align:right; color:#dc2626;"><strong>&minus;4.9pp</strong></td>
+<td style="padding:8px; text-align:right;">&minus;1.3pp</td>
+<td style="padding:8px; text-align:right; color:#059669;">+0.5pp</td>
+<td style="padding:8px; text-align:right;">&minus;0.9pp</td>
+</tr>
+<tr style="border-bottom:1px solid #eee;">
+<td style="padding:8px;"><strong>B: Aug 2024 + Change</strong><br><span style="font-size:11px; color:#6b7280;">(temporal OC measures)</span></td>
+<td style="padding:8px; text-align:right;">0.16</td>
+<td style="padding:8px; text-align:right; color:#dc2626;">&minus;1.1pp</td>
+<td style="padding:8px; text-align:right;">&minus;1.6pp</td>
+<td style="padding:8px; text-align:right; color:#059669;">+0.5pp</td>
+<td style="padding:8px; text-align:right;">&minus;4.5pp</td>
+</tr>
+<tr style="border-bottom:1px solid #eee; background:#f9fafb;">
+<td style="padding:8px;"><strong>C: All three timepoints</strong><br><span style="font-size:11px; color:#6b7280;">(Aug 24 + Mar 25 + Feb 26)</span></td>
+<td style="padding:8px; text-align:right;"><strong>0.20</strong></td>
+<td style="padding:8px; text-align:right;" colspan="4"><span style="font-size:12px;">Feb 26 rate dominates; Aug 24 and Mar 25 flip positive &mdash;<br>conditional on current use, longer history is slightly protective</span></td>
+</tr>
+</tbody>
+</table>
+<div class="blurb">
+<strong>Key finding:</strong> The temporal OC measures (Aug 2024 baseline and change to Mar 2025) explain far less of the satisfaction gap than the Feb 2026 cross-sectional rate. When we use the temporal measures, OC accounts for only 1.1pp of the 6.5pp gap, and 4.5pp is left unexplained. This suggests that the Feb 2026 OC rate is acting as a proxy for a bundle of practice characteristics &mdash; not just OC use, but everything that correlates with being a high-OC practice.<br><br>
+<strong>But the OC signal is real.</strong> In Model C, where all three timepoints are included, the Feb 2026 rate remains the dominant predictor, while the Aug 2024 and Mar 2025 rates flip positive. This means that, conditional on where a practice ends up, having been doing OC <em>earlier</em> is associated with slightly <em>better</em> satisfaction &mdash; consistent with a transition effect.<br><br>
+<strong>Context:</strong> Nearly half of all practices across every tertile had zero OC in August 2024. The big acceleration for the High OC group came after the GPPS fieldwork: their mean rate was 6.6 per 1,000/day in March 2025 but 12.9 by February 2026. The satisfaction scores therefore reflect a much earlier, lower-intensity stage of OC use than the Feb 2026 tertile labels imply.<br><br>
+<strong>Method note:</strong> All models include list size, IMD 2025, and age as covariates (matching the published model). OC rates converted to monthly submissions per 1,000 patients for comparability. Aug 2024: 22 working days; Mar 2025: 21 working days; Feb 2026: 20 working days. N&nbsp;=&nbsp;5,741 practices with data at all three timepoints.
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>8. Summary</h2>
 
 <div class="highlight">
 <strong>Patients in high-OC practices report worse experience across almost every measure.</strong> Overall satisfaction is 6.5 percentage points lower, phone access is harder, contact experience is poorer, and patients wait longer for next steps. Website ease is much lower in high-OC practices (59% vs 87%) where more patients use it.<br><br>
