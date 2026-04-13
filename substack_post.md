@@ -1,6 +1,8 @@
 # Digital Triage in General Practice: Demand, Workload, and Patient Experience at Scale
 *From phone queues to hidden work: what digital triage really does*
 
+> **In brief:** Over £240 million has been spent rolling out digital triage in English general practice. Using publicly available NHS data from ~6,000 practices, I test four propositions: whether it eases the 8am phone rush (yes, but total morning demand rises), whether it increases demand on the practice (yes — net expansion, not just channel substitution), whether patients are happier (no — satisfaction is markedly lower), and whether clinical outcomes are affected (mostly not — but cancer detection improves in the most deprived areas, while diabetes treatment targets show a small squeeze).
+
 If you've tried to contact your GP surgery recently, you may have been asked to fill in a form on a website before anyone would speak to you. The NHS calls this "online consultation" — but the name is misleading. You're not consulting anyone. You're submitting a written request into a triage system. A member of staff reads it, decides what you need, and gets back to you — maybe with a phone call, maybe with a text, maybe with an appointment, maybe not until the next day.
 
 This is digital triage: the practice decides what happens, based on what you've typed into a form. It has gone by several names — "total triage" during COVID, "Modern General Practice Access" in the 2023 NHS Delivery Plan, "online consultation" (OC) in the official data. I'll use OC throughout this post — but remember, it means filling in a form instead of phoning, not a consultation. Whatever you call it, the same system is now embedded in thousands of English practices, and over £240 million of public money has been spent rolling it out.
@@ -39,7 +41,7 @@ For the 8am rush analysis, I've used a smaller set of about 4,300 practices that
 
 One more thing about the OC data. From February 2026, OC submissions are split into clinical and administrative categories. Overall, about 65% of submissions are clinical (a patient describing a health problem that needs clinical assessment), 24% are administrative, and the rest are other or unknown. Not all submissions will need clinical review — the administrative ones can often be handled by reception or admin staff. But in high-OC practices, the clinical share is higher: 67% versus 57% in the low group. So the practices processing the most OC submissions are not simply handling more admin; they are receiving proportionally more demand that does need clinical input. (Some submissions will inevitably be miscategorised, but the overall pattern is clear.)
 
-### Does the 8am rush ease?
+### [Does the 8am rush ease?](https://amcunningham.github.io/gp-oc-dashboard/rush_analysis.html)
 
 This is where the CBT data comes in. The CBT dataset records inbound calls to practices — every call that rings, whether it is answered or not. There are two kinds of 8am rush, and they behave differently.
 
@@ -51,7 +53,7 @@ The structural explanation is straightforward. Digital triage does not remove qu
 
 Behavioural factors may compound this. Patients may carry over the habits of the phone queue, assuming that early submissions get faster responses. Practices may implicitly reinforce that assumption. But the core mechanism is architectural, not behavioural: lower access friction at peak times means higher peak throughput.
 
-### Does visible demand rise?
+### [Does visible demand rise?](https://amcunningham.github.io/gp-oc-dashboard/workforce_appts.html)
 
 Here we need to be careful about terminology. Appointments delivered are not the same as demand. A patient who submits a triage form has expressed demand; a patient who phones the surgery has expressed demand. Whether either results in a recorded appointment is a separate question.
 
@@ -63,7 +65,7 @@ On the appointments side, practices in the highest OC tertile deliver about 25 a
 
 In the high-OC group, practices are processing over 12 OC submissions per 1,000 patients per working day. Two thirds of these are clinical. The appointment data shows us the visible tip of the workload; beneath it sits a substantial volume of clinical processing that we simply cannot measure with the data available. This is not just a measurement gap — it has consequences. Workforce planning models that rely on appointment counts will underestimate the clinical time consumed by OC. Productivity metrics that divide appointments by staff will make OC-heavy practices look less busy than they are. And any policy evaluation that uses recorded activity as its denominator will systematically undercount what these practices are actually doing.
 
-### Are patients happier? No — they're less satisfied
+### [Are patients happier? No — they're less satisfied](https://amcunningham.github.io/gp-oc-dashboard/satisfaction.html)
 
 This is where the theory runs into the most trouble. If the modern access model is working as intended — surfacing demand, managing it effectively, ending the phone battle — patients at high-OC practices should report better experiences.
 
@@ -73,7 +75,7 @@ A regression on all 6,012 practices lets us decompose the 6.5 percentage-point g
 
 There is also the question of digital exclusion. Patients who can't or won't use online forms may find it harder to access high-OC practices — and if their experience is worse as a result, the satisfaction data may actually understate the problem. The GPPS has a response rate of around 27%, and its own [technical reports](https://gp-patient.co.uk/technical-annex-introduction-2025) show that people in deprived areas, younger patients, and men are systematically under-represented. If digitally excluded patients are both less satisfied and less likely to respond, the gap we observe is a floor, not a ceiling.
 
-### But what about clinical outcomes?
+### [But what about clinical outcomes?](https://amcunningham.github.io/gp-oc-dashboard/outcomes.html)
 
 An obvious response to the satisfaction findings is: so what? Maybe digital triage makes patients less happy but produces better care. A system that effectively triages demand might catch conditions earlier, manage chronic disease better, or reduce emergency admissions. That's a perfectly reasonable hypothesis — and we can partly test it. But it's worth being clear about what kind of intervention OC is. It is not a clinical intervention — it doesn't change what happens in the consultation room. It is an access and logistics intervention: it changes how patients reach the practice and how demand is sorted. We should expect its effects on clinical outcomes to be indirect and modest, and that is largely what we find.
 
