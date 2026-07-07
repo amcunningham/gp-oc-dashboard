@@ -109,8 +109,9 @@
   </div>
 
   <div class="card">
-    <label for="q">Your question — about a place, a comparison, a trend, or the findings</label>
-    <input id="q" placeholder="e.g. Which region has the highest average same-day share, and how does continuity compare?">
+    <label for="q" style="font-size:.95rem; color:var(--ink); font-weight:600">Ask a question — about a place, a comparison, a trend, or the findings</label>
+    <input id="q" style="font-size:1.05rem; padding:.75rem .9rem; margin-top:.35rem"
+           placeholder="e.g. Which region has the highest average same-day share, and how does continuity compare?">
     <div class="examples" id="examples"></div>
     <div style="margin-top:.7rem">
       <button id="ask">Ask</button>
@@ -121,9 +122,12 @@
 
   <div class="card">
     <div class="sql-label">
-      <label>Generated SQL — check it, edit it, re-run it</label>
+      <label>The query behind the answer</label>
       <button class="ghost" id="run">Run SQL</button>
     </div>
+    <p class="status" style="margin:.2rem 0 .5rem">You don't need to read or touch this — questions run
+    automatically. It's shown so anyone can check exactly what was asked of the data, and edit and
+    re-run it if they wish.</p>
     <textarea id="sql" rows="6" spellcheck="false">-- SQL appears here; you can also write your own.
 SELECT month, ROUND(100.0*SUM(same_day)/SUM(total),1) AS same_day_pct
 FROM waits GROUP BY 1 ORDER BY 1;</textarea>
