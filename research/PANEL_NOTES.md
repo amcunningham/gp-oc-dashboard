@@ -1,0 +1,334 @@
+# GP same-day appointments × online consultation panel — build notes
+
+Built 6 July 2026. Companion to amcunningham/gp-oc-dashboard (cross-sectional Feb 2026 analyses).
+
+## Files
+
+- `panel_merged.csv` — practice × month panel, Mar 2023 – May 2026 (FE analysis window Apr 2023 – Mar 2026 where OC data exists). ~223,700 practice-months, 6,376 practices.
+- `gpad_agg/gpad_<release>.csv` — per-release GPAD aggregates (intermediate).
+- `panel_oc.csv` — OC submissions panel, Apr 2023 – Mar 2026 (from Oct 2024 + Mar 2026 releases; Mar 2026 preferred where months overlap).
+- `agg_duck2.py` (in /tmp of sandbox; logic reproduced in repo notes) — DuckDB aggregation of GPAD Practice_Level_Crosstab CSVs.
+
+## Panel columns
+
+month, gp_code, total, same_day, next_day, book_unknown, gp, gp_same_day, f2f, phone, online, dna, attended (GPAD counts); supplier, oc_total, oc_clinical, oc_admin, oc_rate_1k, list_size, oc_capability, oc_usage (OC publication); imd_score, imd_quintile (repo practice_imd.csv); oc_tertile_feb26, region (repo full_oc_tertiles.csv); same_day_pct, gp_same_day_pct (derived).
+
+## Sources
+
+- GPAD: Appointments in General Practice, practice-level crosstabs, 13 releases May 2023 → May 2026 (each carries 3 months). NHS England Digital.
+- OC: Submissions via Online Consultation Systems in General Practice, Oct 2024 release (Apr 2023–Oct 2024) + Mar 2026 release (Sep 2024–Mar 2026).
+
+## CORRECTION (6 Jul 2026, evening build)
+
+An interrupted unzip truncated the Mar-2026 OC north-regions file in the first build, dropping
+~60k practice-months (region×month chunks, mostly northern practices in recent months). All
+figures below are from the corrected rebuild. Adoption landscape (corrected): Apr 2023 —
+4,857/6,361 practices (76%) already had OC capability, 4,537 some use, 1,871 at ≥20/1k;
+Mar 2026 — 6,099/6,143 (99%) capability, 6,023 any use, 4,834 at ≥20/1k. The event-study
+"adopters" (n=2,202; 1,627 with ≥6 months pre+post) are only practices crossing a strict
+low(<5/1k)→high(>20/1k) threshold WITHIN the window — most practices adopted before Apr 2023
+and cannot appear as events.
+
+Corrected headline numbers: two-way FE β = 0.0060 (SE 0.0009). Event study: pooled bump +0.5pp
+at k=0 fading by ~k=+11, same pre-trend. Supplier split (mean of k=+6..+12 vs k=−1):
+Accurx (n=669) +0.6pp, flat pre-trend; TPP/SystmConnect (n=148) +2.4pp sustained, steep
+pre-trend from −6.5pp; eConsult (n=102) ~0, noisy.
+
+## First results (prototype, 6 Jul 2026 — superseded by correction above; qualitative story unchanged)
+
+Sample: practice-months with OC data and ≥200 appointments; n = 164,130; 6,305 practices.
+
+- Two-way fixed effects (practice + month FE, SEs clustered by practice):
+  same_day_pct on oc_rate_per_1k → **β = 0.0048 (SE 0.0010, p < 0.001)**.
+  i.e. +100 submissions/1,000 patients/month ≈ +0.5 pp same-day. Median within-practice
+  SD of OC rate is 16.6/1k → typical OC variation shifts same-day % by ~0.08 pp. Effectively nil.
+- Pooled (month FE only, no practice FE): β = 0.0124 — the between-practice association is ~2.6× the
+  within-practice one, and still modest.
+- Interpretation: cross-sectional differences in same-day provision are a property of the practice's
+  access model, not driven by changes in OC volume. Consistent with OC being usable for advance
+  booking as much as same-day triage.
+
+## Event-study feasibility
+
+- 1,335 practices show a low→high OC adoption event (3-month max <5/1k → 3-month min >20/1k).
+- 4,211 practices record >1 supplier over the period (check: supplier field may reflect multiple
+  concurrent systems, not a clean switch).
+
+## Known caveats
+
+- GPAD is official statistics *in development*: no national data-entry standards; time-from-booking
+  partly reflects slot configuration (total-triage practices book everything same-day).
+- October same-day % dips every year (flu/COVID clinics booked in advance inflate denominator) —
+  month FE absorbs national seasonality but not practice-specific vaccination volume.
+  Consider excluding "Planned Vaccination" national category in a sensitivity build.
+- Practice-level GPAD only from Oct 2022; pre-COVID comparison must use sub-ICB geography.
+- OC participation is voluntary; ~73% of practice-months have OC data, growing over time —
+  selection into the OC collection is itself non-random.
+- Practice mergers: gp_code panel is unbalanced (6,373 → 6,139 practices); no successor-code
+  handling yet (ODS epraccur/successor file needed).
+- From 2026/27 the contract requirement to record clinically urgent same-day care will change
+  recording behaviour — treat Apr 2026+ as a separate regime.
+
+## Cross-sectional models (added 6 Jul 2026, evening)
+
+Dataset `xsec_2025.csv` / `xsec_model_data.csv`: one row per practice. Exposure = same-day %
+averaged Apr 2024–Mar 2025 (12m to end of GPPS 2025 fieldwork). Linked: GPPS 2025 practice
+weighted CSV (gp-patient.co.uk) — `overallexp.pcteval` (satisfaction) and
+`localgpservicesprefhpsee.pcteval` (continuity: % seeing/speaking to preferred HCP);
+GP Workforce Mar 2025 practice high-level CSV (FTE by staff group per 10k);
+NHS Payments 2024/25 practice CSV (rurality, dispensing); merger proxy = any month-on-month
+list-size jump >15% during Apr 2023–Mar 2025 (n=150). GPPS sentinel codes (<0, e.g. −97
+suppressed) set to missing. GPPS models weighted by responses, robust (HC1) SEs, region dummies.
+
+A. Predictors of same-day % (n=6,007, R²=0.067): deprivation +0.12pp/IMD point; rural −1.6pp;
+log list +1.1; GP FTE/10k +0.10; nurse FTE/10k −0.22; recent merger −2.0pp; OC rate +0.016.
+Low R² = structure/demographics explain little; access model looks like a practice choice.
+
+B. Satisfaction ~ same-day %: unadjusted −0.096 (p=1e−12) → adjusted −0.032 (p=0.011).
+10pp more same-day ≈ −0.3pp satisfaction. The published negative association largely reflects
+confounding (size, deprivation); the residual effect is trivial.
+
+C. Continuity ~ same-day %: unadjusted −0.236 → adjusted −0.147 (p=7e−15).
+10pp more same-day ≈ −1.5pp continuity. Robust but modest. Continuity's dominant predictor is
+practice size (−11.7 per log unit; small-vs-large quartile means 50.4% vs 34.3%); deprivation
+−0.25/point; dispensing practices +4.8pp.
+
+## Change models 2024→2025 (added 6 Jul 2026, late)
+
+GPPS 2024 practice weighted CSV pulled (identical variable names to 2025; the 2023 wave used the
+pre-redesign questionnaire and is NOT comparable for these measures — only 2024→2025 change
+possible). `change_2024_2025.csv`, n=5,994. Exposure change: same-day % (Apr23–Mar24) →
+(Apr24–Mar25), SD of change 5.3pp. Weighted by min(responses), HC1 SEs, region + covariates.
+
+- Δsatisfaction ~ Δsame-day: +0.027 (p=0.21) — null.
+- Δcontinuity ~ Δsame-day: −0.011 (p=0.77) — null.
+- ΔOC rate predicts neither.
+
+Read with the cross-section: the continuity–same-day association (−0.15) does not appear in
+1-year within-practice changes. Candidate explanations: stable confounding (access model proxies
+stable practice traits), effects too slow for a 1-year window, and attenuation from GPPS
+practice-level sampling noise in difference scores. A 2026-wave extension (fieldwork Jan–Mar
+2026, due ~Jul 2026) would give a 3-wave panel and better power.
+
+## Analytic framework note (per AMC)
+
+Cancer detection is an OUTCOME of the access model, not a predictor of same-day %. Framework:
+predictors/structure (rurality, deprivation, list size, staffing mix, recent merger, OC/CBT
+tooling) → access model (same-day %, triage, mode mix) → outcomes (satisfaction, continuity,
+cancer detection/TWW conversion via Fingertips, potentially A&E attendance).
+
+## Cancer outcomes + mode/volume (added 6 Jul 2026, late)
+
+Fingertips (API, GP practice level, 2024/25): 91347 detection rate (% new cancers via USC
+referral), 91845 conversion rate (% USC referrals → cancer), 91882 USC referral crude rate.
+File `xsec_with_cancer.csv`. Weighted by indicator denominator, HC1, full controls as before.
+
+- Detection rate (mean 52.7%): unadj −0.047 (p=9e−5) → adj −0.012 (p=0.29). NULL after controls.
+- Conversion rate (mean 6.1%): unadj −0.027 → adj −0.0056 (p=0.023). 10pp same-day ≈ −0.06pp. Trivial.
+- USC referral rate: unadj −13/100k → adj −3.2 (p=0.11). Null.
+Raw negative associations are confounding (deprived/urban practices do more same-day and have
+lower CDR). No evidence same-day access models help or harm cancer detection.
+
+Mode & volume vs same-day % (cross-section, adjusted):
+- phone share +0.146 per pp (r=+0.20); F2F share −0.214 per pp (r=−0.29) — same-day models are
+  more telephone-based.
+- consultation volume: +0.026pp same-day per appt/1k/mo (r=+0.20) — higher-volume practices do
+  more same-day (or same-day capacity enables volume).
+- DNA rate: strongly negative (adj −1.56 same-day pp per DNA pp; r=−0.12) — same-day models have
+  fewer DNAs, plausibly mechanical (less time to forget).
+
+## Wait-band (longer timescale) analyses (added 7 Jul 2026)
+
+Re-aggregated all 13 GPAD releases with full booking-interval bands → `waits_agg/waits_<REL>.csv`,
+39 continuous months 2023-03 → 2026-05. Cross-section `xsec_waits.csv` (12m to Mar 2025, n=6,007).
+
+National trend (chart `wait_bands_trend.png`): polarisation. Same-day 43.2%→44.9%; >14-day waits
+16.6%→18.3%; the 1–7-day middle squeezed (27.1%→23.7%). Practice-level corr(same-day %, 15+day %)
+= −0.50.
+
+Determinants of % waits 15+ days (R²=0.245 — far more structurally determined than same-day's
+0.067): rural +2.0pp; log list +2.0; affluent (IMD −0.16/point); nurse FTE/10k +0.22;
+recent merger −0.7; dispensing +0.7. Long-wait practices = rural, affluent, larger, nurse-heavy —
+the booked-ahead model.
+
+GPPS outcomes with BOTH extremes in the model (reference = 1–14 day middle):
+- Continuity: same-day −0.205 (p=1e−20) AND 15+day −0.153 (p=2e−7) — both extremes worse than
+  the middle. Continuity is highest where care is booked days-to-2-weeks ahead.
+- Satisfaction: same-day −0.039 (p=0.007), 15+day −0.020 (p=0.29 ns).
+Decile table: raw continuity falls monotonically with same-day % (47.3%→37.5% across deciles)
+but deciles conflate falling long-wait share; the joint model separates the two.
+
+## GP vs other-staff wait mix (added 7 Jul 2026)
+
+Files: `gp_vs_other_waits_trend.csv` (national monthly), `xsec_gp_vs_other.csv` (12m to Mar-25).
+
+National: GP appointments are majority same-day (55.4%→56.5%, stable) with ~12% at 15+ days
+(stable). Other-staff appointments drive the national polarisation: same-day 31.9%→35.4% AND
+15+ days 21.2%→23.3%. GPs do today's work; nurses/DPC hold the booked-ahead book.
+
+GPPS outcomes with staff-specific wait mixes + GP share of appointments (n=6,000, weighted, HC1):
+- Continuity: GP same-day −0.145 (p=6e−20); GP 15+ null; other-staff 15+ −0.128 (p=8e−7);
+  GP share of all appointments +0.192 (p=5e−18). The continuity cost of same-day models lives
+  specifically in the GP appointment mix; GP-delivered share is the strongest positive predictor.
+- Satisfaction: GP 15+ POSITIVE +0.049 (p=0.004) — booked-ahead GP care associates with higher
+  satisfaction; other-staff 15+ negative −0.046; GP share +0.083 (p=7e−8).
+
+## No-booking cohort + QOF (added 7 Jul 2026)
+
+Cohort: GP same-day % (12m to Mar-25) ≥80% → 332–342 practices (5.5%); ≥90% → 43; ≥70% → 17%.
+Persistent trait: 163/342 at ≥80% in all three years; gp_sd correlates 0.77 two years apart.
+Profile vs rest: smaller, more deprived (IMD 28 v 23), urban, Midlands/London-heavy, phone-heavy,
+other-staff appts also more same-day. Unadjusted continuity −2.7pp, satisfaction −3.0pp.
+
+QOF (Fingertips ind. 295, % points achieved, 2024/25, mean 93.9, ceiling-skewed): NULL on all
+specifications. gp_sd continuous +0.0004 (p=0.92); high80 cohort +0.01pp (p=0.96); OR for
+bottom-quartile QOF 0.89 (p=0.39). Raw 1pp gap (93.0 v 94.0) is entirely composition. QOF is
+delivered via recall/booked systems regardless of access model. Caveats: ceiling effects,
+personalised-care adjustments, partial income protection in recent years compress variation;
+domain-level QOF might still differ. File `xsec_qof.csv`.
+
+## Cancer emergency admissions (added 7 Jul 2026)
+
+Fingertips 91355 (NDRS): emergency admissions WITH cancer, crude rate/100k registered, practice
+level, 2024/25 (mean 522). NOTE: measures any emergency admission of a cancer patient — mixes
+route-to-diagnosis with crisis care of known cancer; NOT the same as % diagnosed via emergency
+presentation (not published at practice level). Added % 65+ (workforce census age bands) as
+control — dominates (β≈20/100k per pp, model R²=0.48). File `xsec_cancer_em.csv`.
+
+- GP same-day % : full model −0.36/100k per pp (p=0.03) — 10pp more GP same-day ≈ −3.6/100k
+  (~0.7% of mean). Borderline, slightly favourable to same-day access; treat as null-to-marginal.
+- No-booking cohort (high80): null (−3.8, p=0.71).
+No evidence same-day-dominant models increase cancer emergency admissions.
+
+General ED attendance/admissions NOT published below sub-ICB (patient side) / provider (hospital
+side); ECDS holds GP_PRACTICE_CODE_TRACED so practice tabulations need DARS, OpenSAFELY, or CPRD.
+
+## Critique: Jamieson, Gravelle & Santos (Health Policy 2025) — avoidable ED attendance (added 7 Jul 2026, per AMC)
+
+Paper: 10.16M adult attendances, 144 Type 1 EDs, 2018/19 HES A&E (NOT ECDS), attendance-level
+LPM/logit with ED fixed effects. Exposures include GPPS patient-reported "can book same-day"
+(NOT GPAD). Finding: higher same-day proportion → attendance less likely avoidable.
+
+AMC's critique (confirmed from deposited full text): both avoidability definitions are partly
+DISPOSITION-BASED — admission ⇒ not avoidable (Disposal domain), ambulance arrival ⇒ urgent,
+NHS definition also requires discharge home/GP + only minor treatments/investigations.
+Consequences:
+1. Circularity via ED behaviour: admission/investigation thresholds vary by bed pressure,
+   4-hour-target management, and patient type. Older/deprived patients admitted at lower
+   thresholds ⇒ mechanically "unavoidable" — their demographic gradients are partly artefact.
+   ED fixed effects absorb between-ED threshold differences only, not within-ED differential
+   handling.
+2. Exposure can reach outcome through the wrong path: poor practice access → later, sicker
+   presentation → admission → classified unavoidable → practice looks BETTER. Direction of
+   bias on the same-day association is indeterminate.
+3. Fragility: kappa between their own two definitions = 0.44.
+
+Openings for our work / a York approach: (a) rates, not conditional-on-attendance shares;
+(b) GPAD supply-side access measures vs their GPPS perception measure; (c) ECDS chief-complaint
+data would allow a PROSPECTIVE avoidability definition (they name this as future work);
+(d) GP clinical input on triage-recording artefacts. Pitch = complementary collaboration,
+not correction.
+
+## Perception vs supply + GPPS access-experience variables (added 7 Jul 2026)
+
+Files `perception_vs_supply.csv`, `gpps_access_experience.csv`; questionnaire reference
+`GPPS_2025_questions.md` + PDF. Key measurement finding: patient-experienced same-day
+(Q20 lastgpapptwhen_1, mean 52%) correlates −0.10 with GPAD same-day SHARE and only +0.05 with
+per-capita same-day supply; +0.18 with total appts per capita. share = percap/total, so the
+three measures are near-collinear; clean spec = share + total capacity.
+
+Clean spec results (z-outcome ~ z_share + z_capacity + controls, weighted, HC1, n≈6,000):
+outcome              share      capacity
+pt same-day (Q20)    −0.149***  +0.181***
+wait too long (Q21)  −0.246***  −0.045**
+next step immediate  −0.204***  −0.128***
+contact fail (Q12)   +0.047***  −0.138***
+phone failed (Q11)   +0.034*    −0.082***
+A&E after fail (Q15_8, among failed) −0.034*  +0.004
+A&E after fail, population approx    −0.015   −0.070***
+
+Reading: CAPACITY protects — fewer failed contacts, fewer A&E fallbacks, more experienced
+same-day. CONFIGURATION (high same-day share) conditionally reduces experienced same-day and
+raises "come back tomorrow" contact failure (rationing signature) — BUT strongly reduces
+"waited too long" among those seen. Tension between Q20 and Q21 worth exploring (expectation
+management by triage systems? conditional-on-appointment speed?).
+Policy point: the GPAD same-day % metric (2026/27 contract) tracks configuration, not the
+capacity that actually predicts patient-experienced access and A&E avoidance.
+NB: gpcontactoutcome = Q11 (phone outcome); gpcontacthandlerequest = Q14 (corrected mapping).
+
+## Remaining covariates linked: ethnicity + ODS-validated mergers (added 7 Jul 2026)
+
+Ethnicity: GPPS dv_ethnicityband_1 (White) → nonwhite % (survey respondents; skews older —
+caveat). Mean 24.6%. Independently predicts lower continuity (−0.050/pp, p=2e−5) and
+satisfaction (−0.056/pp, p=2e−11), partially attenuating IMD. Same-day coefficients survive
+(continuity −0.141, satisfaction −0.026).
+
+Mergers: ODS succ file useless for practices (44 practice rows ever). Built from epraccur
+closures instead: 703 org closures Apr23–Mar26, 190 were practices seen in OC data with a PCN.
+Flags: closure_exposed = same-PCN practice within ±2 months of a closure (n=212 in analysis
+set); merger_recipient = closure_exposed AND ≥5% list jump (n=7 — tiny). Results:
+closure_exposed → satisfaction −2.1pp (p=0.016), continuity −2.2pp (p=0.06);
+merger_recipient → continuity −12.5pp (p=0.03) but n=7, fragile. The old 15%-jump proxy
+(n=150) goes null once these are included — it was mostly noise (boundary/registration churn).
+Local practice closure looks like a real patient-experience shock; needs the full closure list
+(many closures absent from OC data) for a proper estimate.
+
+## Workload / case-mix and prescribing (added 7 Jul 2026)
+
+Sources: Fingertips 241 diabetes QOF prevalence (2024/25 via parent_area_type=66; mean 8.3%);
+NHSBSA EPD API (datastore_search_sql, EPD_202503): antibacterial items (BNF 0501) and total
+items per practice, Mar 2025. File `xsec_workload_rx.csv`. NB OpenPrescribing API is behind
+Cloudflare — NHSBSA open-data API is the scriptable route.
+
+Case-mix → access model: diabetes prevalence and items/patient strongly predict CAPACITY
+(appts per capita: dm_prev +10.0/pp, items/pt +56.8, R²=0.30 — provision tracks need) but NOT
+same-day SHARE (dm_prev p=0.63; R² unchanged at 0.06). Configuration is a choice; capacity is
+need-driven.
+
+Antibiotics (items/1k/month, age-adjusted with %65+, diabetes prevalence controlled; crude —
+no STAR-PU): capacity +0.119*** (more consultations → more scripts, expected); same-day share
++0.080*** (10pp share ≈ +0.9% of mean — small but real: same-day-dominant models prescribe
+slightly more abx); phone share −0.031** (remote-heavy practices prescribe slightly FEWER —
+against the 'remote consulting drives antibiotics' concern). Caveat: prescription month
+attribution, no STAR-PU, single month.
+
+## GP staffing and cancer detection (added 7 Jul 2026, evening)
+
+Direct model (prompted by explorer testing): cdr ~ gp_per10k + nurse_per10k + dpc_per10k +
+IMD + %65+ + log list + rural + region (n~6,000, HC1). Raw corr 0.094 (negligible-to-weak).
+Adjusted: GP FTE/10k +0.081pp detection (p=0.005) - SURVIVES adjustment, unlike the same-day
+share associations; nurse staffing null (-0.098, p=0.17). Going from 9 to 15 GP FTE/10k ~
++0.5pp on mean CDR 52.7%. Fits the recurring pattern: GP-delivered care shows small positive
+associations (satisfaction, continuity, detection) where nurse/DPC staffing does not.
+
+## Nurse staffing and cancer pathway measures (added 7 Jul 2026, evening)
+
+Raw corr nurse FTE/10k vs TWW conversion = +0.27, vs referral rate +0.17. Both collapse with
+adjustment (conv: +0.012, p=0.26; ref_rate: -10.0, p=0.08). Mechanism is age confounding:
+nurse-heavy practices serve older lists (r=0.36 with %65+), and %65+ correlates 0.57 with
+conversion (older patients' urgent referrals are more often cancer). Nurse staffing also null
+for detection rate. Contrast: GP staffing vs detection survives adjustment (+0.081, p=0.005).
+
+## Method note: the explorer as a hypothesis-generating loop (added 7 Jul 2026)
+
+The NL-to-SQL explorer (explore.html) has functioned as more than an access layer. The working
+loop during development: the tool surfaces a raw association -> a clinically-informed reader
+challenges it (wrong variable, wrong frame, confounding suspected) -> the adjusted model is run
+-> the result is added to these notes and to the tool's grounding summary -> both the query and
+narrative routes of the tool improve. Three findings in these notes (GP staffing vs detection;
+nurse staffing vs conversion = age confounding; capacity vs configuration glossary) originated
+as explorer questions. Failure modes observed and fixed during testing are documented in the
+prompt design: nulls spun as support, findings transplanted across exposure-outcome pairs,
+variables misdefined by guess, units guessed, direction left ambiguous. The general lesson:
+LLM interfaces over health data need (a) visible, editable SQL; (b) a grounding summary of
+adjusted findings scoped to exact exposure-outcome pairs; (c) an independent second route
+(notes-based) that can audit the first; (d) a sceptical domain expert in the loop.
+
+## Covariate linkage status (all planned covariates now linked)
+
+- Rural/urban: ONS Rural-Urban Classification via practice postcode (epraccur → LSOA → RUC).
+- Staffing: GP Workforce practice-level monthly (FTE GP/nurse/DPC per 1,000).
+- Mergers/closures: ODS epraccur close dates + successor organisation file.
+- Satisfaction: GPPS practice-level (annual) — overall experience, access items.
+- Fingertips: ethnicity of practice population, cancer detection (TWW conversion/detection rates) —
+  annual, practice-level, via fingertips API.

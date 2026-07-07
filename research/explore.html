@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GP Access Research — Ask the Data</title>
+<style>
+  :root { --ink:#1a2733; --mut:#5a6b7a; --line:#dde5ec; --accent:#005eb8; --bg:#f7f9fb; }
+  * { box-sizing:border-box; }
+  body { font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; margin:0; color:var(--ink); background:var(--bg); }
+  .wrap { max-width:980px; margin:0 auto; padding:1.5rem 1rem 4rem; }
+  h1 { font-size:1.45rem; margin:.2rem 0 .3rem; }
+  .sub { color:var(--mut); margin:0 0 1.2rem; font-size:.95rem; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:10px; padding:1rem 1.1rem; margin-bottom:1rem; }
+  label { font-size:.8rem; color:var(--mut); display:block; margin-bottom:.15rem; }
+  input, select, textarea { font:inherit; border:1px solid var(--line); border-radius:6px; padding:.45rem .6rem; width:100%; }
+  textarea { font-family:ui-monospace,Consolas,monospace; font-size:.85rem; }
+  .row { display:flex; gap:.7rem; flex-wrap:wrap; }
+  .row > div { flex:1; min-width:180px; }
+  button { font:inherit; border:0; border-radius:6px; padding:.55rem 1.1rem; cursor:pointer; background:var(--accent); color:#fff; font-weight:600; }
+  button.ghost { background:#eef3f8; color:var(--accent); }
+  button:disabled { opacity:.5; cursor:wait; }
+  .examples span { display:inline-block; background:#eef3f8; color:var(--accent); border-radius:14px; padding:.25rem .7rem; margin:.15rem .25rem 0 0; font-size:.82rem; cursor:pointer; }
+  .status { font-size:.85rem; color:var(--mut); margin:.4rem 0; }
+  table { border-collapse:collapse; width:100%; font-size:.82rem; margin-top:.6rem; }
+  th, td { border:1px solid var(--line); padding:.3rem .5rem; text-align:left; white-space:nowrap; }
+  th { background:#eef3f8; position:sticky; top:0; }
+  .tablewrap { overflow:auto; max-height:420px; }
+  .caveat { font-size:.8rem; color:var(--mut); border-left:3px solid var(--accent); padding-left:.7rem; }
+  details summary { cursor:pointer; color:var(--accent); font-size:.85rem; }
+  .err { color:#b00020; font-size:.85rem; white-space:pre-wrap; }
+  .sql-label { display:flex; justify-content:space-between; align-items:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Ask the GP Access Research Data</h1>
+  <p class="sub">Natural-language querying of practice-level open data on GP appointment access in England
+  (6,007 practices; monthly panel Mar 2023–May 2026). Your question is turned into SQL by a language model,
+  the SQL is <strong>always shown</strong>, and the query runs entirely in your browser with
+  <a href="https://duckdb.org/docs/api/wasm/overview.html">DuckDB-WASM</a> — no data leaves this page.
+  See the <a href="README.md">data dictionary</a> and <a href="PANEL_NOTES.md">analysis notes</a>.</p>
+
+  <div class="card">
+    <details>
+      <summary>Model settings (needed once — stored only in your browser)</summary>
+      <div class="row" style="margin-top:.6rem">
+        <div>
+          <label>Provider</label>
+          <select id="provider">
+            <option value="demo">Shared demo (no key needed)</option>
+            <option value="anthropic">Anthropic (Claude)</option>
+            <option value="openai">OpenAI-compatible (incl. Ollama)</option>
+          </select>
+        </div>
+        <div>
+          <label>Model</label>
+          <input id="model" value="claude-haiku-4-5-20251001">
+        </div>
+        <div>
+          <label>API key (not needed for local Ollama)</label>
+          <input id="apikey" type="password" placeholder="sk-...">
+        </div>
+        <div id="baseurlwrap" style="display:none">
+          <label>Base URL (e.g. http://localhost:11434/v1)</label>
+          <input id="baseurl" value="http://localhost:11434/v1">
+        </div>
+      </div>
+      <p class="status"><strong>Shared demo:</strong> free to use, rate-limited (20 questions/hour), and
+      <strong>questions are logged anonymously</strong> to improve the tool — don't include personal details.
+      <strong>Own key:</strong> Anthropic keys work directly from the browser; nothing is logged. Keys are kept in
+      localStorage on your machine only. <strong>Local models:</strong> run <code>ollama serve</code> with
+      <code>OLLAMA_ORIGINS=*</code>, pick OpenAI-compatible, model e.g. <code>llama3.1</code>, leave key blank.</p>
+    </details>
+  </div>
+
+  <div class="card">
+    <label for="q">Your question</label>
+    <input id="q" placeholder="e.g. Which region has the highest average same-day share, and how does continuity compare?">
+    <div class="examples" id="examples"></div>
+    <div style="margin-top:.7rem">
+      <button id="ask">Ask</button>
+      <span class="status" id="llmstatus"></span>
+    </div>
+    <div id="answer" style="display:none; margin-top:.8rem; padding:.8rem 1rem; background:#f2f7ee; border-radius:8px; font-size:.95rem; line-height:1.5"></div>
+  </div>
+
+  <div class="card">
+    <div class="sql-label">
+      <label>Generated SQL — check it, edit it, re-run it</label>
+      <button class="ghost" id="run">Run SQL</button>
+    </div>
+    <textarea id="sql" rows="6" spellcheck="false">-- SQL appears here; you can also write your own.
+SELECT month, ROUND(100.0*SUM(same_day)/SUM(total),1) AS same_day_pct
+FROM waits GROUP BY 1 ORDER BY 1;</textarea>
+    <div class="status" id="dbstatus">Loading DuckDB…</div>
+    <div class="err" id="error"></div>
+    <div class="tablewrap"><table id="results"></table></div>
+  </div>
+
+  <div class="card caveat">
+    <strong>Read before interpreting:</strong> this is practice-level (ecological) open data — associations,
+    not causes. GPAD's "same day" measures how practices <em>configure</em> booking (total-triage practices
+    book everything same-day), not what patients experience; the two are nearly uncorrelated. GPAD is official
+    statistics in development. GPPS is a weighted sample survey. From April 2026 contract changes alter
+    same-day recording. Full caveats in the <a href="PANEL_NOTES.md">notes</a>.
+  </div>
+</div>
+
+<script type="module">
+import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.29.0/+esm";
+
+const $ = id => document.getElementById(id);
+const DATA_BASE = location.protocol === "file:"
+  ? "https://raw.githubusercontent.com/amcunningham/gp-oc-dashboard/main/research/data/"
+  : new URL("data/", location.href).href;
+
+// After deploying the Worker (see worker/SETUP.md), put its URL here, e.g.
+// "https://gp-explorer-demo.yoursubdomain.workers.dev". Empty = demo mode disabled.
+const DEMO_PROXY_URL = "https://gp-explorer-demo.anne-marie-cunningham.workers.dev";
+
+const TABLES = {
+  xsec:  "xsec_master.parquet",
+  panel: "panel_merged.parquet",
+  waits: "waits_panel.parquet",
+};
+
+const SCHEMA_DOC = `
+You translate questions about English general practice access into DuckDB SQL.
+Three views exist (practice identifier: gp_code):
+
+xsec — one row per practice (n=6007), exposure year Apr 2024–Mar 2025 unless noted:
+  gp_name, pcn_name, sub_icb_name, icb_name (e.g. 'NHS SUSSEX ICB'), postcode (e.g. 'BN14 7JL'),
+  region (e.g. 'LONDON','MIDLANDS'), list_size, rural (1=rural), imd_score (higher=more deprived),
+  imd_quintile, pct65plus, nonwhite_pct, dispensing_f, gp_per10k, nurse_per10k, dpc_per10k,
+  same_day_pct_12m (% appts booked+delivered same day), sd_share (same), sd_percap (same-day appts
+  /1k patients/month), appts_percap (all appts /1k/month), phone_pct_12m, f2f_pct_12m, dna_pct_12m,
+  gp_sd (% of GP appts same-day), oth_sd, gp_15p (% GP appts booked 15+ days ahead), oth_15p,
+  gp_share (% of appts GP-delivered), high80 (1 = 'no-booking' cohort, >=80% GP same-day),
+  d1_7_pct, d8_14_pct, d15plus_pct (wait-band shares), oc_rate_12m (online consultations /1k/month),
+  closure_exposed, merger_recipient,
+  satisfaction (GPPS % good overall experience), continuity (% see preferred clinician),
+  pt_same_day (% patients whose last appt was same day), wait_too_long, contact_fail, phone_failed,
+  nextstep_immediate, ae_after_fail (% going to A&E after failed contact), gpps_n (survey responses),
+  qof (% QOF points),
+  cdr = CANCER DETECTION RATE: % of new cancer cases diagnosed via urgent suspected-cancer
+  referral, higher=better — use for any "cancer detection" question,
+  conv (TWW conversion: % of urgent referrals that turn out to be cancer), ref_rate (urgent
+  suspected-cancer referrals /100k/yr),
+  ca_em_rate = emergency admissions of patients WITH cancer /100k/yr (crisis care of cancer
+  patients; NOT detection or diagnosis route),
+  dm_prev (diabetes prevalence %),
+  items_per_pt (prescription items/patient/month), abx_per1k (antibiotic items /1k/month).
+
+panel — practice x month, 2023-03..2026-05 (month as 'YYYY-MM' varchar):
+  gp_code, month, total, same_day, next_day, gp, gp_same_day, f2f, phone, online, dna, attended,
+  oc_total, oc_clinical, oc_admin, oc_rate_1k, list_size, supplier, imd_score, region,
+  same_day_pct, gp_same_day_pct.
+
+waits — practice x month wait bands, 2023-03..2026-05:
+  gp_code, month, total, same_day, d1, d2_7, d8_14, d15_21, d22_28, d28plus, unk,
+  gp, gp_d8_14, gp_d15plus.
+
+Rules: DuckDB syntax. SELECT statements only. The three views are named exactly xsec, panel,
+waits — use these bare names in FROM; never invent file paths like 'xsec.parquet'.
+Always aggregate or LIMIT (max 500 rows).
+Percentages of counts: 100.0*SUM(x)/SUM(y). Weight GPPS outcomes by gpps_n when averaging.
+KEEP RESULTS COMPACT AND READABLE: for trends broken down by group (e.g. region x month),
+prefer quarterly or yearly averages, or a first-period vs last-period comparison per group
+(e.g. one row per region with Apr-2023 and Mar-2026 values and % change) — not hundreds of
+monthly rows. PREFER AGGREGATED ANSWERS over raw practice lists: for "what is access like in <place>"
+questions, return summary stats (mean/median of key measures, n of practices) for the place
+alongside the same stats for England, in one result (e.g. GROUP BY a CASE place/England label).
+Places: match with ILIKE on icb_name, sub_icb_name, pcn_name, gp_name, or postcode prefix
+(Brighton -> postcode LIKE 'BN%' or sub_icb_name/pcn_name ILIKE '%brighton%'). Town names are
+often in pcn_name. Return ONLY the SQL inside a \`\`\`sql fence, nothing else.
+NAMED PRACTICES AND RANKINGS ARE QUERIES: a question about a specific practice (match
+gp_name ILIKE or postcode) or about the "best/nicest/worst/highest" practices maps to ranking
+on the relevant measure — "nicest" or "best experience" = satisfaction; "quickest" = pt_same_day
+or wait_too_long; "easy to see the same GP" = continuity; "easy to get an appointment" = low
+contact_fail; "don't mind waiting" = booked-ahead share d15plus_pct is fine or desirable.
+AREA QUESTIONS MUST BE EXHAUSTIVE WITHIN THE AREA: when the user names a locality, resolve it
+to precise postcode districts (e.g. south Bristol = BS3, BS4, BS13, BS14 — use
+regexp_matches(postcode, '^BS(3|4|13|14) ') style anchors, NOT postcode LIKE 'BS%' which
+matches the whole county) and return ALL practices in the area with the relevant measures —
+never a top-N of a wider region, and never silently mix in surrounding towns. Flag low
+gpps_n (<50) rows rather than excluding them when listing an area. Include gp_name, postcode,
+list_size, gpps_n and 2-4 context columns.
+Only if the question is genuinely NOT answerable as a data query — pure opinion, design advice,
+policy discussion, "why do you think..." — return exactly the line
+NOT_A_QUERY
+and nothing else. Questions about any measure in the schema (prescribing, cohorts, satisfaction,
+waits, regions, trends, comparisons) ARE data queries. When in doubt, write the SQL.`;
+
+const EXAMPLES = [
+  "What is GP access like in Brighton?",
+  "Do rural practices have fewer staff than urban ones?",
+  "How did online consultation use grow by region over the panel?",
+  "Antibiotic prescribing in the no-booking cohort vs everyone else",
+  "How have waits of more than two weeks changed since 2023?",
+  "What would the ideal appointment system look like, based on this data?",
+];
+
+// ---------- DuckDB ----------
+let conn, viewsReady = false;
+(async () => {
+  try {
+    const bundles = duckdb.getJsDelivrBundles();
+    const bundle = await duckdb.selectBundle(bundles);
+    const workerUrl = URL.createObjectURL(new Blob(
+      [`importScripts("${bundle.mainWorker}");`], { type: "text/javascript" }));
+    const worker = new Worker(workerUrl);
+    const db = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger(duckdb.LogLevel.WARNING), worker);
+    await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+    conn = await db.connect();
+    const ok = [], failed = [];
+    // on localhost always fetch fresh data (files change during development); cached is fine live
+    const bust = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? `?v=${Date.now()}` : "";
+    for (const [name, file] of Object.entries(TABLES)) {
+      try {
+        await conn.query(`CREATE VIEW ${name} AS SELECT * FROM read_parquet('${DATA_BASE}${file}${bust}')`);
+        ok.push(name);
+      } catch (e) { failed.push(name); }
+    }
+    if (failed.length === 0) {
+      viewsReady = true;
+      $("dbstatus").textContent = "DuckDB ready — three views loaded: xsec, panel, waits.";
+    } else {
+      $("dbstatus").textContent = ok.length ? "Partial load: " + ok.join(", ") : "";
+      $("error").textContent =
+        "Could not load data (" + failed.join(", ") + ") from " + DATA_BASE + "\n" +
+        (location.protocol === "file:"
+          ? "You've opened this page directly from disk, so it tried to fetch the data from GitHub — which only works once research/data is pushed. To test locally instead, double-click start_explorer.bat in the repository folder (or run  python -m http.server  and open  http://localhost:8000/research/explore.html)."
+          : "The server may still have been starting — click Retry.");
+      const btn = document.createElement("button");
+      btn.textContent = "Retry loading data"; btn.className = "ghost"; btn.style.marginTop = ".5rem";
+      btn.onclick = () => location.reload();
+      $("error").appendChild(document.createElement("br"));
+      $("error").appendChild(btn);
+    }
+  } catch (e) {
+    $("dbstatus").textContent = "";
+    $("error").textContent = "DuckDB failed to load: " + e;
+  }
+})();
+
+// ---------- UI ----------
+EXAMPLES.forEach(t => {
+  const s = document.createElement("span");
+  s.textContent = t;
+  s.onclick = () => { $("q").value = t; ask(); };
+  $("examples").appendChild(s);
+});
+$("provider").onchange = () => {
+  const v = $("provider").value;
+  $("baseurlwrap").style.display = v === "openai" ? "" : "none";
+  $("apikey").parentElement.style.display = v === "demo" ? "none" : "";
+  $("model").parentElement.style.display = v === "demo" ? "none" : "";
+  if (v === "openai") $("model").value = "llama3.1";
+  if (v === "anthropic") $("model").value = "claude-haiku-4-5-20251001";
+};
+["provider","model","apikey","baseurl"].forEach(id => {
+  const saved = localStorage.getItem("gpx_" + id);
+  if (saved) $(id).value = saved;
+  $(id).addEventListener("input", () => localStorage.setItem("gpx_" + id, $(id).value));
+});
+$("provider").dispatchEvent(new Event("change"));
+if (localStorage.getItem("gpx_provider")) $("provider").value = localStorage.getItem("gpx_provider");
+
+// ---------- LLM ----------
+async function llmChat(sys, user) {
+  const provider = $("provider").value, model = $("model").value,
+        key = $("apikey").value.trim(), base = $("baseurl").value.replace(/\/$/, "");
+  let text;
+  if (provider === "demo") {
+    if (!DEMO_PROXY_URL) throw new Error("The shared demo isn't switched on for this copy of the page. Choose Anthropic (with your own key) or a local Ollama model in the settings.");
+    const r = await fetch(DEMO_PROXY_URL, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ max_tokens: 700, system: sys,
+        messages: [{ role: "user", content: user }] }),
+    });
+    const dta = await r.json();
+    if (!r.ok) throw new Error(dta.error || ("Demo proxy error " + r.status));
+    text = (dta.content || []).map(c => c.text || "").join("");
+  } else if (provider === "anthropic") {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+      },
+      body: JSON.stringify({ model, max_tokens: 700, system: sys,
+        messages: [{ role: "user", content: user }] }),
+    });
+    if (!r.ok) throw new Error("API error " + r.status + ": " + await r.text());
+    text = (await r.json()).content.map(c => c.text || "").join("");
+  } else {
+    const r = await fetch(base + "/chat/completions", {
+      method: "POST",
+      headers: { "content-type": "application/json",
+                 ...(key ? { authorization: "Bearer " + key } : {}) },
+      body: JSON.stringify({ model, temperature: 0,
+        messages: [{ role: "system", content: sys }, { role: "user", content: user }] }),
+    });
+    if (!r.ok) throw new Error("API error " + r.status + ": " + await r.text());
+    text = (await r.json()).choices[0].message.content;
+  }
+  return text;
+}
+
+function normaliseSql(sql) {
+  // models sometimes invent file paths for the views — map them back to view names
+  return sql.replace(/['"`]?(?:[\w./-]*\/)?(xsec|panel|waits)(?:_master|_merged|_panel)?\.(?:parquet|csv)['"`]?/gi,
+                     (_, name) => name.toLowerCase());
+}
+async function nlToSql(question) {
+  const text = await llmChat(SCHEMA_DOC, "Question: " + question);
+  const m = text.match(/```sql([\s\S]*?)```/i) || text.match(/```([\s\S]*?)```/);
+  return normaliseSql((m ? m[1] : text).trim());
+}
+
+const KEY_FINDINGS = `ADJUSTED FINDINGS from the researcher's models (controls: deprivation,
+list size, rurality, staffing, age structure, ethnicity, region; details in PANEL_NOTES.md):
+1. Satisfaction vs same-day share: raw -0.10/pp is mostly confounding; adjusted -0.03 (trivial).
+   Strongest satisfaction predictors are capacity and GP-delivered share, not configuration.
+2. Continuity vs same-day share: adjusted -0.15 (10pp more same-day = -1.5pp continuity), located
+   in the GP appointment mix; GP booked-ahead care neutral. Practice size matters far more
+   (-8pp continuity per doubling of list).
+3. Change models NULL: within-practice change in same-day % predicted change in neither
+   satisfaction nor continuity - cross-sectional gradients may be stable practice traits.
+4. Cancer detection, TWW conversion, referrals, QOF, cancer emergency admissions vs SAME-DAY
+   SHARE: all null or trivial after adjustment; raw negatives are deprivation/urbanicity
+   confounding. Separately, GP staffing vs cancer detection: weak positive that SURVIVES
+   adjustment (+0.08pp detection per GP FTE/10k, p=0.005); nurse staffing null for detection.
+   Nurse staffing vs TWW conversion: raw r=0.27 is AGE CONFOUNDING (nurse-heavy practices serve
+   older lists; older patients' referrals are more often cancer) — adjusted null (p=0.26);
+   nurse staffing vs referral rate also null adjusted.
+5. Antibiotics: capacity +0.12 (mechanical); same-day share +0.08 (small); phone share -0.03.
+6. Patient-EXPERIENCED access (same-day appts, failed contact, A&E fallback) tracks capacity per
+   patient, NOT same-day share; conditionally high share predicts worse experienced access.
+   Case-mix predicts capacity strongly (R2=0.30) but same-day share not at all (R2=0.07).
+7. OC adoption: +0.5pp same-day bump fading by ~11 months; supplier heterogeneity (TPP sustained,
+   Accurx flat, eConsult null); pre-trends present.
+8. Closure exposure: nearby closure = -2pp satisfaction/continuity (small n).`;
+
+const INTERPRET_SYS = `You are helping a reader understand a query result from a practice-level
+open dataset on GP appointment access in England (GPAD, GPPS, workforce, IMD; details in the
+question context). Answer their question directly and concisely in plain English (3-6 sentences),
+citing the key numbers from the result. Compare to national context where the result allows.
+EFFECT SIZES need context, in plain words: for practice-level correlations, |r| < 0.1 is
+negligible (<1% of variance), 0.1-0.3 weak, 0.3-0.5 moderate, > 0.5 strong; where helpful
+translate to variance explained or to the difference between top and bottom groups. Never use
+the word "ruler".
+DIRECTION must be explicit: never say "declines across deciles/groups" - name the ends, e.g.
+"practices doing the most same-day care average 51%, those doing the least 54%".
+CAUSAL LANGUAGE: "adjusted for deprivation" assumes deprivation is a confounder; cross-sectional
+data cannot exclude that the access measure is instead part of HOW deprivation affects the
+outcome (mediation). Say "consistent with confounding" or "accounted for statistically by",
+never "explained away" or "proves no effect". And whenever you use adjustment language, gloss it
+in everyday terms once, e.g. "in other words, comparing practices serving similar populations,
+the difference largely disappears - the raw gap reflects who these practices serve rather than
+how they organise appointments".
+You also know the researcher's adjusted findings (below). Use them ONLY when the query result
+concerns the SAME exposure AND the SAME outcome as a listed finding — never transfer a finding
+to a different exposure or outcome (e.g. the same-day/cancer nulls say NOTHING about staffing
+and cancer). If the relationship queried is not in the list, say nothing about adjusted models.
+When you do use one, ONE sentence, plainly signposted, e.g. "Worth knowing:
+in the adjusted models this association largely disappears once deprivation and practice size are
+controlled - see the analysis notes." Never bolt on caveats irrelevant to the question, never
+recite the list, and never let the findings override what the result actually shows - report the
+result first, then the context.
+${"" /* findings appended below */}
+` + KEY_FINDINGS + `
+Staffing, appointment and prescribing measures here are per-capita rates (per 1,000 or 10,000
+registered patients) — interpret "more/fewer staff (or appointments, prescribing)" questions as
+per-capita comparisons, which is the standard convention in general practice. Never speculate
+about quantities not present in the result (e.g. absolute headcounts). Make sure any opening
+yes/no agrees with the numbers you then cite.
+UNITS (use these exactly, never guess): appts_percap & sd_percap = appointments per 1,000
+registered patients PER MONTH (national mean ~490); oc_rate_1k/oc_rate_12m = online consultation
+submissions per 1,000 per month; gp_per10k/nurse_per10k/dpc_per10k = FTE per 10,000 patients;
+abx_per1k = antibiotic items per 1,000 per month; items_per_pt = prescription items per patient
+per month; all *_pct, satisfaction, continuity, contact_fail, wait_too_long etc. are percentages;
+qof = % of QOF points; ref_rate & ca_em_rate = per 100,000 per year.
+VARIABLE MEANINGS (use exactly, never guess): cdr = % of new cancer cases diagnosed after an
+urgent suspected-cancer (TWW) referral, higher = more cancers caught via the urgent route;
+conv = % of urgent suspected-cancer referrals that turn out to be cancer (referral "hit rate" —
+higher can mean better targeting OR under-referral); ref_rate = urgent suspected-cancer referrals
+made; ca_em_rate = emergency admissions of people who have cancer (crisis care, NOT route to
+diagnosis); continuity = % who usually see/speak to their preferred clinician (GPPS Q7);
+pt_same_day = % whose last appointment happened the day they contacted the practice (GPPS Q20).
+Essential caveats, briefly and only where relevant: this is cross-sectional association, not
+causation; GPAD 'same-day' reflects how practices configure booking (total-triage practices book
+everything same day), not patient-experienced access; GPPS is a weighted sample survey. When the
+result ranks individual practices on survey measures, note that differences between highly-ranked
+practices are within sampling noise and this is not an endorsement or official rating.
+Plain text only, no markdown headers or bullets.`;
+
+async function interpret(question, sql, rows) {
+  // sample evenly across the result so every group/period is represented
+  const MAX = 80;
+  let sample = rows;
+  if (rows.length > MAX) {
+    const stride = rows.length / MAX;
+    sample = Array.from({length: MAX}, (_, i) => rows[Math.floor(i * stride)]);
+  }
+  const cols = Object.keys(sample[0]);
+  const csv = [cols.join(","), ...sample.map(r => cols.map(c => r[c]).join(","))].join("\n");
+  const user = `Question: ${question}\n\nSQL used:\n${sql}\n\nResult (${rows.length} rows total${rows.length>MAX?`, ${MAX} evenly-spaced rows shown — note rows are sampled, so cite patterns not exact extremes`:""}):\n${csv}`;
+  return await llmChat(INTERPRET_SYS, user);
+}
+
+// ---------- run ----------
+function renderTable(result) {
+  const tbl = $("results"); tbl.innerHTML = "";
+  const rows = result.toArray().map(r => r.toJSON());
+  if (!rows.length) { $("error").textContent = "No rows returned."; return rows; }
+  const cols = Object.keys(rows[0]);
+  tbl.innerHTML =
+    "<tr>" + cols.map(c => `<th>${c}</th>`).join("") + "</tr>" +
+    rows.slice(0, 500).map(r =>
+      "<tr>" + cols.map(c => {
+        let v = r[c];
+        if (typeof v === "number" && !Number.isInteger(v)) v = v.toFixed(2);
+        return `<td>${v ?? ""}</td>`;
+      }).join("") + "</tr>").join("");
+  $("dbstatus").textContent = rows.length + " row(s)" + (rows.length > 500 ? " (showing 500)" : "");
+  return rows;
+}
+
+let lastSqlError = null;
+async function runSql() {
+  $("error").textContent = ""; lastSqlError = null;
+  const sql = $("sql").value;
+  if (!/^\s*(--[^\n]*\n|\s)*(select|with)\b/i.test(sql)) {
+    $("error").textContent = "Only SELECT/WITH queries are allowed."; return null;
+  }
+  if (!conn) { $("error").textContent = "DuckDB still loading…"; return null; }
+  try {
+    $("dbstatus").textContent = "Running…";
+    return renderTable(await conn.query(sql));
+  } catch (e) {
+    lastSqlError = String(e);
+    $("dbstatus").textContent = ""; $("error").textContent = lastSqlError; return null;
+  }
+}
+
+async function ask() {
+  $("error").textContent = "";
+  if (!viewsReady) {
+    $("error").textContent = "The data hasn't loaded (see the message under the SQL box), so questions can't run yet. Use start_explorer.bat / the served page, or click Retry.";
+    return;
+  }
+  if ($("provider").value === "anthropic" && !$("apikey").value.trim()) {
+    document.querySelector("details").open = true;
+    $("error").textContent = "No API key set. Open “Model settings” above and either paste an Anthropic API key (console.anthropic.com → API keys), or switch to a local Ollama model. You can also skip the model entirely and write SQL directly in the box below.";
+    $("apikey").focus();
+    return;
+  }
+  $("llmstatus").textContent = "Thinking…"; $("ask").disabled = true;
+  $("answer").style.display = "none";
+  try {
+    const proposed = await nlToSql($("q").value);
+    if (/^\s*NOT_A_QUERY\s*$/.test(proposed) || /NOT_A_QUERY/.test(proposed.slice(0, 40))) {
+      // narrative question -> answer from the analysis notes instead of the database
+      $("llmstatus").textContent = "Not a data query — answering from the analysis notes…";
+      let notes = "";
+      try {
+        const r = await fetch("PANEL_NOTES.md");
+        if (r.ok) notes = await r.text();
+      } catch (e) {}
+      if (!notes || notes.length < 500) {
+        $("answer").textContent = "This looks like a question about findings rather than a data query, but the analysis notes (PANEL_NOTES.md) couldn't be loaded from this page — that works when the page is served (locally via http.server, or from the live site) rather than opened as a file. Try rephrasing as a data question instead.";
+        $("answer").style.display = "";
+        $("llmstatus").textContent = ""; $("ask").disabled = false;
+        return;
+      }
+      const a = await llmChat(
+        `You answer questions about GP appointment access in England using the researcher's
+analysis notes below (findings from open NHS data, 2023-2026). Ground every claim in the notes;
+where the notes don't cover something, say so. Be concise (a short paragraph or two). Make clear
+these are cross-sectional/ecological findings, not causal proof.
+CRITICAL DISCIPLINE: (1) Report null results as nulls — a null change-model means the data did
+NOT show X, never spin it as support. (2) Separate finding from inference: anything beyond the
+notes must be prefixed "speculatively:" or omitted. (3) No rhetorical embellishment of
+mechanisms the data cannot see. Plain text only, no markdown.
+--- ANALYSIS NOTES ---\n` + notes.slice(0, 24000),
+        $("q").value);
+      $("answer").textContent = "From the analysis notes (not a live query): " + a;
+      $("answer").style.display = "";
+      $("llmstatus").textContent = "";
+      $("ask").disabled = false;
+      return;
+    }
+    $("sql").value = proposed;
+    $("llmstatus").textContent = "";
+    let rows = await runSql();
+    if (!rows && lastSqlError) {
+      // one self-repair attempt: hand the DB error back to the model
+      $("llmstatus").textContent = "Query failed — asking the model to fix it…";
+      const fixed = await llmChat(SCHEMA_DOC,
+        `Question: ${$("q").value}\n\nYour previous SQL:\n${$("sql").value}\n\nDuckDB rejected it with:\n${lastSqlError}\n\nReturn the corrected SQL only, in a \`\`\`sql fence.`);
+      const m = fixed.match(/```sql([\s\S]*?)```/i) || fixed.match(/```([\s\S]*?)```/);
+      $("sql").value = (m ? m[1] : fixed).trim();
+      $("llmstatus").textContent = "";
+      rows = await runSql();
+    }
+    if (rows && rows.length) {
+      $("llmstatus").textContent = "Interpreting…";
+      try {
+        const a = await interpret($("q").value, $("sql").value, rows);
+        $("answer").textContent = a;
+        $("answer").style.display = "";
+      } catch (e) { /* interpretation optional — table still shown */ }
+      $("llmstatus").textContent = "";
+    }
+  } catch (e) {
+    $("llmstatus").textContent = ""; $("error").textContent = String(e);
+  } finally { $("ask").disabled = false; }
+}
+
+$("ask").onclick = ask;
+$("run").onclick = runSql;
+$("q").addEventListener("keydown", e => { if (e.key === "Enter") ask(); });
+</script>
+</body>
+</html>
