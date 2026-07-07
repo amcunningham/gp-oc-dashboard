@@ -45,14 +45,20 @@
     <details>
       <summary>What data is behind this? What can I ask?</summary>
       <div style="font-size:.9rem; line-height:1.55; margin-top:.6rem">
-        <p style="margin:.2rem 0"><strong>One row per practice (~6,000 English GP practices)</strong>, linking a year of data to March 2025:
-        appointment patterns and booking waits (NHS England appointments data); online consultation use;
-        patient experience — satisfaction, continuity, ability to get an appointment, what people did when they
-        couldn't (GP Patient Survey 2025); staffing (GPs, nurses, other clinicians per patient); population —
-        deprivation, age, ethnicity, rural/urban; quality and outcomes — QOF, cancer detection and referrals,
-        cancer emergency admissions; prescribing volumes and antibiotics (NHSBSA).</p>
-        <p style="margin:.4rem 0"><strong>Plus monthly history for every practice, March 2023 – May 2026</strong>:
-        appointment volumes, same-day vs booked-ahead mix, waiting-time bands, and online consultation use.</p>
+        <p style="margin:.2rem 0"><strong>~6,000 English GP practices</strong>: one row per practice for the year to
+        March 2025, plus monthly history March 2023 – May 2026 (appointment volumes, same-day vs booked-ahead mix,
+        waiting bands, online consultation use). Built entirely from open data:</p>
+        <ul style="margin:.4rem 0 .4rem 1.2rem; padding:0">
+          <li><a href="https://digital.nhs.uk/data-and-information/publications/statistical/appointments-in-general-practice">Appointments in General Practice</a> — volumes, booking-to-appointment waits, mode, staff type</li>
+          <li><a href="https://digital.nhs.uk/data-and-information/publications/statistical/submissions-via-online-consultation-systems-in-general-practice">Online Consultation Submissions</a> — OC use and suppliers</li>
+          <li><a href="https://gp-patient.co.uk/">GP Patient Survey 2025</a> — satisfaction, continuity, experienced access, respondent demographics</li>
+          <li><a href="https://digital.nhs.uk/data-and-information/publications/statistical/general-and-personal-medical-services">General Practice Workforce</a> — GP/nurse/other FTEs, registered population age</li>
+          <li><a href="https://digital.nhs.uk/data-and-information/publications/statistical/nhs-payments-to-general-practice">NHS Payments to General Practice</a> — rurality, dispensing status</li>
+          <li><a href="https://fingertips.phe.org.uk/">OHID Fingertips</a> — IMD deprivation, QOF points and diabetes prevalence, cancer detection/referral measures (NDRS)</li>
+          <li><a href="https://opendata.nhsbsa.net/dataset/english-prescribing-data-epd">NHSBSA English Prescribing Data</a> — prescription items, antibiotics</li>
+          <li><a href="https://digital.nhs.uk/services/organisation-data-service/data-search-and-export/csv-downloads/gp-and-gp-practice-related-data">NHS ODS</a> — practice postcodes, closures</li>
+        </ul>
+        <p style="margin:.4rem 0">Full build pipeline and derived files: <a href="README.md">data dictionary</a> · <a href="https://github.com/amcunningham/gp-oc-dashboard/tree/main/research">GitHub</a>.</p>
         <p style="margin:.4rem 0"><strong>Good questions look like:</strong> a place ("access in Brighton", "compare Cardiff Road Surgery
         with its PCN" — practices are named), a comparison ("deprived vs affluent", "rural vs urban", "big vs small"),
         a trend ("how have long waits changed since 2023?"), a relationship ("does phone consulting relate to antibiotic
