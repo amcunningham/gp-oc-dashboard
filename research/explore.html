@@ -43,6 +43,28 @@
 
   <div class="card">
     <details>
+      <summary>What data is behind this? What can I ask?</summary>
+      <div style="font-size:.9rem; line-height:1.55; margin-top:.6rem">
+        <p style="margin:.2rem 0"><strong>One row per practice (~6,000 English GP practices)</strong>, linking a year of data to March 2025:
+        appointment patterns and booking waits (NHS England appointments data); online consultation use;
+        patient experience — satisfaction, continuity, ability to get an appointment, what people did when they
+        couldn't (GP Patient Survey 2025); staffing (GPs, nurses, other clinicians per patient); population —
+        deprivation, age, ethnicity, rural/urban; quality and outcomes — QOF, cancer detection and referrals,
+        cancer emergency admissions; prescribing volumes and antibiotics (NHSBSA).</p>
+        <p style="margin:.4rem 0"><strong>Plus monthly history for every practice, March 2023 – May 2026</strong>:
+        appointment volumes, same-day vs booked-ahead mix, waiting-time bands, and online consultation use.</p>
+        <p style="margin:.4rem 0"><strong>Good questions look like:</strong> a place ("access in Brighton", "compare Cardiff Road Surgery
+        with its PCN" — practices are named), a comparison ("deprived vs affluent", "rural vs urban", "big vs small"),
+        a trend ("how have long waits changed since 2023?"), a relationship ("does phone consulting relate to antibiotic
+        prescribing?"), or a findings question ("what predicts continuity?") which is answered from the research notes.</p>
+        <p style="margin:.4rem 0; color:var(--mut)">It can't see: individual patients or GPs (everything is practice-level),
+        hospital data beyond the cancer measures, anything outside England, or events after May 2026.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <details>
       <summary>Model settings (needed once — stored only in your browser)</summary>
       <div class="row" style="margin-top:.6rem">
         <div>
@@ -75,7 +97,7 @@
   </div>
 
   <div class="card">
-    <label for="q">Your question</label>
+    <label for="q">Your question — about a place, a comparison, a trend, or the findings</label>
     <input id="q" placeholder="e.g. Which region has the highest average same-day share, and how does continuity compare?">
     <div class="examples" id="examples"></div>
     <div style="margin-top:.7rem">
