@@ -55,7 +55,8 @@
         <p style="margin:.4rem 0">Built entirely from open data:</p>
         <ul style="margin:.4rem 0 .4rem 1.2rem; padding:0">
           <li><a href="https://digital.nhs.uk/data-and-information/publications/statistical/appointments-in-general-practice">Appointments in General Practice</a> — volumes, booking-to-appointment waits, mode, staff type</li>
-          <li><a href="https://digital.nhs.uk/data-and-information/publications/statistical/submissions-via-online-consultation-systems-in-general-practice">Online Consultation Submissions</a> — OC use and suppliers</li>
+          <li><a href="https://digital.nhs.uk/data-and-information/publications/statistical/submissions-via-online-consultation-systems-in-general-practice">Online Consultation Submissions</a> — OC use, suppliers, and time-of-day of submissions</li>
+          <li><a href="https://digital.nhs.uk/data-and-information/publications/statistical/cloud-based-telephony">Cloud Based Telephony</a> — call volumes and the 8–10am phone rush</li>
           <li><a href="https://gp-patient.co.uk/">GP Patient Survey 2025</a> — satisfaction, continuity, experienced access, respondent demographics</li>
           <li><a href="https://digital.nhs.uk/data-and-information/publications/statistical/general-and-personal-medical-services">General Practice Workforce</a> — GP/nurse/other FTEs, registered population age</li>
           <li><a href="https://digital.nhs.uk/data-and-information/publications/statistical/nhs-payments-to-general-practice">NHS Payments to General Practice</a> — rurality, dispensing status</li>
@@ -156,11 +157,12 @@ const TABLES = {
   xsec:  "xsec_master.parquet",
   panel: "panel_merged.parquet",
   waits: "waits_panel.parquet",
+  rush:  "rush_both_sameday.csv",
 };
 
 const SCHEMA_DOC = `
 You translate questions about English general practice access into DuckDB SQL.
-Three views exist (practice identifier: gp_code):
+Four views exist (practice identifier: gp_code):
 
 xsec — one row per practice (n=6007), exposure year Apr 2024–Mar 2025 unless noted:
   gp_name, pcn_name, sub_icb_name, icb_name (e.g. 'NHS SUSSEX ICB'), postcode (e.g. 'BN14 7JL'),
@@ -194,8 +196,15 @@ waits — practice x month wait bands, 2023-03..2026-05:
   gp_code, month, total, same_day, d1, d2_7, d8_14, d15_21, d22_28, d28plus, unk,
   gp, gp_d8_14, gp_d15plus.
 
-Rules: DuckDB syntax. SELECT statements only. The three views are named exactly xsec, panel,
-waits — use these bare names in FROM; never invent file paths like 'xsec.parquet'.
+rush — one row per practice (~4,700 with cloud telephony), phone & OC demand timing:
+  gp_code, rush_pct (% of weekday phone calls received 8-10am, Feb 2026, cloud-based telephony),
+  calls_per_1k (weekday calls /1k patients/month), total_wd (weekday calls),
+  oc_rush_pct (% of weekday online-consultation submissions arriving 8-10am, Mar 2026),
+  oc_wd_total, same_day_12m, plus imd_score, rural, region covariates.
+  Use for questions about the "8am rush" on phones or online.
+
+Rules: DuckDB syntax. SELECT statements only. The four views are named exactly xsec, panel,
+waits, rush — use these bare names in FROM; never invent file paths like 'xsec.parquet'.
 Always aggregate or LIMIT (max 500 rows).
 Percentages of counts: 100.0*SUM(x)/SUM(y). Weight GPPS outcomes by gpps_n when averaging.
 KEEP RESULTS COMPACT AND READABLE: for trends broken down by group (e.g. region x month),
@@ -251,13 +260,14 @@ let conn, viewsReady = false;
     const bust = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? `?v=${Date.now()}` : "";
     for (const [name, file] of Object.entries(TABLES)) {
       try {
-        await conn.query(`CREATE VIEW ${name} AS SELECT * FROM read_parquet('${DATA_BASE}${file}${bust}')`);
+        const reader = file.endsWith(".csv") ? "read_csv_auto" : "read_parquet";
+        await conn.query(`CREATE VIEW ${name} AS SELECT * FROM ${reader}('${DATA_BASE}${file}${bust}')`);
         ok.push(name);
       } catch (e) { failed.push(name); }
     }
     if (failed.length === 0) {
       viewsReady = true;
-      $("dbstatus").textContent = "DuckDB ready — three views loaded: xsec, panel, waits.";
+      $("dbstatus").textContent = "DuckDB ready — four views loaded: xsec, panel, waits, rush.";
     } else {
       $("dbstatus").textContent = ok.length ? "Partial load: " + ok.join(", ") : "";
       $("error").textContent =
