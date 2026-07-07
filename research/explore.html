@@ -201,7 +201,9 @@ rush — one row per practice (~4,700 with cloud telephony), phone & OC demand t
   calls_per_1k (weekday calls /1k patients/month), total_wd (weekday calls),
   oc_rush_pct (% of weekday online-consultation submissions arriving 8-10am, Mar 2026),
   oc_wd_total, same_day_12m, plus imd_score, rural, region covariates.
-  Use for questions about the "8am rush" on phones or online.
+  Use for questions about the "8am rush" on phones or online. rush has NO postcode or
+  practice-name columns — for places or names, JOIN xsec USING (gp_code) and filter on
+  xsec.postcode / pcn_name / icb_name as usual.
 
 Rules: DuckDB syntax. SELECT statements only. The four views are named exactly xsec, panel,
 waits, rush — use these bare names in FROM; never invent file paths like 'xsec.parquet'.
@@ -235,12 +237,12 @@ and nothing else. Questions about any measure in the schema (prescribing, cohort
 waits, regions, trends, comparisons) ARE data queries. When in doubt, write the SQL.`;
 
 const EXAMPLES = [
-  "What is GP access like in Brighton?",
+  "Do practices in Brighton have more of an 8am rush than Bristol?",
+  "Are higher numbers of GPs associated with better cancer detection?",
+  "Is an older patient population associated with higher satisfaction, allowing for deprivation?",
   "Do rural practices have fewer staff than urban ones?",
-  "How did online consultation use grow by region over the panel?",
-  "Antibiotic prescribing in the no-booking cohort vs everyone else",
-  "How have waits of more than two weeks changed since 2023?",
-  "What would the ideal appointment system look like, based on this data?",
+  "What types of practices have more on-the-day access?",
+  "What does this data tell us about how practices choose their appointment systems?",
 ];
 
 // ---------- DuckDB ----------
