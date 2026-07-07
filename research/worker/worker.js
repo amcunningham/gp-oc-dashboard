@@ -42,7 +42,8 @@ export default {
     const ip = request.headers.get("CF-Connecting-IP") || "unknown";
     const hour = new Date().toISOString().slice(0, 13);
     const day = hour.slice(0, 10);
-    const ipKey = `rate:${ip}:${hour}`;
+    const ipDayHash = (await sha256(ip + day)).slice(0, 12); // no raw IPs stored anywhere
+    const ipKey = `rate:${ipDayHash}:${hour}`;
     const dayKey = `rate:global:${day}`;
     const [ipCount, dayCount] = await Promise.all([
       env.LOGS.get(ipKey).then(v => parseInt(v || "0")),
@@ -83,12 +84,12 @@ export default {
     // ---- log the question (fire-and-forget; anonymised to IP hash) ----
     try {
       const userMsg = payload.messages.filter(m => m.role === "user").pop();
-      const ipHash = await sha256(ip + day);        // rotates daily; no raw IPs stored
+      const sys = payload.system.trim();
       const entry = {
         t: new Date().toISOString(),
-        who: ipHash.slice(0, 12),
-        kind: payload.system.startsWith("You translate") ? "sql"
-            : payload.system.startsWith("You are helping") ? "interpret"
+        who: ipDayHash,               // rotates daily; no raw IPs stored
+        kind: sys.startsWith("You translate") ? "sql"
+            : sys.startsWith("You are helping") ? "interpret"
             : "notes",
         q: (userMsg ? userMsg.content : "").slice(0, 2000),
         ok: r.ok,
