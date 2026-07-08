@@ -266,7 +266,7 @@ and nothing else. Questions about any measure in the schema (prescribing, cohort
 waits, regions, trends, comparisons) ARE data queries. When in doubt, write the SQL.`;
 
 const EXAMPLES = [
-  "How does [your practice's name] compare with the rest of its PCN?",
+  "Tell me about [your practice's name]",
   "What is GP access like in Levenshulme?",
   "Do practices in Brighton have more of an 8am rush than Bristol?",
   "What types of practices have more on-the-day access?",
@@ -333,6 +333,10 @@ CONSISTENCY CHECK on every comparative sentence: before writing "higher/lower/mo
 verify the claim against the two numbers you are citing, and attach each number to its named
 group in the same sentence ("X practice 60.1% vs the rest of the PCN 54.8% - i.e. HIGHER").
 An inverted comparison is the worst error you can make; re-read your draft for these.
+ADJECTIVES must be earned by the numbers in the result: never write "a large practice" while
+citing a below-average list size — say "slightly below the England average list size (9,654 vs
+10,329)" and let the comparison be the description. If a descriptor and its benchmark disagree,
+drop the descriptor.
 Do NOT impose a narrative: an entity can be better on some measures and worse on others —
 report each measure's direction independently from its own numbers, even if the mix seems
 inconsistent. If change or difference columns exist, take directions from their signs, not
@@ -377,9 +381,6 @@ practices); (5) direction of travel: this year vs last (satisfaction, continuity
 share) — note single-year GPPS moves of a few points are within noise (~100 responses per
 practice); (6) one closing sentence on what the configuration suggests, clearly framed as
 interpretation, plus: survey-based, practice-level, not a rating or endorsement.
-FOLLOW-UPS: after ANY answer, end with up to three short natural follow-up questions the reader
-might ask next, each on its own line starting exactly "NEXT: " — they must be answerable from
-this dataset (places, comparisons, trends, relationships). No other text after them.
 Plain text only, no markdown headers or bullets.
 ` + KEY_FINDINGS;
 
@@ -671,8 +672,6 @@ CRITICAL DISCIPLINE: (1) Report null results as nulls — a null change-model me
 NOT show X, never spin it as support. (2) Separate finding from inference: anything beyond the
 notes must be prefixed "speculatively:" or omitted. (3) No rhetorical embellishment of
 mechanisms the data cannot see. Plain text only, no markdown.
-After the answer, you may add up to three short follow-up questions answerable from the
-dataset, each on its own line starting exactly "NEXT: ".
 --- ANALYSIS NOTES ---\n` + notes.slice(0, 24000),
         $("q").value, "smart");
       showAnswer(a, "notes");
