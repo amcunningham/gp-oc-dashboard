@@ -232,6 +232,17 @@ alongside the same stats for England, in one result (e.g. GROUP BY a CASE place/
 Places: match with ILIKE on icb_name, sub_icb_name, pcn_name, gp_name, or postcode prefix
 (Brighton -> postcode LIKE 'BN%' or sub_icb_name/pcn_name ILIKE '%brighton%'). Town names are
 often in pcn_name. Return ONLY the SQL inside a \`\`\`sql fence, nothing else.
+PRACTICE PORTRAIT: when asked about a single named practice ("tell me about X", "how does X
+compare"), default to the full portrait — SELECT these measures for (a) the practice, (b) the
+rest of its PCN (averages), as labelled rows:
+  list_size, pct65plus, imd_score, nonwhite_pct                       (population)
+  same_day_pct_12m, sd_share_prior_year, appts_percap, phone_pct_12m,
+  f2f_pct_12m, d15plus_pct                                            (access model + trajectory)
+  oc_rate_12m                                                          (online consultation)
+  satisfaction, satisfaction_2024, continuity, continuity_2024,
+  pt_same_day, wait_too_long, contact_fail, gpps_n                     (experience, both years)
+Also JOIN rush USING (gp_code) for rush_pct and oc_rush_pct where available.
+xsec now carries satisfaction_2024, continuity_2024, sd_share_prior_year for year-on-year change.
 ENTITY-VS-GROUP COMPARISONS (a practice vs its PCN/area/England): return LONG format — one row
 per group with a text label column as the FIRST column (e.g. 'St Leonards Practice' /
 'Rest of Exeter City PCN (n=4)'), measures as columns. Never one wide row mixing both groups'
@@ -480,6 +491,16 @@ causation; GPAD 'same-day' reflects how practices configure booking (total-triag
 everything same day), not patient-experienced access; GPPS is a weighted sample survey. When the
 result ranks individual practices on survey measures, note that differences between highly-ranked
 practices are within sampling noise and this is not an endorsement or official rating.
+PRACTICE PORTRAIT ANSWERS: when the result profiles one practice against its peers, follow this
+order — (1) who and where: list size, population context vs peers; (2) the access model: same-day
+share, capacity per patient, phone vs face-to-face mix, booked-ahead share; (3) demand channels:
+online consultation rate and, if present, the 8-10am concentration of calls and OC submissions;
+(4) patient experience vs peers: satisfaction, continuity, experienced same-day, waits,
+contact failure - each direction stated from its own numbers; (5) direction of travel: this
+year vs last (satisfaction, continuity, same-day share) - note single-year GPPS moves of a few
+points are within noise (~100 responses per practice); (6) one closing sentence on what the
+configuration suggests, clearly framed as interpretation, plus: survey-based, practice-level,
+not a rating or endorsement.
 Plain text only, no markdown headers or bullets.`;
 
 async function interpret(question, sql, rows) {
