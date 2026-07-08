@@ -29,6 +29,34 @@ export default {
     const cors = CORS(origin === allowed || origin.startsWith("http://localhost") ? origin : allowed);
 
     if (request.method === "OPTIONS") return new Response(null, { headers: cors });
+
+    // ---- private log export: GET /logs?token=... (set secret LOG_TOKEN to enable) ----
+    const url = new URL(request.url);
+    if (request.method === "GET" && url.pathname === "/logs") {
+      if (!env.LOG_TOKEN || url.searchParams.get("token") !== env.LOG_TOKEN)
+        return new Response("Not found", { status: 404 });
+      const rows = [["time", "visitor", "kind", "ok", "question", "answer"]];
+      let cursor;
+      do {
+        const page = await env.LOGS.list({ prefix: "log:", cursor });
+        for (const k of page.keys) {
+          const v = await env.LOGS.get(k.name);
+          if (!v) continue;
+          try {
+            const e = JSON.parse(v);
+            const clean = s => '"' + String(s || "").replace(/"/g, '""').replace(/\r?\n/g, " ") + '"';
+            rows.push([e.t, e.who, e.kind, e.ok,
+              clean(String(e.q).replace(/^Question:\s*/i, "")), clean(e.a)]);
+          } catch {}
+        }
+        cursor = page.list_complete ? null : page.cursor;
+      } while (cursor);
+      return new Response(rows.map(r => r.join(",")).join("\n"), {
+        headers: { "content-type": "text/csv; charset=utf-8",
+                   "content-disposition": "attachment; filename=gp-explorer-questions.csv" },
+      });
+    }
+
     if (request.method !== "POST")
       return new Response("POST only", { status: 405, headers: cors });
 
@@ -92,6 +120,7 @@ export default {
             : sys.startsWith("You are helping") ? "interpret"
             : "notes",
         q: (userMsg ? userMsg.content : "").slice(0, 2000),
+        a: r.ok ? (data.content || []).map(c => c.text || "").join("").slice(0, 3000) : "",
         ok: r.ok,
       };
       await env.LOGS.put(`log:${entry.t}:${entry.who}`, JSON.stringify(entry), { expirationTtl: 60 * 60 * 24 * 30 });

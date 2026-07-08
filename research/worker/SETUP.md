@@ -36,6 +36,17 @@ logged (anonymised) for you to review.
 Set `DEMO_ENABLED` to `false` in the Worker's variables (takes effect immediately, no
 redeploy). Visitors then see a polite message and can still use their own key or Ollama.
 
+## Exporting the whole question log
+
+Add one more secret to the Worker: name `LOG_TOKEN`, value = a passphrase you invent (long and
+random-ish). Then the full log downloads as a CSV from:
+
+`https://gp-explorer-demo.<your-subdomain>.workers.dev/logs?token=YOURPASSPHRASE`
+
+Columns: time, visitor (daily-rotating hash), kind (sql / interpret / notes), ok, question.
+Anyone without the token gets a 404, and the export stays off entirely until LOG_TOKEN is set.
+Treat the URL like a password — don't share it or leave it in browser history on shared machines.
+
 ## Reading the question log
 
 Worker → your KV namespace → "KV pairs": entries are keyed `log:<timestamp>:<visitor-hash>`,

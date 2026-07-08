@@ -241,11 +241,13 @@ and nothing else. Questions about any measure in the schema (prescribing, cohort
 waits, regions, trends, comparisons) ARE data queries. When in doubt, write the SQL.`;
 
 const EXAMPLES = [
+  "How does [your practice's name] compare with the rest of its PCN?",
+  "What is GP access like in Levenshulme?",
   "Do practices in Brighton have more of an 8am rush than Bristol?",
+  "What types of practices have more on-the-day access?",
   "Are higher numbers of GPs associated with better cancer detection?",
   "Is an older patient population associated with higher satisfaction, allowing for deprivation?",
   "Do rural practices have fewer staff than urban ones?",
-  "What types of practices have more on-the-day access?",
   "What does this data tell us about how practices choose their appointment systems?",
 ];
 
@@ -297,7 +299,13 @@ let conn, viewsReady = false;
 EXAMPLES.forEach(t => {
   const s = document.createElement("span");
   s.textContent = t;
-  s.onclick = () => { $("q").value = t; ask(); };
+  s.onclick = () => {
+    $("q").value = t;
+    if (t.includes("[")) {           // template chip: let the user fill in the blank
+      $("q").focus();
+      $("q").setSelectionRange(t.indexOf("["), t.indexOf("]") + 1);
+    } else { ask(); }
+  };
   $("examples").appendChild(s);
 });
 $("provider").onchange = () => {
