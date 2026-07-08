@@ -20,7 +20,7 @@
   button { font:inherit; border:0; border-radius:6px; padding:.55rem 1.1rem; cursor:pointer; background:var(--accent); color:#fff; font-weight:600; }
   button.ghost { background:#eef3f8; color:var(--accent); }
   button:disabled { opacity:.5; cursor:wait; }
-  .examples span { display:inline-block; background:#eef3f8; color:var(--accent); border-radius:14px; padding:.25rem .7rem; margin:.15rem .25rem 0 0; font-size:.82rem; cursor:pointer; }
+  .examples span, #next span { display:inline-block; background:#eef3f8; color:var(--accent); border-radius:14px; padding:.25rem .7rem; margin:.15rem .25rem 0 0; font-size:.82rem; cursor:pointer; }
   .status { font-size:.85rem; color:var(--mut); margin:.4rem 0; }
   table { border-collapse:collapse; width:100%; font-size:.82rem; margin-top:.6rem; }
   th, td { border:1px solid var(--line); padding:.3rem .5rem; text-align:left; white-space:nowrap; }
@@ -118,6 +118,7 @@
       <span class="status" id="llmstatus"></span>
     </div>
     <div id="answer" style="display:none; margin-top:.8rem; padding:.8rem 1rem; background:#f2f7ee; border-radius:8px; font-size:.95rem; line-height:1.5"></div>
+    <div id="next" style="display:none; margin-top:.4rem"></div>
     <div id="fb" style="display:none; margin-top:.5rem; font-size:.85rem; color:var(--mut)">
       Was this answer useful?
       <button class="ghost" id="fbup" style="padding:.2rem .6rem">&#128077;</button>
@@ -163,8 +164,7 @@ const DATA_BASE = location.protocol === "file:"
   ? "https://raw.githubusercontent.com/amcunningham/gp-oc-dashboard/main/research/data/"
   : new URL("data/", location.href).href;
 
-// After deploying the Worker (see worker/SETUP.md), put its URL here, e.g.
-// "https://gp-explorer-demo.yoursubdomain.workers.dev". Empty = demo mode disabled.
+// Shared-demo proxy (Cloudflare Worker). Empty string disables demo mode.
 const DEMO_PROXY_URL = "https://gp-explorer-demo.anne-marie-cunningham.workers.dev";
 
 const TABLES = {
@@ -188,9 +188,11 @@ xsec — one row per practice (n=6007), exposure year Apr 2024–Mar 2025 unless
   gp_share (% of appts GP-delivered), high80 (1 = 'no-booking' cohort, >=80% GP same-day),
   d1_7_pct, d8_14_pct, d15plus_pct (wait-band shares), oc_rate_12m (online consultations /1k/month),
   closure_exposed, merger_recipient,
-  satisfaction (GPPS % good overall experience), continuity (% see preferred clinician),
-  pt_same_day (% patients whose last appt was same day), wait_too_long, contact_fail, phone_failed,
-  nextstep_immediate, ae_after_fail (% going to A&E after failed contact), gpps_n (survey responses),
+  satisfaction (GPPS % good overall experience), satisfaction_2024 (last year's),
+  continuity (% see preferred clinician), continuity_2024 (last year's), sd_share_prior_year,
+  pt_same_day (% patients whose last appt was same day), wait_too_long, contact_fail,
+  phone_failed, nextstep_immediate, ae_after_fail (% going to A&E after failed contact),
+  gpps_n (survey responses),
   qof (% QOF points),
   cdr = CANCER DETECTION RATE: % of new cancer cases diagnosed via urgent suspected-cancer
   referral, higher=better — use for any "cancer detection" question,
@@ -198,8 +200,8 @@ xsec — one row per practice (n=6007), exposure year Apr 2024–Mar 2025 unless
   suspected-cancer referrals /100k/yr),
   ca_em_rate = emergency admissions of patients WITH cancer /100k/yr (crisis care of cancer
   patients; NOT detection or diagnosis route),
-  dm_prev (diabetes prevalence %),
-  items_per_pt (prescription items/patient/month), abx_per1k (antibiotic items /1k/month).
+  dm_prev (diabetes prevalence %), items_per_pt (prescription items/patient/month),
+  abx_per1k (antibiotic items /1k/month).
 
 panel — practice x month, 2023-03..2026-05 (month as 'YYYY-MM' varchar):
   gp_code, month, total, same_day, next_day, gp, gp_same_day, f2f, phone, online, dna, attended,
@@ -231,32 +233,7 @@ questions, return summary stats (mean/median of key measures, n of practices) fo
 alongside the same stats for England, in one result (e.g. GROUP BY a CASE place/England label).
 Places: match with ILIKE on icb_name, sub_icb_name, pcn_name, gp_name, or postcode prefix
 (Brighton -> postcode LIKE 'BN%' or sub_icb_name/pcn_name ILIKE '%brighton%'). Town names are
-often in pcn_name. Return ONLY the SQL inside a \`\`\`sql fence, nothing else.
-PRACTICE PORTRAIT: when asked about a single named practice ("tell me about X", "how does X
-compare"), default to the full portrait — SELECT these measures for (a) the practice, (b) the
-rest of its PCN (averages), as labelled rows:
-  list_size, pct65plus, imd_score, nonwhite_pct                       (population)
-  same_day_pct_12m, sd_share_prior_year, appts_percap, phone_pct_12m,
-  f2f_pct_12m, d15plus_pct                                            (access model + trajectory)
-  oc_rate_12m                                                          (online consultation)
-  satisfaction, satisfaction_2024, continuity, continuity_2024,
-  pt_same_day, wait_too_long, contact_fail, gpps_n                     (experience, both years)
-Also JOIN rush USING (gp_code) for rush_pct and oc_rush_pct where available.
-Keep portrait SQL COMPACT: plain AVG() for the peer row (no per-column CASE filters), ROUND
-once, no unnecessary columns — the query must comfortably fit in the response.
-The comparator row must EXCLUDE the practice itself (…AND peer.gp_code <> practice.gp_code) —
-"rest of PCN" must not contain the practice being compared — and remember the GROUP BY for
-any non-aggregated label parts.
-xsec now carries satisfaction_2024, continuity_2024, sd_share_prior_year for year-on-year change.
-ENTITY-VS-GROUP COMPARISONS (a practice vs its PCN/area/England): return LONG format — one row
-per group with a text label column as the FIRST column (e.g. 'St Leonards Practice' /
-'Rest of Exeter City PCN (n=4)'), measures as columns. Never one wide row mixing both groups'
-numbers. Where practical add a final row 'Difference' (practice minus comparator, signed).
-NAMED PRACTICES AND RANKINGS ARE QUERIES: a question about a specific practice (match
-gp_name ILIKE or postcode) or about the "best/nicest/worst/highest" practices maps to ranking
-on the relevant measure — "nicest" or "best experience" = satisfaction; "quickest" = pt_same_day
-or wait_too_long; "easy to see the same GP" = continuity; "easy to get an appointment" = low
-contact_fail; "don't mind waiting" = booked-ahead share d15plus_pct is fine or desirable.
+often in pcn_name.
 AREA QUESTIONS MUST BE EXHAUSTIVE WITHIN THE AREA: when the user names a locality, resolve it
 to precise postcode districts (e.g. south Bristol = BS3, BS4, BS13, BS14 — use
 regexp_matches(postcode, '^BS(3|4|13|14) ') style anchors, NOT postcode LIKE 'BS%' which
@@ -264,6 +241,36 @@ matches the whole county) and return ALL practices in the area with the relevant
 never a top-N of a wider region, and never silently mix in surrounding towns. Flag low
 gpps_n (<50) rows rather than excluding them when listing an area. Include gp_name, postcode,
 list_size, gpps_n and 2-4 context columns.
+PRACTICE PORTRAIT: when asked about a single named practice ("tell me about X", "how does X
+compare"), default to the full portrait — SELECT these measures for (a) the practice, (b) the
+rest of its PCN (averages, excluding the practice itself), AND (c) 'England (all practices)'
+national averages, as three labelled rows (PCNs are small — England is the stable benchmark):
+  list_size, pct65plus, imd_score, nonwhite_pct                       (population)
+  same_day_pct_12m, sd_share_prior_year, appts_percap, phone_pct_12m,
+  f2f_pct_12m, d15plus_pct                                            (access model + trajectory)
+  oc_rate_12m                                                          (online consultation)
+  satisfaction, satisfaction_2024, continuity, continuity_2024,
+  satisfaction - satisfaction_2024 AS satisfaction_change,
+  continuity - continuity_2024 AS continuity_change,
+  pt_same_day, wait_too_long, contact_fail, gpps_n                     (experience, both years)
+Also JOIN rush USING (gp_code) for rush_pct and oc_rush_pct where available.
+Keep portrait SQL COMPACT: plain AVG() for the peer rows (no per-column CASE filters), ROUND
+once, no unnecessary columns — the query must comfortably fit in the response.
+The comparator rows must EXCLUDE the practice itself (…AND peer.gp_code <> practice.gp_code
+for the PCN row) — "rest of PCN" must not contain the practice being compared — and remember
+the GROUP BY for any non-aggregated label parts.
+ENTITY-VS-GROUP COMPARISONS (a practice vs its PCN/area/England): return LONG format — one row
+per group with a text label column as the FIRST column (e.g. 'St Leonards Practice' /
+'Rest of Exeter City PCN (n=4)' / 'England'), measures as columns. Never one wide row mixing
+both groups' numbers.
+NAMED PRACTICES AND RANKINGS ARE QUERIES: a question about a specific practice (match
+gp_name ILIKE or postcode) or about the "best/nicest/worst/highest" practices maps to ranking
+on the relevant measure — "nicest" or "best experience" = satisfaction; "quickest" = pt_same_day
+or wait_too_long; "easy to see the same GP" = continuity; "easy to get an appointment" = low
+contact_fail; "don't mind waiting" = booked-ahead share d15plus_pct is fine or desirable.
+When ranking on GPPS survey measures require gpps_n >= 50 (small samples are noisy) and include
+gp_name, pcn_name or postcode, list_size, gpps_n and 2-3 context columns in the output.
+Return ONLY the SQL inside a \`\`\`sql fence, nothing else.
 Only if the question is genuinely NOT answerable as a data query — pure opinion, design advice,
 policy discussion, "why do you think..." — return exactly the line
 NOT_A_QUERY
@@ -280,6 +287,113 @@ const EXAMPLES = [
   "Do rural practices have fewer staff than urban ones?",
   "What does this data tell us about how practices choose their appointment systems?",
 ];
+
+const KEY_FINDINGS = `ADJUSTED FINDINGS from the researcher's models (controls: deprivation,
+list size, rurality, staffing, age structure, ethnicity, region; details in PANEL_NOTES.md):
+1. Satisfaction vs same-day share: raw -0.10/pp is mostly confounding; adjusted -0.03 (trivial).
+   Strongest satisfaction predictors are capacity and GP-delivered share, not configuration.
+2. Continuity vs same-day share: adjusted -0.15 (10pp more same-day = -1.5pp continuity), located
+   in the GP appointment mix; GP booked-ahead care neutral. Practice size matters far more
+   (-8pp continuity per doubling of list).
+3. Change models NULL: within-practice change in same-day % predicted change in neither
+   satisfaction nor continuity - cross-sectional gradients may be stable practice traits.
+4. Cancer detection, TWW conversion, referrals, QOF, cancer emergency admissions vs SAME-DAY
+   SHARE: all null or trivial after adjustment; raw negatives are deprivation/urbanicity
+   confounding. Separately, GP staffing vs cancer detection: weak positive that SURVIVES
+   adjustment (+0.08pp detection per GP FTE/10k, p=0.005); nurse staffing null for detection.
+   Nurse staffing vs TWW conversion: raw r=0.27 is AGE CONFOUNDING (nurse-heavy practices serve
+   older lists; older patients' referrals are more often cancer) — adjusted null (p=0.26);
+   nurse staffing vs referral rate also null adjusted.
+5. Antibiotics: capacity +0.12 (mechanical); same-day share +0.08 (small); phone share -0.03.
+6. Patient-EXPERIENCED access (same-day appts, failed contact, A&E fallback) tracks capacity per
+   patient, NOT same-day share; conditionally high share predicts worse experienced access.
+   Case-mix predicts capacity strongly (R2=0.30) but same-day share not at all (R2=0.07).
+7. OC adoption: +0.5pp same-day bump fading by ~11 months; supplier heterogeneity (TPP sustained,
+   Accurx flat, eConsult null); pre-trends present.
+8. Closure exposure: nearby closure = -2pp satisfaction/continuity (small n).`;
+
+const INTERPRET_SYS = `You are helping a reader understand a query result from a practice-level
+open dataset on GP appointment access in England (GPAD, GPPS, workforce, IMD; details in the
+question context). Answer their question directly and concisely in plain English (3-6 sentences,
+more for practice portraits), citing the key numbers from the result. Compare to national
+context where the result allows.
+Staffing, appointment and prescribing measures here are per-capita rates (per 1,000 or 10,000
+registered patients) — interpret "more/fewer staff (or appointments, prescribing)" questions as
+per-capita comparisons, which is the standard convention in general practice. Never speculate
+about quantities not present in the result (e.g. absolute headcounts). Make sure any opening
+yes/no agrees with the numbers you then cite.
+UNITS (use these exactly, never guess): appts_percap & sd_percap = appointments per 1,000
+registered patients PER MONTH (national mean ~490); oc_rate_1k/oc_rate_12m = online consultation
+submissions per 1,000 per month; gp_per10k/nurse_per10k/dpc_per10k = FTE per 10,000 patients;
+abx_per1k = antibiotic items per 1,000 per month; items_per_pt = prescription items per patient
+per month; all *_pct, satisfaction, continuity, contact_fail, wait_too_long etc. are percentages;
+qof = % of QOF points; ref_rate & ca_em_rate = per 100,000 per year.
+VARIABLE MEANINGS (use exactly, never guess): cdr = % of new cancer cases diagnosed after an
+urgent suspected-cancer (TWW) referral, higher = more cancers caught via the urgent route;
+conv = % of urgent suspected-cancer referrals that turn out to be cancer (referral "hit rate" —
+higher can mean better targeting OR under-referral); ref_rate = urgent suspected-cancer referrals
+made; ca_em_rate = emergency admissions of people who have cancer (crisis care, NOT route to
+diagnosis); continuity = % who usually see/speak to their preferred clinician (GPPS Q7);
+pt_same_day = % whose last appointment happened the day they contacted the practice (GPPS Q20).
+EFFECT SIZES need context, in plain words: for practice-level correlations, |r| < 0.1 is
+negligible (<1% of variance), 0.1-0.3 weak, 0.3-0.5 moderate, > 0.5 strong; where helpful
+translate to variance explained or to the difference between top and bottom groups. Never use
+the word "ruler".
+DIRECTION must be explicit: never say "declines across deciles/groups" - name the ends, e.g.
+"practices doing the most same-day care average 51%, those doing the least 54%".
+CONSISTENCY CHECK on every comparative sentence: before writing "higher/lower/more/fewer",
+verify the claim against the two numbers you are citing, and attach each number to its named
+group in the same sentence ("X practice 60.1% vs the rest of the PCN 54.8% - i.e. HIGHER").
+An inverted comparison is the worst error you can make; re-read your draft for these.
+Do NOT impose a narrative: an entity can be better on some measures and worse on others —
+report each measure's direction independently from its own numbers, even if the mix seems
+inconsistent. If change or difference columns exist, take directions from their signs, not
+from memory.
+ORDER OF OPERATIONS: for each measure, determine the direction from the numbers FIRST, then
+write one clean sentence stating it. Never open a sentence with an expected direction and
+correct it at the end ("lower ... i.e. actually higher") — if a draft sentence contradicts
+itself, rewrite it. For entity-vs-group answers do not use the adjusted research findings to
+anticipate which way a measure "should" go; describe only what these rows show.
+YEARS: unsuffixed measures are CURRENT (2025 survey / year to Mar 2025); _2024 measures are
+LAST YEAR — all "is/has" statements use current values only; _2024 appears only in trend
+sentences, and trend direction comes from the *_change columns' signs.
+CAUSAL LANGUAGE: "adjusted for deprivation" assumes deprivation is a confounder; cross-sectional
+data cannot exclude that the access measure is instead part of HOW deprivation affects the
+outcome (mediation). Say "consistent with confounding" or "accounted for statistically by",
+never "explained away" or "proves no effect". And whenever you use adjustment language, gloss it
+in everyday terms once, e.g. "in other words, comparing practices serving similar populations,
+the difference largely disappears - the raw gap reflects who these practices serve rather than
+how they organise appointments".
+You also know the researcher's adjusted findings (below). Use them ONLY when the query result
+concerns the SAME exposure AND the SAME outcome as a listed finding — never transfer a finding
+to a different exposure or outcome (e.g. the same-day/cancer nulls say NOTHING about staffing
+and cancer). If the relationship queried is not in the list, say nothing about adjusted models.
+When you do use one, ONE sentence, plainly signposted, e.g. "Worth knowing:
+in the adjusted models this association largely disappears once deprivation and practice size are
+controlled - see the analysis notes." Never bolt on caveats irrelevant to the question, never
+recite the list, and never let the findings override what the result actually shows - report the
+result first, then the context.
+Essential caveats, briefly and only where relevant: this is cross-sectional association, not
+causation; GPAD 'same-day' reflects how practices configure booking (total-triage practices book
+everything same day), not patient-experienced access; GPPS is a weighted sample survey. When the
+result ranks individual practices on survey measures, note that differences between highly-ranked
+practices are within sampling noise and this is not an endorsement or official rating.
+PRACTICE PORTRAIT ANSWERS: when the result profiles one practice against its peers, follow this
+order — (1) who and where: list size, population context vs England and PCN; (2) the access
+model: same-day share, capacity per patient, phone vs face-to-face mix, booked-ahead share;
+(3) demand channels: online consultation rate and, if present, the 8-10am concentration of calls
+and OC submissions; (4) patient experience: satisfaction, continuity, experienced same-day,
+waits, contact failure — each direction stated from its own numbers, compared primarily against
+ENGLAND (the stable benchmark), with the PCN row as local colour (it is only a handful of
+practices); (5) direction of travel: this year vs last (satisfaction, continuity, same-day
+share) — note single-year GPPS moves of a few points are within noise (~100 responses per
+practice); (6) one closing sentence on what the configuration suggests, clearly framed as
+interpretation, plus: survey-based, practice-level, not a rating or endorsement.
+FOLLOW-UPS: after ANY answer, end with up to three short natural follow-up questions the reader
+might ask next, each on its own line starting exactly "NEXT: " — they must be answerable from
+this dataset (places, comparisons, trends, relationships). No other text after them.
+Plain text only, no markdown headers or bullets.
+` + KEY_FINDINGS;
 
 // ---------- DuckDB ----------
 let conn, viewsReady = false;
@@ -353,10 +467,13 @@ $("provider").onchange = () => {
 });
 $("provider").dispatchEvent(new Event("change"));
 if (localStorage.getItem("gpx_provider")) $("provider").value = localStorage.getItem("gpx_provider");
+$("provider").dispatchEvent(new Event("change"));
 
 // ---------- LLM ----------
-async function llmChat(sys, user) {
-  const provider = $("provider").value, model = $("model").value,
+async function llmChat(sys, user, tier) {
+  // tier "smart" = interpretation/narrative (stronger model); default tier = SQL generation
+  const provider = $("provider").value,
+        model = (provider === "anthropic" && tier === "smart") ? "claude-sonnet-5" : $("model").value,
         key = $("apikey").value.trim(), base = $("baseurl").value.replace(/\/$/, "");
   let text;
   if (provider === "demo") {
@@ -364,7 +481,7 @@ async function llmChat(sys, user) {
     const r = await fetch(DEMO_PROXY_URL, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ max_tokens: 1800, system: sys,
+      body: JSON.stringify({ max_tokens: 1800, system: sys, tier: tier || "fast",
         messages: [{ role: "user", content: user }] }),
     });
     const dta = await r.json();
@@ -400,7 +517,7 @@ async function llmChat(sys, user) {
 
 function normaliseSql(sql) {
   // models sometimes invent file paths for the views — map them back to view names
-  return sql.replace(/['"`]?(?:[\w./-]*\/)?(xsec|panel|waits)(?:_master|_merged|_panel)?\.(?:parquet|csv)['"`]?/gi,
+  return sql.replace(/['"`]?(?:[\w./-]*\/)?(xsec|panel|waits|rush)(?:_master|_merged|_panel|_both_sameday)?\.(?:parquet|csv)['"`]?/gi,
                      (_, name) => name.toLowerCase());
 }
 async function nlToSql(question) {
@@ -409,105 +526,6 @@ async function nlToSql(question) {
   const m = text.match(/```sql([\s\S]*?)(?:```|$)/i) || text.match(/```([\s\S]*?)(?:```|$)/);
   return normaliseSql((m ? m[1] : text).trim());
 }
-
-const KEY_FINDINGS = `ADJUSTED FINDINGS from the researcher's models (controls: deprivation,
-list size, rurality, staffing, age structure, ethnicity, region; details in PANEL_NOTES.md):
-1. Satisfaction vs same-day share: raw -0.10/pp is mostly confounding; adjusted -0.03 (trivial).
-   Strongest satisfaction predictors are capacity and GP-delivered share, not configuration.
-2. Continuity vs same-day share: adjusted -0.15 (10pp more same-day = -1.5pp continuity), located
-   in the GP appointment mix; GP booked-ahead care neutral. Practice size matters far more
-   (-8pp continuity per doubling of list).
-3. Change models NULL: within-practice change in same-day % predicted change in neither
-   satisfaction nor continuity - cross-sectional gradients may be stable practice traits.
-4. Cancer detection, TWW conversion, referrals, QOF, cancer emergency admissions vs SAME-DAY
-   SHARE: all null or trivial after adjustment; raw negatives are deprivation/urbanicity
-   confounding. Separately, GP staffing vs cancer detection: weak positive that SURVIVES
-   adjustment (+0.08pp detection per GP FTE/10k, p=0.005); nurse staffing null for detection.
-   Nurse staffing vs TWW conversion: raw r=0.27 is AGE CONFOUNDING (nurse-heavy practices serve
-   older lists; older patients' referrals are more often cancer) — adjusted null (p=0.26);
-   nurse staffing vs referral rate also null adjusted.
-5. Antibiotics: capacity +0.12 (mechanical); same-day share +0.08 (small); phone share -0.03.
-6. Patient-EXPERIENCED access (same-day appts, failed contact, A&E fallback) tracks capacity per
-   patient, NOT same-day share; conditionally high share predicts worse experienced access.
-   Case-mix predicts capacity strongly (R2=0.30) but same-day share not at all (R2=0.07).
-7. OC adoption: +0.5pp same-day bump fading by ~11 months; supplier heterogeneity (TPP sustained,
-   Accurx flat, eConsult null); pre-trends present.
-8. Closure exposure: nearby closure = -2pp satisfaction/continuity (small n).`;
-
-const INTERPRET_SYS = `You are helping a reader understand a query result from a practice-level
-open dataset on GP appointment access in England (GPAD, GPPS, workforce, IMD; details in the
-question context). Answer their question directly and concisely in plain English (3-6 sentences),
-citing the key numbers from the result. Compare to national context where the result allows.
-EFFECT SIZES need context, in plain words: for practice-level correlations, |r| < 0.1 is
-negligible (<1% of variance), 0.1-0.3 weak, 0.3-0.5 moderate, > 0.5 strong; where helpful
-translate to variance explained or to the difference between top and bottom groups. Never use
-the word "ruler".
-DIRECTION must be explicit: never say "declines across deciles/groups" - name the ends, e.g.
-"practices doing the most same-day care average 51%, those doing the least 54%".
-CONSISTENCY CHECK on every comparative sentence: before writing "higher/lower/more/fewer",
-verify the claim against the two numbers you are citing, and attach each number to its named
-group in the same sentence ("X practice 60.1% vs the rest of the PCN 54.8% - i.e. HIGHER").
-An inverted comparison is the worst error you can make; re-read your draft for these.
-Do NOT impose a narrative: an entity can be better on some measures and worse on others —
-report each measure's direction independently from its own numbers, even if the mix seems
-inconsistent. If a Difference row exists, take directions from its signs, not from memory.
-ORDER OF OPERATIONS: for each measure, determine the direction from the numbers FIRST, then
-write one clean sentence stating it. Never open a sentence with an expected direction and
-correct it at the end ("lower ... i.e. actually higher") — if a draft sentence contradicts
-itself, rewrite it. For entity-vs-group answers do not use the adjusted research findings to
-anticipate which way a measure "should" go; describe only what these rows show.
-CAUSAL LANGUAGE: "adjusted for deprivation" assumes deprivation is a confounder; cross-sectional
-data cannot exclude that the access measure is instead part of HOW deprivation affects the
-outcome (mediation). Say "consistent with confounding" or "accounted for statistically by",
-never "explained away" or "proves no effect". And whenever you use adjustment language, gloss it
-in everyday terms once, e.g. "in other words, comparing practices serving similar populations,
-the difference largely disappears - the raw gap reflects who these practices serve rather than
-how they organise appointments".
-You also know the researcher's adjusted findings (below). Use them ONLY when the query result
-concerns the SAME exposure AND the SAME outcome as a listed finding — never transfer a finding
-to a different exposure or outcome (e.g. the same-day/cancer nulls say NOTHING about staffing
-and cancer). If the relationship queried is not in the list, say nothing about adjusted models.
-When you do use one, ONE sentence, plainly signposted, e.g. "Worth knowing:
-in the adjusted models this association largely disappears once deprivation and practice size are
-controlled - see the analysis notes." Never bolt on caveats irrelevant to the question, never
-recite the list, and never let the findings override what the result actually shows - report the
-result first, then the context.
-${"" /* findings appended below */}
-` + KEY_FINDINGS + `
-Staffing, appointment and prescribing measures here are per-capita rates (per 1,000 or 10,000
-registered patients) — interpret "more/fewer staff (or appointments, prescribing)" questions as
-per-capita comparisons, which is the standard convention in general practice. Never speculate
-about quantities not present in the result (e.g. absolute headcounts). Make sure any opening
-yes/no agrees with the numbers you then cite.
-UNITS (use these exactly, never guess): appts_percap & sd_percap = appointments per 1,000
-registered patients PER MONTH (national mean ~490); oc_rate_1k/oc_rate_12m = online consultation
-submissions per 1,000 per month; gp_per10k/nurse_per10k/dpc_per10k = FTE per 10,000 patients;
-abx_per1k = antibiotic items per 1,000 per month; items_per_pt = prescription items per patient
-per month; all *_pct, satisfaction, continuity, contact_fail, wait_too_long etc. are percentages;
-qof = % of QOF points; ref_rate & ca_em_rate = per 100,000 per year.
-VARIABLE MEANINGS (use exactly, never guess): cdr = % of new cancer cases diagnosed after an
-urgent suspected-cancer (TWW) referral, higher = more cancers caught via the urgent route;
-conv = % of urgent suspected-cancer referrals that turn out to be cancer (referral "hit rate" —
-higher can mean better targeting OR under-referral); ref_rate = urgent suspected-cancer referrals
-made; ca_em_rate = emergency admissions of people who have cancer (crisis care, NOT route to
-diagnosis); continuity = % who usually see/speak to their preferred clinician (GPPS Q7);
-pt_same_day = % whose last appointment happened the day they contacted the practice (GPPS Q20).
-Essential caveats, briefly and only where relevant: this is cross-sectional association, not
-causation; GPAD 'same-day' reflects how practices configure booking (total-triage practices book
-everything same day), not patient-experienced access; GPPS is a weighted sample survey. When the
-result ranks individual practices on survey measures, note that differences between highly-ranked
-practices are within sampling noise and this is not an endorsement or official rating.
-PRACTICE PORTRAIT ANSWERS: when the result profiles one practice against its peers, follow this
-order — (1) who and where: list size, population context vs peers; (2) the access model: same-day
-share, capacity per patient, phone vs face-to-face mix, booked-ahead share; (3) demand channels:
-online consultation rate and, if present, the 8-10am concentration of calls and OC submissions;
-(4) patient experience vs peers: satisfaction, continuity, experienced same-day, waits,
-contact failure - each direction stated from its own numbers; (5) direction of travel: this
-year vs last (satisfaction, continuity, same-day share) - note single-year GPPS moves of a few
-points are within noise (~100 responses per practice); (6) one closing sentence on what the
-configuration suggests, clearly framed as interpretation, plus: survey-based, practice-level,
-not a rating or endorsement.
-Plain text only, no markdown headers or bullets.`;
 
 async function interpret(question, sql, rows) {
   // sample evenly across the result so every group/period is represented
@@ -520,7 +538,28 @@ async function interpret(question, sql, rows) {
   const cols = Object.keys(sample[0]);
   const csv = [cols.join(","), ...sample.map(r => cols.map(c => r[c]).join(","))].join("\n");
   const user = `Question: ${question}\n\nSQL used:\n${sql}\n\nResult (${rows.length} rows total${rows.length>MAX?`, ${MAX} evenly-spaced rows shown — note rows are sampled, so cite patterns not exact extremes`:""}):\n${csv}`;
-  return await llmChat(INTERPRET_SYS, user);
+  return await llmChat(INTERPRET_SYS, user, "smart");
+}
+
+// ---------- answer + follow-ups ----------
+function showAnswer(text, kind) {
+  const lines = String(text).split(/\r?\n/);
+  const nexts = lines.filter(l => /^NEXT:\s*/i.test(l)).map(l => l.replace(/^NEXT:\s*/i, "").trim()).filter(Boolean);
+  const main = lines.filter(l => !/^NEXT:\s*/i.test(l)).join("\n").trim();
+  $("answer").textContent = (kind === "notes" ? "From the analysis notes (not a live query): " : "") + main;
+  $("answer").style.display = "";
+  const nx = $("next"); nx.innerHTML = "";
+  if (nexts.length) {
+    nexts.slice(0, 3).forEach(t => {
+      const s = document.createElement("span");
+      s.textContent = t;
+      s.onclick = () => { $("q").value = t; ask(); };
+      nx.appendChild(s);
+    });
+    nx.style.display = "";
+  } else { nx.style.display = "none"; }
+  lastKind = kind;
+  $("fbthanks").textContent = ""; $("fbcomment").style.display = "none"; $("fb").style.display = "";
 }
 
 // ---------- run ----------
@@ -578,7 +617,7 @@ async function ask() {
     return;
   }
   $("llmstatus").textContent = "Thinking…"; $("ask").disabled = true;
-  $("answer").style.display = "none";
+  $("answer").style.display = "none"; $("next").style.display = "none"; $("fb").style.display = "none";
   try {
     const proposed = await nlToSql($("q").value);
     if (/^\s*NOT_A_QUERY\s*$/.test(proposed) || /NOT_A_QUERY/.test(proposed.slice(0, 40))) {
@@ -604,11 +643,11 @@ CRITICAL DISCIPLINE: (1) Report null results as nulls — a null change-model me
 NOT show X, never spin it as support. (2) Separate finding from inference: anything beyond the
 notes must be prefixed "speculatively:" or omitted. (3) No rhetorical embellishment of
 mechanisms the data cannot see. Plain text only, no markdown.
+After the answer, you may add up to three short follow-up questions answerable from the
+dataset, each on its own line starting exactly "NEXT: ".
 --- ANALYSIS NOTES ---\n` + notes.slice(0, 24000),
-        $("q").value);
-      $("answer").textContent = "From the analysis notes (not a live query): " + a;
-      $("answer").style.display = "";
-      lastKind = "notes"; $("fbthanks").textContent = ""; $("fbcomment").style.display = "none"; $("fb").style.display = "";
+        $("q").value, "smart");
+      showAnswer(a, "notes");
       $("llmstatus").textContent = "";
       $("ask").disabled = false;
       return;
@@ -629,8 +668,8 @@ mechanisms the data cannot see. Plain text only, no markdown.
       $("llmstatus").textContent = "Query failed — asking the model to fix it…";
       const fixed = await llmChat(SCHEMA_DOC,
         `Question: ${$("q").value}\n\nYour previous SQL:\n${$("sql").value}\n\nDuckDB rejected it with:\n${lastSqlError}\n\nReturn the corrected SQL only, in a \`\`\`sql fence.`);
-      const m = fixed.match(/```sql([\s\S]*?)```/i) || fixed.match(/```([\s\S]*?)```/);
-      $("sql").value = (m ? m[1] : fixed).trim();
+      const m = fixed.match(/```sql([\s\S]*?)(?:```|$)/i) || fixed.match(/```([\s\S]*?)(?:```|$)/);
+      $("sql").value = normaliseSql((m ? m[1] : fixed).trim());
       $("llmstatus").textContent = "";
       rows = await runSql();
     }
@@ -638,9 +677,7 @@ mechanisms the data cannot see. Plain text only, no markdown.
       $("llmstatus").textContent = "Interpreting…";
       try {
         const a = await interpret($("q").value, $("sql").value, rows);
-        $("answer").textContent = a;
-        $("answer").style.display = "";
-        lastKind = "data"; $("fbthanks").textContent = ""; $("fbcomment").style.display = "none"; $("fb").style.display = "";
+        showAnswer(a, "data");
       } catch (e) {
         // table still shown; say why the written answer is missing
         $("answer").textContent = "The results table is below, but the written interpretation couldn't be generated: " +

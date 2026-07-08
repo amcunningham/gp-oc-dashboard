@@ -117,7 +117,9 @@ export default {
     let body;
     try { body = await request.json(); } catch { return json({ error: "Bad request" }, 400, cors); }
     const payload = {
-      model: env.MODEL || "claude-haiku-4-5-20251001",
+      model: body.tier === "smart"
+        ? (env.SMART_MODEL || "claude-sonnet-5")
+        : (env.MODEL || "claude-haiku-4-5-20251001"),
       max_tokens: Math.min(body.max_tokens || 700, 2000),
       system: String(body.system || "").slice(0, 40000),
       messages: (body.messages || []).slice(-2).map(m => ({
