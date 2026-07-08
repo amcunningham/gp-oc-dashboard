@@ -242,25 +242,11 @@ never a top-N of a wider region, and never silently mix in surrounding towns. Fl
 gpps_n (<50) rows rather than excluding them when listing an area. Include gp_name, postcode,
 list_size, gpps_n and 2-4 context columns.
 PRACTICE PORTRAIT: when asked about a single named practice ("tell me about X", "how does X
-compare"), default to the full portrait — SELECT these measures for (a) the practice, (b) the
-rest of its PCN (averages, excluding the practice itself), AND (c) 'England (all practices)'
-national averages, as three labelled rows (PCNs are small — England is the stable benchmark):
-  list_size, pct65plus, imd_score, nonwhite_pct                       (population)
-  same_day_pct_12m, sd_share_prior_year, appts_percap, phone_pct_12m,
-  f2f_pct_12m, d15plus_pct                                            (access model + trajectory)
-  oc_rate_12m                                                          (online consultation)
-  satisfaction, satisfaction_2024, continuity, continuity_2024,
-  satisfaction - satisfaction_2024 AS satisfaction_change,
-  continuity - continuity_2024 AS continuity_change,
-  pt_same_day, wait_too_long, contact_fail, gpps_n                     (experience, both years)
-Also join rush for rush_pct and oc_rush_pct where available — with EXPLICIT qualified ON
-clauses, never USING, when more than two tables are involved (e.g.
-LEFT JOIN rush r ON r.gp_code = x.gp_code) and qualify every gp_code reference.
-Keep portrait SQL COMPACT: plain AVG() for the peer rows (no per-column CASE filters), ROUND
-once, no unnecessary columns — the query must comfortably fit in the response.
-The comparator rows must EXCLUDE the practice itself (…AND peer.gp_code <> practice.gp_code
-for the PCN row) — "rest of PCN" must not contain the practice being compared — and remember
-the GROUP BY for any non-aggregated label parts.
+compare"), do NOT write SQL. Instead return exactly one line:
+PORTRAIT: <practice name fragment> ~ <place hint if any>
+e.g. "PORTRAIT: st leonards ~ exeter" or "PORTRAIT: beacon medical group ~ plymouth" or
+"PORTRAIT: wells road surgery" (no place). The page expands this into a tested three-row
+comparison (practice / rest of PCN / England). Use lowercase fragments, no punctuation.
 ENTITY-VS-GROUP COMPARISONS (a practice vs its PCN/area/England): return LONG format — one row
 per group with a text label column as the FIRST column (e.g. 'St Leonards Practice' /
 'Rest of Exeter City PCN (n=4)' / 'England'), measures as columns. Never one wide row mixing
@@ -522,6 +508,44 @@ function normaliseSql(sql) {
   return sql.replace(/['"`]?(?:[\w./-]*\/)?(xsec|panel|waits|rush)(?:_master|_merged|_panel|_both_sameday)?\.(?:parquet|csv)['"`]?/gi,
                      (_, name) => name.toLowerCase());
 }
+function buildPortraitSql(name, place) {
+  const esc = s => String(s || "").replace(/[^a-z0-9 &'-]/gi, "").replace(/'/g, "''").trim();
+  const n = esc(name), p = esc(place);
+  const placeCond = p
+    ? `AND (pcn_name ILIKE '%${p}%' OR sub_icb_name ILIKE '%${p}%' OR icb_name ILIKE '%${p}%'
+           OR postcode ILIKE '${p}%' OR gp_name ILIKE '%${p}%')`
+    : "";
+  const M = `ROUND(AVG(p.list_size),0), ROUND(AVG(p.pct65plus),1), ROUND(AVG(p.imd_score),1), ROUND(AVG(p.nonwhite_pct),1),
+  ROUND(AVG(p.same_day_pct_12m),1), ROUND(AVG(p.sd_share_prior_year),1), ROUND(AVG(p.appts_percap),1), ROUND(AVG(p.phone_pct_12m),1), ROUND(AVG(p.f2f_pct_12m),1), ROUND(AVG(p.d15plus_pct),1),
+  ROUND(AVG(p.oc_rate_12m),1)`;
+  const E = `ROUND(AVG(p.satisfaction),1), ROUND(AVG(p.satisfaction_2024),1), ROUND(AVG(p.satisfaction - p.satisfaction_2024),1),
+  ROUND(AVG(p.continuity),1), ROUND(AVG(p.continuity_2024),1), ROUND(AVG(p.continuity - p.continuity_2024),1),
+  ROUND(AVG(p.pt_same_day),1), ROUND(AVG(p.wait_too_long),1), ROUND(AVG(p.contact_fail),1), ROUND(AVG(p.gpps_n),0)`;
+  return `WITH target AS (
+  SELECT * FROM xsec WHERE gp_name ILIKE '%${n}%' ${placeCond}
+  ORDER BY list_size DESC LIMIT 1
+)
+SELECT t.gp_name || ' (' || t.postcode || ')' AS entity,
+  ROUND(t.list_size,0) AS list_size, t.pct65plus, t.imd_score, t.nonwhite_pct,
+  t.same_day_pct_12m, t.sd_share_prior_year, t.appts_percap, t.phone_pct_12m, t.f2f_pct_12m, t.d15plus_pct,
+  t.oc_rate_12m, r.rush_pct, r.oc_rush_pct,
+  t.satisfaction, t.satisfaction_2024, ROUND(t.satisfaction - t.satisfaction_2024,1) AS satisfaction_change,
+  t.continuity, t.continuity_2024, ROUND(t.continuity - t.continuity_2024,1) AS continuity_change,
+  t.pt_same_day, t.wait_too_long, t.contact_fail, ROUND(t.gpps_n,0) AS gpps_n
+FROM target t LEFT JOIN rush r ON r.gp_code = t.gp_code
+UNION ALL
+SELECT 'Rest of ' || t.pcn_name || ' (n=' || COUNT(*) || ')',
+  ${M}, ROUND(AVG(r2.rush_pct),1), ROUND(AVG(r2.oc_rush_pct),1), ${E}
+FROM target t JOIN xsec p ON p.pcn_name = t.pcn_name AND p.gp_code <> t.gp_code
+LEFT JOIN rush r2 ON r2.gp_code = p.gp_code
+GROUP BY t.pcn_name
+UNION ALL
+SELECT 'England (all practices)',
+  ${M.replace(/p\./g, "")}, (SELECT ROUND(AVG(rush_pct),1) FROM rush), (SELECT ROUND(AVG(oc_rush_pct),1) FROM rush),
+  ${E.replace(/p\./g, "")}
+FROM xsec p;`;
+}
+
 async function nlToSql(question) {
   const text = await llmChat(SCHEMA_DOC, "Question: " + question);
   // tolerate a missing closing fence (truncated responses)
@@ -621,7 +645,9 @@ async function ask() {
   $("llmstatus").textContent = "Thinking…"; $("ask").disabled = true;
   $("answer").style.display = "none"; $("next").style.display = "none"; $("fb").style.display = "none";
   try {
-    const proposed = await nlToSql($("q").value);
+    let proposed = await nlToSql($("q").value);
+    const pm = proposed.match(/^\s*PORTRAIT:\s*([^~\n]+?)\s*(?:~\s*(.+?)\s*)?$/im);
+    if (pm) proposed = buildPortraitSql(pm[1], pm[2]);   // tested template, not freehand SQL
     if (/^\s*NOT_A_QUERY\s*$/.test(proposed) || /NOT_A_QUERY/.test(proposed.slice(0, 40))) {
       // narrative question -> answer from the analysis notes instead of the database
       $("llmstatus").textContent = "Not a data query — answering from the analysis notes…";
