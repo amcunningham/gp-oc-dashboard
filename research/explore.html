@@ -242,6 +242,8 @@ rest of its PCN (averages), as labelled rows:
   satisfaction, satisfaction_2024, continuity, continuity_2024,
   pt_same_day, wait_too_long, contact_fail, gpps_n                     (experience, both years)
 Also JOIN rush USING (gp_code) for rush_pct and oc_rush_pct where available.
+Keep portrait SQL COMPACT: plain AVG() for the peer row (no per-column CASE filters), ROUND
+once, no unnecessary columns — the query must comfortably fit in the response.
 xsec now carries satisfaction_2024, continuity_2024, sd_share_prior_year for year-on-year change.
 ENTITY-VS-GROUP COMPARISONS (a practice vs its PCN/area/England): return LONG format — one row
 per group with a text label column as the FIRST column (e.g. 'St Leonards Practice' /
@@ -359,7 +361,7 @@ async function llmChat(sys, user) {
     const r = await fetch(DEMO_PROXY_URL, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ max_tokens: 700, system: sys,
+      body: JSON.stringify({ max_tokens: 1800, system: sys,
         messages: [{ role: "user", content: user }] }),
     });
     const dta = await r.json();
@@ -374,7 +376,7 @@ async function llmChat(sys, user) {
         "anthropic-version": "2023-06-01",
         "anthropic-dangerous-direct-browser-access": "true",
       },
-      body: JSON.stringify({ model, max_tokens: 700, system: sys,
+      body: JSON.stringify({ model, max_tokens: 1800, system: sys,
         messages: [{ role: "user", content: user }] }),
     });
     if (!r.ok) throw new Error("API error " + r.status + ": " + await r.text());
@@ -400,7 +402,8 @@ function normaliseSql(sql) {
 }
 async function nlToSql(question) {
   const text = await llmChat(SCHEMA_DOC, "Question: " + question);
-  const m = text.match(/```sql([\s\S]*?)```/i) || text.match(/```([\s\S]*?)```/);
+  // tolerate a missing closing fence (truncated responses)
+  const m = text.match(/```sql([\s\S]*?)(?:```|$)/i) || text.match(/```([\s\S]*?)(?:```|$)/);
   return normaliseSql((m ? m[1] : text).trim());
 }
 
