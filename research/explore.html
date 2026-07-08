@@ -641,7 +641,12 @@ mechanisms the data cannot see. Plain text only, no markdown.
         $("answer").textContent = a;
         $("answer").style.display = "";
         lastKind = "data"; $("fbthanks").textContent = ""; $("fbcomment").style.display = "none"; $("fb").style.display = "";
-      } catch (e) { /* interpretation optional — table still shown */ }
+      } catch (e) {
+        // table still shown; say why the written answer is missing
+        $("answer").textContent = "The results table is below, but the written interpretation couldn't be generated: " +
+          String(e.message || e).replace(/^Error:\s*/, "");
+        $("answer").style.display = "";
+      }
       $("llmstatus").textContent = "";
     }
   } catch (e) {
