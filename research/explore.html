@@ -118,6 +118,16 @@
       <span class="status" id="llmstatus"></span>
     </div>
     <div id="answer" style="display:none; margin-top:.8rem; padding:.8rem 1rem; background:#f2f7ee; border-radius:8px; font-size:.95rem; line-height:1.5"></div>
+    <div id="fb" style="display:none; margin-top:.5rem; font-size:.85rem; color:var(--mut)">
+      Was this answer useful?
+      <button class="ghost" id="fbup" style="padding:.2rem .6rem">&#128077;</button>
+      <button class="ghost" id="fbdown" style="padding:.2rem .6rem">&#128078;</button>
+      <span id="fbthanks"></span>
+      <div id="fbcomment" style="display:none; margin-top:.4rem">
+        <input id="fbtext" placeholder="What was wrong or missing? (optional — please no personal details)" style="font-size:.85rem">
+        <button class="ghost" id="fbsend" style="margin-top:.3rem; padding:.3rem .8rem">Send</button>
+      </div>
+    </div>
   </div>
 
   <div class="card">
@@ -548,6 +558,7 @@ mechanisms the data cannot see. Plain text only, no markdown.
         $("q").value);
       $("answer").textContent = "From the analysis notes (not a live query): " + a;
       $("answer").style.display = "";
+      lastKind = "notes"; $("fbthanks").textContent = ""; $("fbcomment").style.display = "none"; $("fb").style.display = "";
       $("llmstatus").textContent = "";
       $("ask").disabled = false;
       return;
@@ -571,6 +582,7 @@ mechanisms the data cannot see. Plain text only, no markdown.
         const a = await interpret($("q").value, $("sql").value, rows);
         $("answer").textContent = a;
         $("answer").style.display = "";
+        lastKind = "data"; $("fbthanks").textContent = ""; $("fbcomment").style.display = "none"; $("fb").style.display = "";
       } catch (e) { /* interpretation optional — table still shown */ }
       $("llmstatus").textContent = "";
     }
@@ -582,6 +594,34 @@ mechanisms the data cannot see. Plain text only, no markdown.
 $("ask").onclick = ask;
 $("run").onclick = runSql;
 $("q").addEventListener("keydown", e => { if (e.key === "Enter") ask(); });
+
+// ---------- feedback ----------
+let lastKind = "";
+async function sendFeedback(verdict, comment) {
+  if (!DEMO_PROXY_URL) return;
+  try {
+    await fetch(DEMO_PROXY_URL.replace(/\/$/, "") + "/feedback", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ verdict, comment, question: $("q").value, kind: lastKind }),
+    });
+  } catch (e) {}
+}
+$("fbup").onclick = () => {
+  sendFeedback("up", "");
+  $("fbthanks").textContent = "Thanks!";
+  $("fbcomment").style.display = "none";
+};
+$("fbdown").onclick = () => {
+  $("fbthanks").textContent = "";
+  $("fbcomment").style.display = "";
+  $("fbtext").focus();
+};
+$("fbsend").onclick = () => {
+  sendFeedback("down", $("fbtext").value);
+  $("fbcomment").style.display = "none";
+  $("fbtext").value = "";
+  $("fbthanks").textContent = "Thanks — this helps improve the tool.";
+};
 </script>
 </body>
 </html>

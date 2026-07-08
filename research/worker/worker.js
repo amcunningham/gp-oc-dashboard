@@ -35,22 +35,25 @@ export default {
     if (request.method === "GET" && url.pathname === "/logs") {
       if (!env.LOG_TOKEN || url.searchParams.get("token") !== env.LOG_TOKEN)
         return new Response("Not found", { status: 404 });
-      const rows = [["time", "visitor", "kind", "ok", "question", "answer"]];
-      let cursor;
-      do {
-        const page = await env.LOGS.list({ prefix: "log:", cursor });
-        for (const k of page.keys) {
-          const v = await env.LOGS.get(k.name);
-          if (!v) continue;
-          try {
-            const e = JSON.parse(v);
-            const clean = s => '"' + String(s || "").replace(/"/g, '""').replace(/\r?\n/g, " ") + '"';
-            rows.push([e.t, e.who, e.kind, e.ok,
-              clean(String(e.q).replace(/^Question:\s*/i, "")), clean(e.a)]);
-          } catch {}
-        }
-        cursor = page.list_complete ? null : page.cursor;
-      } while (cursor);
+      const clean = s => '"' + String(s || "").replace(/"/g, '""').replace(/\r?\n/g, " ") + '"';
+      const rows = [["time", "visitor", "kind", "ok", "question", "answer", "verdict", "comment"]];
+      for (const prefix of ["log:", "fb:"]) {
+        let cursor;
+        do {
+          const page = await env.LOGS.list({ prefix, cursor });
+          for (const k of page.keys) {
+            const v = await env.LOGS.get(k.name);
+            if (!v) continue;
+            try {
+              const e = JSON.parse(v);
+              rows.push(prefix === "log:"
+                ? [e.t, e.who, e.kind, e.ok, clean(String(e.q).replace(/^Question:\s*/i, "")), clean(e.a), "", ""]
+                : [e.t, e.who, "feedback", "", clean(e.q), "", e.verdict, clean(e.comment)]);
+            } catch {}
+          }
+          cursor = page.list_complete ? null : page.cursor;
+        } while (cursor);
+      }
       return new Response(rows.map(r => r.join(",")).join("\n"), {
         headers: { "content-type": "text/csv; charset=utf-8",
                    "content-disposition": "attachment; filename=gp-explorer-questions.csv" },
@@ -59,6 +62,30 @@ export default {
 
     if (request.method !== "POST")
       return new Response("POST only", { status: 405, headers: cors });
+
+    // ---- feedback: POST /feedback {verdict, comment, question, kind} ----
+    if (url.pathname === "/feedback") {
+      if (origin !== allowed && !origin.startsWith("http://localhost"))
+        return json({ error: "Origin not allowed." }, 403, cors);
+      const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+      const day = new Date().toISOString().slice(0, 10);
+      const who = (await sha256(ip + day)).slice(0, 12);
+      const fbKey = `ratefb:${who}:${day}`;
+      const n = parseInt(await env.LOGS.get(fbKey) || "0");
+      if (n >= 20) return json({ error: "Feedback limit reached for today." }, 429, cors);
+      await env.LOGS.put(fbKey, String(n + 1), { expirationTtl: 90000 });
+      let b;
+      try { b = await request.json(); } catch { return json({ error: "Bad request" }, 400, cors); }
+      const entry = {
+        t: new Date().toISOString(), who,
+        verdict: b.verdict === "up" ? "up" : "down",
+        comment: String(b.comment || "").slice(0, 1000),
+        q: String(b.question || "").slice(0, 500),
+        kind: String(b.kind || "").slice(0, 20),
+      };
+      await env.LOGS.put(`fb:${entry.t}:${who}`, JSON.stringify(entry), { expirationTtl: 60 * 60 * 24 * 90 });
+      return json({ ok: true }, 200, cors);
+    }
 
     if ((env.DEMO_ENABLED || "true") !== "true")
       return json({ error: "The shared demo is currently switched off. You can still use your own API key or a local model." }, 503, cors);
