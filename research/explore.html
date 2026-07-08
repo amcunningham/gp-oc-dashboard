@@ -253,7 +253,9 @@ national averages, as three labelled rows (PCNs are small — England is the sta
   satisfaction - satisfaction_2024 AS satisfaction_change,
   continuity - continuity_2024 AS continuity_change,
   pt_same_day, wait_too_long, contact_fail, gpps_n                     (experience, both years)
-Also JOIN rush USING (gp_code) for rush_pct and oc_rush_pct where available.
+Also join rush for rush_pct and oc_rush_pct where available — with EXPLICIT qualified ON
+clauses, never USING, when more than two tables are involved (e.g.
+LEFT JOIN rush r ON r.gp_code = x.gp_code) and qualify every gp_code reference.
 Keep portrait SQL COMPACT: plain AVG() for the peer rows (no per-column CASE filters), ROUND
 once, no unnecessary columns — the query must comfortably fit in the response.
 The comparator rows must EXCLUDE the practice itself (…AND peer.gp_code <> practice.gp_code
@@ -663,9 +665,9 @@ dataset, each on its own line starting exactly "NEXT: ".
     $("sql").value = proposed;
     $("llmstatus").textContent = "";
     let rows = await runSql();
-    if (!rows && lastSqlError) {
-      // one self-repair attempt: hand the DB error back to the model
-      $("llmstatus").textContent = "Query failed — asking the model to fix it…";
+    for (let attempt = 1; attempt <= 2 && !rows && lastSqlError; attempt++) {
+      // self-repair: hand the DB error back to the model (up to twice)
+      $("llmstatus").textContent = `Query failed — asking the model to fix it (attempt ${attempt})…`;
       const fixed = await llmChat(SCHEMA_DOC,
         `Question: ${$("q").value}\n\nYour previous SQL:\n${$("sql").value}\n\nDuckDB rejected it with:\n${lastSqlError}\n\nReturn the corrected SQL only, in a \`\`\`sql fence.`);
       const m = fixed.match(/```sql([\s\S]*?)(?:```|$)/i) || fixed.match(/```([\s\S]*?)(?:```|$)/);
