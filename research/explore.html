@@ -244,6 +244,9 @@ rest of its PCN (averages), as labelled rows:
 Also JOIN rush USING (gp_code) for rush_pct and oc_rush_pct where available.
 Keep portrait SQL COMPACT: plain AVG() for the peer row (no per-column CASE filters), ROUND
 once, no unnecessary columns — the query must comfortably fit in the response.
+The comparator row must EXCLUDE the practice itself (…AND peer.gp_code <> practice.gp_code) —
+"rest of PCN" must not contain the practice being compared — and remember the GROUP BY for
+any non-aggregated label parts.
 xsec now carries satisfaction_2024, continuity_2024, sd_share_prior_year for year-on-year change.
 ENTITY-VS-GROUP COMPARISONS (a practice vs its PCN/area/England): return LONG format — one row
 per group with a text label column as the FIRST column (e.g. 'St Leonards Practice' /
