@@ -232,6 +232,10 @@ alongside the same stats for England, in one result (e.g. GROUP BY a CASE place/
 Places: match with ILIKE on icb_name, sub_icb_name, pcn_name, gp_name, or postcode prefix
 (Brighton -> postcode LIKE 'BN%' or sub_icb_name/pcn_name ILIKE '%brighton%'). Town names are
 often in pcn_name. Return ONLY the SQL inside a \`\`\`sql fence, nothing else.
+ENTITY-VS-GROUP COMPARISONS (a practice vs its PCN/area/England): return LONG format — one row
+per group with a text label column as the FIRST column (e.g. 'St Leonards Practice' /
+'Rest of Exeter City PCN (n=4)'), measures as columns. Never one wide row mixing both groups'
+numbers. Where practical add a final row 'Difference' (practice minus comparator, signed).
 NAMED PRACTICES AND RANKINGS ARE QUERIES: a question about a specific practice (match
 gp_name ILIKE or postcode) or about the "best/nicest/worst/highest" practices maps to ranking
 on the relevant measure — "nicest" or "best experience" = satisfaction; "quickest" = pt_same_day
@@ -427,6 +431,9 @@ CONSISTENCY CHECK on every comparative sentence: before writing "higher/lower/mo
 verify the claim against the two numbers you are citing, and attach each number to its named
 group in the same sentence ("X practice 60.1% vs the rest of the PCN 54.8% - i.e. HIGHER").
 An inverted comparison is the worst error you can make; re-read your draft for these.
+Do NOT impose a narrative: an entity can be better on some measures and worse on others —
+report each measure's direction independently from its own numbers, even if the mix seems
+inconsistent. If a Difference row exists, take directions from its signs, not from memory.
 CAUSAL LANGUAGE: "adjusted for deprivation" assumes deprivation is a confounder; cross-sectional
 data cannot exclude that the access measure is instead part of HOW deprivation affects the
 outcome (mediation). Say "consistent with confounding" or "accounted for statistically by",
