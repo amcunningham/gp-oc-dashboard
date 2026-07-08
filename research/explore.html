@@ -64,6 +64,15 @@
           <li><a href="https://opendata.nhsbsa.net/dataset/english-prescribing-data-epd">NHSBSA English Prescribing Data</a> — prescription items, antibiotics</li>
           <li><a href="https://digital.nhs.uk/services/organisation-data-service/data-search-and-export/csv-downloads/gp-and-gp-practice-related-data">NHS ODS</a> — practice postcodes, closures</li>
         </ul>
+        <p style="margin:.5rem 0 .2rem"><strong>What the survey measures actually ask</strong> (GP Patient Survey 2025, exact questions in the <a href="GPPS_2025_questions.md">question reference</a>):</p>
+        <ul style="margin:.2rem 0 .4rem 1.2rem; padding:0">
+          <li><em>Satisfaction</em> — "Overall, how would you describe your experience of your GP practice?" (% very/fairly good)</li>
+          <li><em>Continuity</em> — "How often do you get to see or speak to your preferred healthcare professional when you ask to?" (% always/almost always or a lot of the time; asked only of patients with a preferred professional)</li>
+          <li><em>Experienced same-day access</em> — "How long after you first contacted your GP practice did the appointment take place?" (% "on the same day")</li>
+          <li><em>Waited too long</em> — "How do you feel about how long you waited for your appointment?" (% "it took too long")</li>
+          <li><em>Failed contact</em> — a composite: "told to contact my practice again another day, as they couldn't help that day" + "I couldn't contact my practice" (from "did you know what the next step would be?")</li>
+          <li><em>A&amp;E after failed contact</em> — "What did you do when you couldn't contact your GP practice…?" (% "I went to A&amp;E", among those whose contact failed)</li>
+        </ul>
         <p style="margin:.4rem 0">Full build pipeline and derived files: <a href="README.md">data dictionary</a> · <a href="https://github.com/amcunningham/gp-oc-dashboard/tree/main/research">GitHub</a>.</p>
         <p style="margin:.4rem 0"><strong>Good questions look like:</strong> a place ("access in Brighton", "compare Cardiff Road Surgery
         with its PCN" — practices are named), a comparison ("deprived vs affluent", "rural vs urban", "big vs small"),
@@ -148,11 +157,12 @@ FROM waits GROUP BY 1 ORDER BY 1;</textarea>
   </div>
 
   <div class="card caveat">
-    <strong>Read before interpreting:</strong> this is practice-level (ecological) open data — associations,
-    not causes. GPAD's "same day" measures how practices <em>configure</em> booking (total-triage practices
-    book everything same-day), not what patients experience; the two are nearly uncorrelated. GPAD is official
-    statistics in development. GPPS is a weighted sample survey. From April 2026 contract changes alter
-    same-day recording. Full caveats in the <a href="PANEL_NOTES.md">notes</a>.
+    <strong>Read before interpreting:</strong> this is open, practice-level data — it describes practices,
+    not patients, and shows associations, not causes. Survey measures come from the GP Patient Survey:
+    weighted samples of roughly 100 responses per practice, so small differences between practices are
+    within noise. The appointment data (GPAD) is official statistics in development, and practices record
+    their appointments differently. Nothing here is a rating, ranking or endorsement of any practice.
+    Fuller caveats — and the research findings themselves — are in the <a href="PANEL_NOTES.md">notes</a>.
   </div>
 </div>
 
@@ -201,7 +211,8 @@ xsec — one row per practice (n=6007), exposure year Apr 2024–Mar 2025 unless
   ca_em_rate = emergency admissions of patients WITH cancer /100k/yr (crisis care of cancer
   patients; NOT detection or diagnosis route),
   dm_prev (diabetes prevalence %), items_per_pt (prescription items/patient/month),
-  abx_per1k (antibiotic items /1k/month).
+  abx_per1k (antibiotic items /1k/month), statins_per1k (statin items /1k registered patients
+  /month, Mar 2025 — crude, not age-adjusted; older lists prescribe far more statins).
 
 panel — practice x month, 2023-03..2026-05 (month as 'YYYY-MM' varchar):
   gp_code, month, total, same_day, next_day, gp, gp_same_day, f2f, phone, online, dna, attended,
@@ -313,7 +324,9 @@ yes/no agrees with the numbers you then cite.
 UNITS (use these exactly, never guess): appts_percap & sd_percap = appointments per 1,000
 registered patients PER MONTH (national mean ~490); oc_rate_1k/oc_rate_12m = online consultation
 submissions per 1,000 per month; gp_per10k/nurse_per10k/dpc_per10k = FTE per 10,000 patients;
-abx_per1k = antibiotic items per 1,000 per month; items_per_pt = prescription items per patient
+abx_per1k = antibiotic items per 1,000 per month; statins_per1k = statin items per 1,000
+registered patients per month (crude — statin volume is strongly age-driven, so compare only
+alongside pct65plus or within similar-age groups); items_per_pt = prescription items per patient
 per month; all *_pct, satisfaction, continuity, contact_fail, wait_too_long etc. are percentages;
 qof = % of QOF points; ref_rate & ca_em_rate = per 100,000 per year.
 VARIABLE MEANINGS (use exactly, never guess): cdr = % of new cancer cases diagnosed after an
@@ -321,8 +334,16 @@ urgent suspected-cancer (TWW) referral, higher = more cancers caught via the urg
 conv = % of urgent suspected-cancer referrals that turn out to be cancer (referral "hit rate" —
 higher can mean better targeting OR under-referral); ref_rate = urgent suspected-cancer referrals
 made; ca_em_rate = emergency admissions of people who have cancer (crisis care, NOT route to
-diagnosis); continuity = % who usually see/speak to their preferred clinician (GPPS Q7);
-pt_same_day = % whose last appointment happened the day they contacted the practice (GPPS Q20).
+diagnosis); continuity = % who usually see/speak to their preferred clinician (GPPS Q7, asked
+only of patients who have a preferred professional);
+pt_same_day = % whose last appointment happened the day they contacted the practice (GPPS Q20);
+wait_too_long = % who felt they waited too long for their appointment (GPPS Q21);
+contact_fail = COMPOSITE of two GPPS Q12 responses: "told to contact the practice again another
+day" + "couldn't contact my practice" — describe it as failed or deferred contact, not one or
+the other; phone_failed = % whose call went unanswered or who gave up in the queue (GPPS Q11);
+nextstep_immediate = % told the next step there and then (GPPS Q13);
+ae_after_fail = % who went to A&E, AMONG those whose contact failed (GPPS Q15) — conditional,
+not a population rate (use ae_pop for the approximate population-level share).
 EFFECT SIZES need context, in plain words: for practice-level correlations, |r| < 0.1 is
 negligible (<1% of variance), 0.1-0.3 weak, 0.3-0.5 moderate, > 0.5 strong; where helpful
 translate to variance explained or to the difference between top and bottom groups. Never use
@@ -366,8 +387,12 @@ controlled - see the analysis notes." Never bolt on caveats irrelevant to the qu
 recite the list, and never let the findings override what the result actually shows - report the
 result first, then the context.
 Essential caveats, briefly and only where relevant: this is cross-sectional association, not
-causation; GPAD 'same-day' reflects how practices configure booking (total-triage practices book
-everything same day), not patient-experienced access; GPPS is a weighted sample survey. When the
+causation; GPAD 'same-day' reflects how practices configure and record their appointment book,
+not patient-experienced access (the two are nearly uncorrelated in this dataset) — why they
+diverge is NOT established, so present recording differences or triage logging only as possible
+explanations, never as fact; and do NOT equate triage or online consultation use with same-day
+dominance (triage-based practices vary widely in same-day share); GPPS is a weighted sample
+survey. When the
 result ranks individual practices on survey measures, note that differences between highly-ranked
 practices are within sampling noise and this is not an endorsement or official rating.
 PRACTICE PORTRAIT ANSWERS: when the result profiles one practice against its peers, follow this

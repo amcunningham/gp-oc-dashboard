@@ -57,7 +57,7 @@ Sample: practice-months with OC data and ≥200 appointments; n = 164,130; 6,305
 ## Known caveats
 
 - GPAD is official statistics *in development*: no national data-entry standards; time-from-booking
-  partly reflects slot configuration (total-triage practices book everything same-day).
+  partly reflects slot configuration (same-day share reflects booking configuration and recording, not experienced speed (r~-0.1 with GPPS Q20); WHY they diverge is not established - recording/triage-logging and capacity differences are plausible but undemonstrated; NB triage/OC use does NOT imply same-day dominance (see OC findings; Exeter examples)).
 - October same-day % dips every year (flu/COVID clinics booked in advance inflate denominator) —
   month FE absorbs national seasonality but not practice-specific vaccination volume.
   Consider excluding "Planned Vaccination" national category in a sensitivity build.
@@ -332,3 +332,276 @@ adjusted findings scoped to exact exposure-outcome pairs; (c) an independent sec
 - Satisfaction: GPPS practice-level (annual) — overall experience, access items.
 - Fingertips: ethnicity of practice population, cancer detection (TWW conversion/detection rates) —
   annual, practice-level, via fingertips API.
+
+# ============================================================
+# SESSION 3 FINDINGS (added 8 Jul 2026, evening block)
+# Written retrospectively; every result below was prompted by
+# AMC's questions and survived her adversarial review.
+# SAMPLE LEDGER (applies throughout): "full sample" = ~6,000
+# practices with GPPS 2025 (gpps_n>=50 where survey outcomes
+# used); "CBT sample" = ~3,970 practices also reporting cloud
+# telephony (larger, less deprived [-0.4 SD], more southern,
+# heavier OC [+0.4 SD]; access-model variables representative).
+# Anything involving rush shapes, call volumes or answer rates
+# is CBT-sample only.
+# ============================================================
+
+## 3.1 Satisfaction anatomy (full sample)
+
+New columns: access_satisfaction (GPPS Q16, % good experience of
+contacting the practice, mean 71.8) and phone_easy (Q1, % easy to
+get through by phone). Q32 overall satisfaction correlates:
+Q16 +0.90, phone ease +0.78, waited-too-long -0.71, contact
+failure -0.68, continuity +0.60, experienced same-day (Q20) +0.32
+[all same-survey; shared-source inflation, ordering robust].
+Cross-source (uninflated): GP FTE/10k +0.27, appts per capita
++0.16, GP-delivered share +0.10, same-day share -0.10.
+Q16 itself: phone ease +0.87, Q20 +0.31, capacity +0.13, share
+-0.10. Reading: overall satisfaction is dominated by access
+experience, then continuity; configuration irrelevant; of hard
+measures GP staffing leads. NB Q20 is a behavioural report (last
+appt was same-day), NOT access satisfaction - distinct constructs
+(AMC point); Q16 is the purpose-built access-satisfaction item.
+
+## 3.2 The two 8am rushes vs experience (CBT sample)
+
+Phone-rush concentration (rush_pct, % of weekday calls 8-10am)
+is UNRELATED to satisfaction measures (+0.03..+0.07). OC-rush
+concentration (oc_rush_pct) is negative throughout: raw -0.21
+satisfaction, -0.25 access satisfaction, -0.31 phone ease.
+Population-adjusted (IMD, age, ethnicity, rurality, size, region
+- deliberately EXCLUDING downstream access-model variables per
+over-adjustment risk, AMC): -2.3 / -3.2 / -5.3 pp per SD, all
+p<0.001; adding capacity changes nothing; adding OC VOLUME to the
+model: volume null on satisfaction and access satisfaction (mild
+negative on phone ease only, -1.4/SD), rush shape keeps full
+effect. THE PENALTY FOLLOWS THE SHAPE OF INTAKE, NOT THE TOOL OR
+THE VOLUME.
+
+Mechanism candidates tested:
+- Platform caps: morning concentration is near-identical across
+  recorded suppliers (34-37%) -> not a platform default; but ALL
+  platforms can be closed at capacity (AMC), so practice-
+  configured windows remain candidate. Discriminating test
+  proposed: code practices' published OC opening hours from their
+  websites vs oc_rush_pct.
+- Under-capacity: oc_rush_pct is orthogonal to every supply and
+  demand observable (GP FTE +0.02, capacity +0.07, calls -0.07,
+  dm_prev +0.07, IMD 0.00) -> looks like intake DESIGN/behaviour,
+  not resourcing. BUT see 3.6: the under-capacity reading is
+  vindicated for the rush's toxic OUTPUT (deflection), which IS
+  resource- and need-patterned.
+- Allocation rule: BOTH rushes carry the same provision
+  signature - same-day allocation models (gp same-day share
+  ~+0.20 each; null vs volume/staffing/booked-ahead). AMC
+  formulation adopted: where today's care is allocated today,
+  early submission is RATIONAL; the perception "get in early or
+  miss out" tracks the allocation rule, not scarcity.
+
+## 3.3 Resolution timing (Q13; CBT sample; NB Q13 is asked only
+of respondents who GOT a next step - the race's losers are
+routed past it to Q15)
+
+"Knew next step there and then": phone rush +0.28 (adjusted
++1.2/SD) - the phone race resolves instantly; OC rush -0.22
+(-2.0/SD); OC VOLUME -0.66 raw / -9.1pp per SD - the largest
+activity correlation in the project, but largely definitional
+(forms are asynchronous). Full Q13 distribution: OC volume's
+loss of "there and then" reappears almost entirely as "later the
+SAME day" (+0.63), modest leakage to next-day (+0.31). OC-rush
+practices' same-day resolution (cat 1+2) is +0.08 - normal.
+So: OC limbo is hours not days and is NOT the harm (volume is
+satisfaction-null); the OC-rush harm is not slow verdicts but
+MORE OUTRIGHT LOSERS (see 3.4). Mediation NOT modelled
+(satisfaction ~ rush + Q13 rejected as over-adjustment: Q13 is
+downstream; controlling a mediator amputates the pathway and
+invites collider bias).
+
+## 3.4 Failure decomposition (full sample; contact_fail was a
+composite - AMC required the split)
+
+Q12_3 "told to contact again another day" (DEFLECTION, mean
+8.7%) vs Q12_4 "couldn't contact at all" (mean 1.2%).
+- Deflection: OC volume -0.19 (forms accept the request), OC
+  rush +0.21, phone rush +0.16 (both races deflect); vs access
+  satisfaction -0.70 (largest same-survey weight found).
+- Couldn't-contact: OC volume +0.15 (phone deprioritised /
+  digitally excluded tail), vs access satisfaction -0.37.
+Patients punish the ANSWERED REJECTION far more than the
+unanswered phone. Heavy OC trades deflection down for a smaller
+excluded tail - first clearly pro-OC experience finding.
+
+## 3.5 Deflection determinants (full sample) - THE INVERSE CARE
+LAW, LOCATED
+
+Adjusted, pp per SD on mean 8.7%: capacity -0.95, GP FTE -0.83,
+GP same-day share +0.63, deprivation +0.158/IMD point (~+2pp
+across IQR); all p<1e-14. Unlike the rush shapes, deflection IS
+need meeting resources - deprivation drives it net of supply,
+i.e. unmet demand invisible to supply measures shows up as
+rejections (AMC's under-capacity hypothesis vindicated HERE).
+The most-deflected are the least equipped to re-race tomorrow.
+
+## 3.6 Call volumes and answering (CBT sample)
+
+Call volume/1k = the missing DEMAND proxy: +0.32 diabetes
+prevalence, +0.26 IMD, +0.20 age65+; unrelated to same-day share
+(-0.01); OC substitution -0.33; satisfaction mildly POSITIVE
+adjusted (+0.43/SD) - busy phones are a reachable practice in
+use, not distress. AMC: total inbound conflates demand with
+redial frustration -> split via CBT indicators (inferred:
+CBT001 inbound, CBT003 answered, CBT004 abandoned-in-queue;
+VERIFY vs metadata xlsx before publication).
+ANSWER RATE (mean 60%): +0.49 with patient-reported phone ease
+(strongest cross-source correlation in project), +0.38 access
+satisfaction, +0.30 satisfaction, -0.28 deflection; UNRELATED to
+deprivation (-0.04), GP staffing (+0.04), capacity in every
+decomposition (all-staff, GP-delivered, other-staff), OC use,
+AND admin/non-clinical FTE per 10k (-0.01 raw; -0.13/SD adj, ns;
+caveat: category lumps receptionists with secretaries/managers;
+deployment unmeasured). LIST SIZE -10.0pp per log unit
+(p=1e-156), ~-7pp answer rate per doubling, NOT explained by
+admin per capita. Answering = operations, degraded by scale.
+
+## 3.7 Anima / Continuum Health (full sample; AMC identified
+Continuum = Anima's company name, from practice websites:
+Rushden + Higham Ferrers = Anima, The Mounts = Accurx, all
+total-triage front doors; all three in the bottom-20 continuity
+list, a Northamptonshire cluster)
+
+Cohort: 313 practices with Continuum/Anima recorded supplier by
+Mar 2026. Their GPPS-2025 scores: satisfaction -5.0pp, continuity
+-5.7pp, access satisfaction -6.0pp adjusted (all p<1e-7),
+highest contact-fail (11.9%), despite affluent profile.
+CRITICAL TIMING: only ONE practice carried the label by the
+GPPS-2025 fieldwork window -> these are PRE-ADOPTION baselines.
+Reading: struggling-access practices adopt Anima (selection),
+not (yet) platform effect. Residual: adoption date vs
+reporting-start date indistinguishable in the supplier field
+(Wealden Ridge held Continuum with zero submissions), so some
+true adopters may predate fieldwork - calibrate with website/
+announcement dates.
+PROSPECTIVE DESIGN READY: 313 identified adopters, pre-scores
+banked (GPPS 2025), post-scores due imminently (GPPS 2026,
+fieldwork Jan-Mar 2026): adopters vs matched non-adopters DiD on
+satisfaction/access/continuity/contact-fail. Effectively
+pre-registered by this note.
+
+## 3.8 Continuity extremes (full sample, gpps_n>=50)
+
+ELITE (>=80% continuity): 143 practices
+(continuity_elite_80plus.csv). Profile of top-100: list 6,000 vs
+10,300; 50% rural; 50% dispensing; IMD 18 vs 24; 65+ 24% vs 18%;
+same-day share LOWER (36 vs 43); satisfaction 93.2 vs 76.9.
+23 elite practices are urban AND IMD Q4-5 - mostly tiny personal
+lists (eponymous single-handers). Two refute the same-day/
+continuity trade-off outright: Moss Way L11 (IMD 49, 72.9%
+same-day, 84.7 continuity, 90.6 satisfaction) and Dr Kulshrestha
+B18 (IMD 51, 69.7% same-day, 82.8, 96.1). At personal-list scale
+same-day and continuity are the same thing.
+DESERTS (<15%): 288 practices. Bottom-100 profile: list 15,000;
+OC 88.5/1k (heaviest of any cohort, an UNDERCOUNT given 3.7);
+GP share 41.9 vs 46.7; deprivation IDENTICAL to average (23.7 vs
+23.5) - continuity destruction is ORGANISATIONAL, not social
+(contrast deflection, 3.5). Zeros (5 practices at 0.0%) carry
+small Q7 bases and some entrants are atypical access services -
+manual clean needed before publication. Satisfaction in the
+basement spans 33-86: Wish Park (Hove) 0% continuity / 79%
+satisfaction - convenience clientele; forgiveness flows both
+ways (see 3.9).
+Response-rate note: Reeth 60.1% response (highest in England;
+mean 29.1) but resprate is demographics (age +0.85, nonwhite
+-0.76, IMD -0.60, rural +0.51) - GPPS hears affluent old rural
+England loudest; deflection gradients likely UNDERSTATED.
+
+## 3.9 Case studies
+
+ST LEONARDS PRACTICE, Exeter (L83042; the Pereira Gray
+continuity practice): highest continuity in its PCN (60.1 vs
+54.8) and RISING (+6.8pp yr-on-yr) while same-day share ROSE
+44->52% - within-practice refutation of reading the cross-
+sectional trade-off causally. Model: Accurx-heavy morning OC
+funnel (61% of OC 8-10am), 51% phone delivery, 34% more
+capacity than PCN peers, easiest contact (1.7% fail) - but
+lowest PCN satisfaction (71.8 vs 83.5, improving) and highest
+waited-too-long. Phone-first same-day triage organised FOR
+continuity; satisfaction penalty plausibly mode/expectations.
+WEALDEN RIDGE (G81088; AMC's origin practice, Visiba-linked):
+prediction test - AMC guessed few deflections; WRONG in an
+instructive way: deflection 13.7% (vs 8.7) with 0.0% couldn't-
+contact, 72.8% instant verdicts, no morning race either channel,
+below-avg capacity, booked-ahead model. Access satisfaction 66
+(below avg) yet OVERALL satisfaction 90: the 0.90 access/overall
+coupling DECOUPLES where in-room strengths dominate - full GPPS
+profile shows health-confidence +1.28 SD (their most distinctive
+score), records/being-known +0.78, listening +0.44, preferred-
+professional +0.44; weakest: WEBSITE -0.81 (= the digital front
+door, plausibly Visiba UX), care-planning, mental wellbeing.
+Their triage traffic is essentially invisible in national OC
+data (Continuum record, zero submissions; token Accurx) - the
+hidden-workload thesis embodied. Calls 470/1k (37th pct), rush
+19% - flat, orderly, analogue-preferred.
+
+## 3.10 Typologies and the cross-tabulation
+
+SUPPLY TYPOLOGY (k-means, k=5, CBT sample n=3,964; features =
+what practices DO: gp_sd, oth_sd, d15plus, phone share, GP
+share, log OC rate, both rush shapes, answer rate; outcomes and
+demographics excluded by design). Silhouette 0.11-0.12 at all k:
+practices are a CONTINUUM; types are map segments, not species
+(relativises the BJGP two-cluster paper). Types (satisfaction
+order): Bookable (n=1091; most booked-ahead, rural-ish; 78.8 /
+continuity 43.0); GP-answers-today (1009; GP share 58%, phone-
+first, best answer rate 65%; 77.7/41.5); Engaged-tone (570;
+minimal OC, worst answer rate 47%, biggest call rush; 76.1/37.6);
+MDT triage (750; GP share 33%, heavy OC, biggest lists;
+75.8/37.1); 8am form race (544; OC 104/1k, OC rush 56%;
+72.9/33.7). Both worst types share contact-fail 12.1 - the two
+failure modes. Demographics near-flat across types: organisational
+speciation, not population sorting. HONESTY: eta-squared of type
+on outcomes 3.0-4.4%; within-type SD ~11 vs between-type range
+~6 - types differ reliably in aggregate, predict individual
+practices poorly. Non-CBT practices allocated by nearest centroid
+on 6 shared features (supply_typology_all6k.csv): engaged-tone
+share doubles (14->33%) in the analogue third (label there =
+"low-digital"); profiles replicate out-of-sample (form race
+72.3/33.7).
+
+PATIENT-EYE TYPOLOGY (k=5, full sample n~5,530; features = what
+patients REPORT: contact-channel mix Q10, channel ease Q1-3,
+verdict timing Q13, failure Q12, experienced same-day Q20, wait
+verdict Q21; satisfaction EXCLUDED from clustering). Better
+separation (silhouette 0.16-0.23). Types: Phone-works (1297;
+76% phone, everything functions; satisfaction 88.3, continuity
+56.8, lists 7.4k); Digital-works (654; 35% online; 81.5/42.2);
+Phone-adequate (1891; 78.1/40.4); Digital-fails (768; 67.5/29.0;
+biggest lists); Unanswerable-phone (920; fail 20%; 63.5/28.8;
+most deprived 27.5). Channel x functioning: functioning dominates
+(same-channel pairs differ ~20pp satisfaction; same-functioning
+cross-channel ~5pp). Circularity caveat: types built partly from
+experience items; satisfaction gaps partly constructed; the
+continuity gradient (57->29) is the non-circular signal.
+
+CROSS-TAB (supply x patient types; full sample n=5,526; Cramer's
+V=0.20): every configuration produces every experience; odds
+differ ~2x at extremes. Form race: 7% phone-works, 47% failing
+front doors (28% digital-fails, highest cell). Bookable: 33%
+phone-works. MDT triage: most likely digital-works (21-25%).
+Engaged-tone: 24-26% unanswerable, ~1-2% digital-works (nowhere
+to fail into but the queue). HEADLINE: configuration doubles or
+halves the odds of a working front door and never settles them.
+
+## 3.11 Files added this session
+
+cbt_answer_rates.csv; continuity_elite_80plus.csv;
+practice_typology_k5.csv (CBT); supply_typology_all6k.csv;
+patient_typology_k5.csv; rush_both_sameday.csv (earlier);
+xsec_master gains: access_satisfaction, phone_easy,
+satisfaction_2024, continuity_2024, sd_share_prior_year,
+statins_per1k, cdr/conv/ref_rate, geography columns.
+TO DO: cohort files + typologies into repo data/ and explorer
+schema; verify CBT indicator labels vs metadata; GPPS 2026 DiD
+(3.7) on release; OC window-policy website survey (3.2);
+Northants cluster local history; manual clean of desert cohort;
+letter to NHSE OC publication team re supplier-field opacity
+(Anima-as-Continuum, Visiba invisibility).
