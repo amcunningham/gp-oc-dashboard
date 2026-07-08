@@ -554,6 +554,13 @@ async function runSql() {
 
 async function ask() {
   $("error").textContent = "";
+  const qval = $("q").value;
+  if (/\[[^\]]*\]/.test(qval)) {
+    $("error").textContent = "Replace the [bracketed part] with a real practice name first — e.g. \"How does The Densham Surgery compare with the rest of its PCN?\"";
+    $("q").focus();
+    $("q").setSelectionRange(qval.indexOf("["), qval.indexOf("]") + 1);
+    return;
+  }
   if (!viewsReady) {
     $("error").textContent = "The data hasn't loaded (see the message under the SQL box), so questions can't run yet. Use start_explorer.bat / the served page, or click Retry.";
     return;
@@ -596,6 +603,14 @@ mechanisms the data cannot see. Plain text only, no markdown.
       $("answer").textContent = "From the analysis notes (not a live query): " + a;
       $("answer").style.display = "";
       lastKind = "notes"; $("fbthanks").textContent = ""; $("fbcomment").style.display = "none"; $("fb").style.display = "";
+      $("llmstatus").textContent = "";
+      $("ask").disabled = false;
+      return;
+    }
+    if (!/^\s*(--[^\n]*\n|\s)*(select|with)\b/i.test(proposed)) {
+      // model replied with prose (a clarification or refusal) rather than SQL — show it as a message
+      $("answer").textContent = proposed;
+      $("answer").style.display = "";
       $("llmstatus").textContent = "";
       $("ask").disabled = false;
       return;
