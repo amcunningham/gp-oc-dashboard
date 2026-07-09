@@ -605,3 +605,97 @@ schema; verify CBT indicator labels vs metadata; GPPS 2026 DiD
 Northants cluster local history; manual clean of desert cohort;
 letter to NHSE OC publication team re supplier-field opacity
 (Anima-as-Continuum, Visiba invisibility).
+
+## 3.12 Late-evening additions (8 Jul 2026): demand levers, antibiotics, long-interval composition
+
+EMPOWERMENT: healthconfidence (GPPS Q42) vs IMD -0.52 raw; adjusted -0.30pp/IMD point
+(p~1e-153) net of age/ethnicity/rurality/region - the self-management reserve is scarcest where
+demand pressure is highest. Confidence -> calls/1k -7.3 per SD (p=.049, cross-source) - the only
+demand-side lever with the predicted sign vs a machine-measured outcome. Continuity showed NO
+demand reduction in delivered appointments (throughput-capped instrument - delivered volume
+cannot reveal demand under capacity constraint; patient-level literature unchallenged).
+
+ANTIBIOTICS vs CONTINUITY (counter-literature, robust): practice-level +1.06..+1.15 items/1k/mo
+per SD continuity, p<1e-17, surviving: full age bands (85+, 75-84, 65+, 0-4), diabetes
+prevalence, deprivation, ethnicity, dispensing, urban-only restriction. AMC: %85+ never a
+volume driver (small population share). DISPLACEMENT test: deflection -0.84 (p=4e-11) with
+continuity +0.75 in same model - consistent with low-access practices EXPORTING prescriptions
+to OOH/ED (practice-attributed data blind to them); continuity practices capture their own
+infections. Candidate explanations ranked: displacement; ecological reversal (within-practice
+continuity may still reduce prescribing - Simpson); residual case-mix/care homes; NOT dispensing
+or rurality (tested). Person-level adjudication = NI GPIP (see protocol annex).
+
+LONG-INTERVAL COMPOSITION (AMC challenge: '28-day bookings may be reviews = continuity'):
+CONFIRMED - planned-category share rises monotonically with booking interval: 7.3% (same-day)
+-> 54.3% (>28 days; Planned Clinics + Procedures + SMR top the band); May 2026 release.
+Long-interval growth CANNOT be read as queue inflation; honest horizon-drift gauge = growth in
+UNPLANNED long-interval bookings only (requires category-kept re-aggregation - TODO).
+Two-gauge capacity dashboard rev.2: deflection rate + unplanned-horizon drift.
+
+RACE-AS-CHOICE demoted to unresolved: oc_rush orthogonal to measured supply/need BUT correlates
++0.21 with deflection (the imbalance thermometer); invisible imbalance cannot be excluded;
+adjudication = window-policy ground truth (PACT access-systems questionnaire > website scrape).
+
+NI PROTOCOL LINKAGE: AMC's prior protocol v0.7 (funding/deprivation/continuity/unplanned care;
+GPIP consultation-level with clinician IDs; HBS linkage) receives England-derived pre-specified
+hypotheses via Annex A (drafted 8 Jul 2026): displacement (all-source antimicrobial
+attribution); within- vs between-practice continuity-antibiotic association; continuity as
+contact-demand efficiency (GPIP observes contacts, not throughput); access-model exposure gap
+patched by PACT questionnaire census (~316 practices; NO booking timestamps in GPIP -
+consultation-recorded, per AMC). PACT Accessing Continuity (Dineen/Mahoney, Bristol) =
+complementary ground-truth instrument; collaboration email drafted.
+
+## 3.13 OC submission timing: caps do not exist, the race is clinical, and the clinical/admin split is broken for whole platforms (8 Jul 2026, night)
+
+Source: OC Submissions day/time supplementary file, Mar 2026 (per-practice weekday x hour-band
+counts, CLINICAL/ADMIN/TOTAL). All results weekday-only, practices with >=100 weekday submissions
+(n=5,054) unless stated.
+
+**Noon-cap census (AMC: "which practices cap ie receive no OC after 12pm... cause i don't think
+that is happening").** She was right. Only 2 of 4,402 practices receive <2% of submissions after
+noon; median practice receives 40% after noon. Hard morning windows essentially do not exist in
+the data. The morning concentration documented in 3.2 is therefore BEHAVIOURAL (patient response),
+not an imposed cap. Consequence: briefing v0.2 language about "morning-capped windows" / "intake
+design" was wrong and removed in v0.3. Working hypothesis: where today's care is allocated today,
+early submission is rational - a scarcity response, mirroring the 8am phone race.
+
+**Clinical vs admin time-of-day split.** Clinical requests race, admin requests don't: 42.9% of
+clinical submissions arrive 8-10am vs 27.7% of admin. Joint model (access satisfaction on both
+rush measures + usual controls): clinical-rush -2.16pp/SD vs admin-rush -1.20pp/SD. The
+experience association attaches to the clinical race specifically - consistent with the
+scarcity-response reading, since admin requests face no same-day allocation pressure.
+
+**Wealden Ridge re-check.** All 163 weekday submissions are ADMIN, zero clinical, evening-peaked
+(18:00 band = 17%). No race because no clinical intake is recorded at all - the Visiba triage
+activity is invisible at origin, confirming 3.9's data-completeness case at the practice itself.
+
+**"Next to no clinical digital" census (AMC) - CORRECTED after AMC caught my error.** First
+pass reported 436 practices as "admin-only". AMC opened the file and spotted that adm was also
+0 ("so confused cause all labled 0 for admin") - correct: I had ignored the file's fourth
+category column, UNKNOWN_OTHER. The corrected picture splits into two very different cohorts:
+
+(1) NO-SPLIT REPORTERS (n=409, >=90% of submissions uncategorised): whole platforms return no
+clinical/admin code at all - Evergreen Health Solutions 183 (Wigan/Gtr Manchester cluster),
+Silicon Practice Ltd / FootFall 130. Near-average OC volumes; a supplier data-pipeline gap, not
+a practice behaviour. Nationally 899k of 9.5M weekday submissions (9.4%) are uncategorised, so
+"% clinical" is 65.9% of total but 72.8% of categorised - denominator matters.
+
+(2) ADMIN-DOMINANT WITH REAL SPLIT (n=22, <10% clinical of categorised, >=100 categorised):
+the true "invisible clinical triage" cohort - the split is populated but contains almost no
+clinical. Wealden Ridge (Accurx, 163 admin / 0 clinical) sits here, alongside a visible Klinik
+Healthcare cluster (Stratford Health Centre, The Forest Practice, The Simpson Centre - all
+0 clinical) and several Accurx practices. These are practices where clinical triage demonstrably
+happens on a platform but is recorded as zero.
+
+Implications: (a) 3.2's clinical-rush models excluded cohort 1 via the clinical-volume filter,
+so results stand but under-represent Evergreen/FootFall practices; (b) the NHSE data-
+completeness letter now has three named failure modes - platform invisible entirely
+(Visiba/Wealden's triage arm), platform present but returning no categorisation (Evergreen,
+Silicon), and split populated but clinical recorded as zero (Accurx and Klinik at specific
+practices). File: data/admin_only_oc_cohort.csv (431 rows, category column distinguishes the
+two cohorts).
+
+**GPPS 2026 note:** publication announced for 9 Jul 2026 - the morning after this session.
+Pre-registered intentions (see 3.7): Anima/Continuum DiD on 2025->2026 change using adoption
+timing; deflection and access-satisfaction deltas for the admin-only cohort; refresh of banked
+KEY_FINDINGS in explore.html once practice-level file lands.

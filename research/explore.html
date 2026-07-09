@@ -36,7 +36,7 @@
 <div class="wrap">
   <h1>Ask the GP Access Research Data</h1>
   <p class="sub">Natural-language querying of practice-level open data on GP appointment access in England
-  (6,007 practices; monthly panel Mar 2023–May 2026). Your question is turned into SQL by a language model,
+  (6,007 practices; monthly panel Mar 2023–May 2026; GP Patient Survey 2025 and 2026 waves). Your question is turned into SQL by a language model,
   the SQL is <strong>always shown</strong>, and the query runs entirely in your browser with
   <a href="https://duckdb.org/docs/api/wasm/overview.html">DuckDB-WASM</a> — no data leaves this page.
   See the <a href="README.md">data dictionary</a> and <a href="PANEL_NOTES.md">analysis notes</a>.</p>
@@ -51,7 +51,9 @@
         <p style="margin:.2rem 0"><strong>A practice profile snapshot</strong> — staffing, population, patient
         experience, quality and prescribing measures. These are anchored to the year ending March 2025, because the
         patient survey they centre on was fielded in early 2025; the matching appointment measures cover the same
-        year so that like is compared with like.</p>
+        year so that like is compared with like. The July 2026 patient-survey wave (fieldwork Jan–Mar 2026) is
+        included as <code>_2026</code> columns — including, for the first time, the share of patients told to
+        contact their practice again another day.</p>
         <p style="margin:.4rem 0">Built entirely from open data:</p>
         <ul style="margin:.4rem 0 .4rem 1.2rem; padding:0">
           <li><a href="https://digital.nhs.uk/data-and-information/publications/statistical/appointments-in-general-practice">Appointments in General Practice</a> — volumes, booking-to-appointment waits, mode, staff type</li>
@@ -178,7 +180,7 @@ const DATA_BASE = location.protocol === "file:"
 const DEMO_PROXY_URL = "https://gp-explorer-demo.anne-marie-cunningham.workers.dev";
 
 const TABLES = {
-  xsec:  "xsec_master.parquet",
+  xsec:  "xsec_master_2026.parquet",
   panel: "panel_merged.parquet",
   waits: "waits_panel.parquet",
   rush:  "rush_both_sameday.csv",
@@ -213,6 +215,13 @@ xsec — one row per practice (n=6007), exposure year Apr 2024–Mar 2025 unless
   dm_prev (diabetes prevalence %), items_per_pt (prescription items/patient/month),
   abx_per1k (antibiotic items /1k/month), statins_per1k (statin items /1k registered patients
   /month, Mar 2025 — crude, not age-adjusted; older lists prescribe far more statins).
+  GPPS 2026 WAVE (survey fieldwork Jan–Mar 2026; same definitions as the 2025 columns):
+  satisfaction_2026, continuity_2026, access_satisfaction_2026, phone_easy_2026,
+  nextstep_immediate_2026, wait_too_long_2026, gpps_n_2026,
+  deflection_2026 (% of patients told to contact the practice again another day at last
+  contact — first year this is available; no 2025 equivalent column),
+  couldnt_contact_2026 (% unable to make contact at all).
+  For change questions use e.g. satisfaction_2026 - satisfaction. Weight by gpps_n_2026.
 
 panel — practice x month, 2023-03..2026-05 (month as 'YYYY-MM' varchar):
   gp_code, month, total, same_day, next_day, gp, gp_same_day, f2f, phone, online, dna, attended,
@@ -285,6 +294,7 @@ const EXAMPLES = [
   "Is an older patient population associated with higher satisfaction, allowing for deprivation?",
   "Do rural practices have fewer staff than urban ones?",
   "What does this data tell us about how practices choose their appointment systems?",
+  "Did access satisfaction improve more in deprived areas between 2025 and 2026?",
 ];
 
 const KEY_FINDINGS = `ADJUSTED FINDINGS from the researcher's models (controls: deprivation,
@@ -309,7 +319,19 @@ list size, rurality, staffing, age structure, ethnicity, region; details in PANE
    Case-mix predicts capacity strongly (R2=0.30) but same-day share not at all (R2=0.07).
 7. OC adoption: +0.5pp same-day bump fading by ~11 months; supplier heterogeneity (TPP sustained,
    Accurx flat, eConsult null); pre-trends present.
-8. Closure exposure: nearby closure = -2pp satisfaction/continuity (small n).`;
+8. Closure exposure: nearby closure = -2pp satisfaction/continuity (small n).
+9. Total-triage shift (2025->2026 change models): practices whose online intake surged
+   (>=+100 submissions/1k/month between survey waves, n=1,350, any supplier) fell against
+   non-changers - satisfaction -1.0pp, access satisfaction -1.7pp, continuity -3.0pp (all
+   p<0.001) - while national averages rose. Anima/Continuum adopters, the most intense triage
+   model, fell furthest (access -2.9, continuity -5.0); messaging-first platforms (Accurx,
+   eConsult) show no effect. The effect belongs to the intake-model change, not a single vendor.
+10. The dip is transition-shaped but not repaid: practices that went digital-heavy 2024->2025
+    and fell >=3pp satisfaction recovered in 2026 at the same rate as any other faller
+    (regression to the mean; recovery gap +0.5pp, ns) and remain ~2-3pp below their 2024 baseline.
+11. 2026 national picture: access satisfaction +2.6pp, phone ease +3.5pp, satisfaction +1.2pp
+    on 2025. Deflection (deflection_2026, mean 7.1%) is now directly measured and rises with
+    deprivation net of capacity.`;
 
 const INTERPRET_SYS = `You are helping a reader understand a query result from a practice-level
 open dataset on GP appointment access in England (GPAD, GPPS, workforce, IMD; details in the
@@ -367,9 +389,11 @@ write one clean sentence stating it. Never open a sentence with an expected dire
 correct it at the end ("lower ... i.e. actually higher") — if a draft sentence contradicts
 itself, rewrite it. For entity-vs-group answers do not use the adjusted research findings to
 anticipate which way a measure "should" go; describe only what these rows show.
-YEARS: unsuffixed measures are CURRENT (2025 survey / year to Mar 2025); _2024 measures are
-LAST YEAR — all "is/has" statements use current values only; _2024 appears only in trend
-sentences, and trend direction comes from the *_change columns' signs.
+YEARS: unsuffixed survey measures are the 2025 wave (year to Mar 2025 for appointment measures);
+_2024 measures are the 2024 wave; _2026 measures are the 2026 wave (fieldwork Jan–Mar 2026,
+published July 2026) — always name the wave when comparing, and compute change as
+(value_2026 - value_2025-unsuffixed). Trend direction comes from the signed change, never from
+adjectives.
 CAUSAL LANGUAGE: "adjusted for deprivation" assumes deprivation is a confounder; cross-sectional
 data cannot exclude that the access measure is instead part of HOW deprivation affects the
 outcome (mediation). Say "consistent with confounding" or "accounted for statistically by",
