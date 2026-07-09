@@ -38,8 +38,9 @@ GROUP BY 1 ORDER BY 1;
 
 ## Core tables
 
-### `data/xsec_master.csv` / `.parquet` — practice cross-section (n=6,007, 63 columns)
-One row per practice. Exposure year Apr 2024–Mar 2025 unless noted. Key column groups:
+### `data/xsec_master_2026.csv` / `.parquet` — practice cross-section (n=6,007, 90 columns)
+One row per practice. Exposure year Apr 2024–Mar 2025 unless noted. This is the file the
+explorer serves; `xsec_master.*` is the frozen pre-2026-wave version. Key column groups:
 
 | Group | Columns | Source |
 |---|---|---|
@@ -51,7 +52,8 @@ One row per practice. Exposure year Apr 2024–Mar 2025 unless noted. Key column
 | Structure | `list_size`, `log_list`, `rural`, `dispensing_f`, `imd_score`, `imd_quintile`, `pct65plus`, `nonwhite_pct` | NHS Payments 24/25, IMD, GP Workforce census, GPPS |
 | Workforce | `gp_per10k`, `nurse_per10k`, `dpc_per10k`, `gp_fte`, `nurse_fte`, `dpc_fte`, `admin_fte` | GP Workforce Mar 2025 |
 | Mergers/closures | `merged_recent` (list-jump proxy — superseded), `closure_exposed`, `merger_recipient` | ODS epraccur + panel |
-| Patient experience (GPPS 2025) | `satisfaction` (Q32), `continuity` (Q7), `pt_same_day` (Q20), `wait_too_long` (Q21), `nextstep_immediate` (Q13), `contact_fail` (Q12), `phone_failed` (Q11), `ae_after_fail`/`ae_pop` (Q15), `gpps_n` | GP Patient Survey 2025 |
+| Patient experience (GPPS 2025) | `satisfaction` (Q32), `continuity` (Q7), `pt_same_day` (Q20), `wait_too_long` (Q21), `nextstep_immediate` (Q13), `contact_fail` (Q12), `phone_failed` (Q11), `ae_after_fail`/`ae_pop` (Q15), `deflection_2025`/`couldnt_contact_2025` (Q12 categories), `gpps_n` | GP Patient Survey 2025 |
+| Patient experience (GPPS 2026, fieldwork Jan–Apr 2026) | `satisfaction_2026`, `continuity_2026`, `access_satisfaction_2026`, `phone_easy_2026`, `nextstep_immediate_2026`, `wait_too_long_2026`, `deflection_2026`, `couldnt_contact_2026`, `gpps_n_2026` (`pt_same_day_2026` present but unverified — low year-on-year correlation suggests a category-mapping issue) | GP Patient Survey 2026 |
 | Clinical outcomes | `qof` (% points 24/25), `cdr` (cancer detection), `conv` (TWW conversion), `ref_rate` (USC referrals), `ca_em_rate` (cancer emergency admissions) | QOF, Fingertips/NDRS |
 | Workload & prescribing | `dm_prev` (diabetes prevalence 24/25), `items_per_pt`, `abx_per1k` (Mar 2025) | Fingertips, NHSBSA EPD |
 

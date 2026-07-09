@@ -218,9 +218,9 @@ xsec — one row per practice (n=6007), exposure year Apr 2024–Mar 2025 unless
   GPPS 2026 WAVE (survey fieldwork Jan–Mar 2026; same definitions as the 2025 columns):
   satisfaction_2026, continuity_2026, access_satisfaction_2026, phone_easy_2026,
   nextstep_immediate_2026, wait_too_long_2026, gpps_n_2026,
-  deflection_2026 (% of patients told to contact the practice again another day at last
-  contact — first year this is available; no 2025 equivalent column),
-  couldnt_contact_2026 (% unable to make contact at all).
+  deflection_2026 and deflection_2025 (% of patients told to contact the practice again
+  another day at last contact — England mean fell 8.8 to 7.1),
+  couldnt_contact_2026 and couldnt_contact_2025 (% unable to make contact at all).
   For change questions use e.g. satisfaction_2026 - satisfaction. Weight by gpps_n_2026.
 
 panel — practice x month, 2023-03..2026-05 (month as 'YYYY-MM' varchar):
@@ -566,22 +566,27 @@ function buildPortraitSql(name, place) {
            OR postcode ILIKE '${p}%' OR gp_name ILIKE '%${p}%')`
     : "";
   const M = `ROUND(AVG(p.list_size),0), ROUND(AVG(p.pct65plus),1), ROUND(AVG(p.imd_score),1), ROUND(AVG(p.nonwhite_pct),1),
-  ROUND(AVG(p.same_day_pct_12m),1), ROUND(AVG(p.sd_share_prior_year),1), ROUND(AVG(p.appts_percap),1), ROUND(AVG(p.phone_pct_12m),1), ROUND(AVG(p.f2f_pct_12m),1), ROUND(AVG(p.d15plus_pct),1),
+  ROUND(AVG(p.same_day_pct_12m),1), ROUND(AVG(p.appts_percap),1), ROUND(AVG(p.f2f_pct_12m),1), ROUND(AVG(p.d15plus_pct),1),
   ROUND(AVG(p.oc_rate_12m),1)`;
-  const E = `ROUND(AVG(p.satisfaction),1), ROUND(AVG(p.satisfaction_2024),1), ROUND(AVG(p.satisfaction - p.satisfaction_2024),1),
-  ROUND(AVG(p.continuity),1), ROUND(AVG(p.continuity_2024),1), ROUND(AVG(p.continuity - p.continuity_2024),1),
-  ROUND(AVG(p.pt_same_day),1), ROUND(AVG(p.wait_too_long),1), ROUND(AVG(p.contact_fail),1), ROUND(AVG(p.gpps_n),0)`;
+  const E = `ROUND(AVG(p.satisfaction),1), ROUND(AVG(p.satisfaction_2026),1), ROUND(AVG(p.satisfaction_2026 - p.satisfaction),1),
+  ROUND(AVG(p.continuity),1), ROUND(AVG(p.continuity_2026),1), ROUND(AVG(p.continuity_2026 - p.continuity),1),
+  ROUND(AVG(p.access_satisfaction_2026),1), ROUND(AVG(p.deflection_2025),1), ROUND(AVG(p.deflection_2026),1),
+  ROUND(AVG(p.wait_too_long_2026),1), ROUND(AVG(p.gpps_n_2026),0)`;
   return `WITH target AS (
   SELECT * FROM xsec WHERE gp_name ILIKE '%${n}%' ${placeCond}
   ORDER BY list_size DESC LIMIT 1
 )
 SELECT t.gp_name || ' (' || t.postcode || ')' AS entity,
   ROUND(t.list_size,0) AS list_size, t.pct65plus, t.imd_score, t.nonwhite_pct,
-  t.same_day_pct_12m, t.sd_share_prior_year, t.appts_percap, t.phone_pct_12m, t.f2f_pct_12m, t.d15plus_pct,
+  t.same_day_pct_12m, t.appts_percap, t.f2f_pct_12m, t.d15plus_pct,
   t.oc_rate_12m, r.rush_pct, r.oc_rush_pct,
-  t.satisfaction, t.satisfaction_2024, ROUND(t.satisfaction - t.satisfaction_2024,1) AS satisfaction_change,
-  t.continuity, t.continuity_2024, ROUND(t.continuity - t.continuity_2024,1) AS continuity_change,
-  t.pt_same_day, t.wait_too_long, t.contact_fail, ROUND(t.gpps_n,0) AS gpps_n
+  ROUND(t.satisfaction,1) AS satisfaction_2025, ROUND(t.satisfaction_2026,1) AS satisfaction_2026,
+  ROUND(t.satisfaction_2026 - t.satisfaction,1) AS satisfaction_change_25_26,
+  ROUND(t.continuity,1) AS continuity_2025, ROUND(t.continuity_2026,1) AS continuity_2026,
+  ROUND(t.continuity_2026 - t.continuity,1) AS continuity_change_25_26,
+  ROUND(t.access_satisfaction_2026,1) AS access_satisfaction_2026,
+  ROUND(t.deflection_2025,1) AS deflection_2025, ROUND(t.deflection_2026,1) AS deflection_2026,
+  ROUND(t.wait_too_long_2026,1) AS wait_too_long_2026, ROUND(t.gpps_n_2026,0) AS gpps_n_2026
 FROM target t LEFT JOIN rush r ON r.gp_code = t.gp_code
 UNION ALL
 SELECT 'Rest of ' || t.pcn_name || ' (n=' || COUNT(*) || ')',
