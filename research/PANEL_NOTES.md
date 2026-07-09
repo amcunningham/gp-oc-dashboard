@@ -688,14 +688,195 @@ Healthcare cluster (Stratford Health Centre, The Forest Practice, The Simpson Ce
 happens on a platform but is recorded as zero.
 
 Implications: (a) 3.2's clinical-rush models excluded cohort 1 via the clinical-volume filter,
-so results stand but under-represent Evergreen/FootFall practices; (b) the NHSE data-
-completeness letter now has three named failure modes - platform invisible entirely
-(Visiba/Wealden's triage arm), platform present but returning no categorisation (Evergreen,
-Silicon), and split populated but clinical recorded as zero (Accurx and Klinik at specific
-practices). File: data/admin_only_oc_cohort.csv (431 rows, category column distinguishes the
-two cohorts).
+# ============================================================
+# SESSION 4 (9 Jul 2026): THE 2026 SURVEY WAVE AND THE
+# FOURTEEN-YEAR FILE. Written same-day. Every headline below
+# was reshaped by AMC's challenges; her corrections are credited
+# inline. Wealden Ridge is deliberately excluded from commentary
+# in this session's notes (single identifiable practice).
+# ============================================================
 
-**GPPS 2026 note:** publication announced for 9 Jul 2026 - the morning after this session.
-Pre-registered intentions (see 3.7): Anima/Continuum DiD on 2025->2026 change using adoption
-timing; deflection and access-satisfaction deltas for the admin-only cohort; refresh of banked
-KEY_FINDINGS in explore.html once practice-level file lands.
+## 4.0 Plain-language summary
+
+The 2026 patient survey (fieldwork 2 Jan - 13 Apr 2026, published 9 Jul) shows modest national
+improvement: contacting practices got easier, and "call back tomorrow" fell from about 9 in 100
+patients to 7 in 100. Improvement was slightly larger in deprived areas, which remain far behind.
+
+Practices that moved to full online triage in the past year did worse than everyone else while
+the country improved. This attaches to the intake model, not any one company's product. The
+contact-experience penalty looks temporary (practices a year in have mostly recovered); the loss
+of seeing your usual GP does not fade on average - BUT it is not inevitable: nearly half of
+adopters IMPROVED continuity, some dramatically, across all suppliers. How the practice
+configures routing matters more than the software. Adopters were also already struggling - their
+survey scores had been sliding relative to peers for a decade before they switched - so the
+switch cannot be cleanly blamed for their position, and almost none switch back.
+
+The practices that deflect the most patients have been the hardest-to-contact practices since at
+least 2012, worsening steadily, hit hardest by the post-COVID demand surge. About a hundred
+escaped the deflection tail this year, with big satisfaction gains; escapers built up online and
+phone intake. The two hundred still stuck are poorer-area practices. Meanwhile, the ~2,300
+practices that closed over the decade were small (median 3,600 patients, half the size of
+survivors) and scored close to the national average until the end: closure removes small,
+adequate practices, while large struggling ones persist because their patients have nowhere to
+go. Ordinary list growth does no measurable harm; the fastest-growing fifth (median +83%,
+i.e. merger-scale growth) now scores worst.
+
+## 4.1 Ingest and infrastructure
+
+ingest_gpps2026.py ran on publication morning (integrity check passed). New xsec_master_2026
+columns: *_2026 for satisfaction, continuity, access_satisfaction, phone_easy,
+nextstep_immediate, wait_too_long, gpps_n; deflection_2026 and couldnt_contact_2026 (Q12
+categories). deflection_2025/couldnt_contact_2025 banked retroactively from the re-downloaded
+2025 raw file after AMC caught that the 2025 extraction had never been saved. pt_same_day_2026
+QUARANTINED (r=0.33 with 2025; suspected Q20 category-mapping problem; excluded from explorer
+schema). Fieldwork windows comparable (2025: 30 Dec 2024 - 1 Apr 2025).
+
+The long file: gpps_long.csv/.parquet - 120,370 practice-wave rows, 2012-2023 (nine biannual
+publications 2012-06..2016-07 + seven annual waves), satisfaction (Q28_12pct), phone_easy
+(Q3_12pct), continuity (Q9_12pct), identified by chained practice-level correlations and
+validated against published national figures (July 2016 matches the NHSE bulletin exactly:
+85.2 / 70.1). Breaks documented: 2016->17 biannual->annual, 2017->18 sampling, 2024 = new
+series (file deliberately stops at 2023). practice_list_history.csv/.parquet - real registered
+list sizes, April snapshots 2013-2026, 98,277 rows, national totals validated (56.0M -> 63.7M),
+includes since-closed practices. Both added to the explorer as views (history, lists) with
+series-break and era-confounding guards in the schema prompt.
+
+## 4.2 National picture 2026
+
+Access satisfaction +2.6pp, phone ease +3.5pp, satisfaction +1.2pp, continuity +1.5pp on 2025.
+Deflection 8.8% -> 7.1% (first true change reading; 2025 value banked this session). Change
+pro-poor (most-deprived quintile d_acc +3.25 vs +2.54 least) but level gap ~7pp and deflection
+still doubles across the IMD gradient (4.9% -> 9.7%). Largest practices improved most (+3.3 vs
++1.9 smallest) despite the size penalty in levels. SW and NE&Yorkshire lag on every delta.
+Distributions NARROWED (satisfaction sd 11.3->10.8, access 13.5->12.4, deflection 6.7->5.6):
+the year's improvement was the bottom tail shrinking, not the top pulling away. Candidate
+mechanism (CBT rollout completion?) not yet tested.
+
+## 4.3 Total-triage adoption (AMC reframe: "probably a function of total triage", not Anima)
+
+Change models 2025->2026 (controls: baseline outcome, IMD, list, GP FTE, region).
+Supplier-agnostic exposure - OC intake surge >=+100 subs/1k/month between fieldwork windows,
+n=1,350: satisfaction -1.0, access -1.7, continuity -3.0 (all p<0.001) against a rising tide.
+Per-platform between-wave adopters: Anima/Continuum (n=149) -1.6/-2.9/-5.0; SystmConnect access
+-1.2; Accurx (n=284) and eConsult (n=42) null. Anima retains -2.6 access controlling for surge -
+consistent with intensity-of-model (dose), though vendor effects can't be excluded.
+
+EXPOSURE-DURATION SPLIT (prompted by AMC asking for the fieldwork dates): access penalty fades
+with exposure (7-12m -0.8 / 4-9m -1.5 / 1-4m -2.2) = largely transitional; continuity penalty
+does NOT fade (-2.1/-3.2/-2.9, flat). Anima's access penalty also does not fade (-3.15 at
+7-12m).
+
+PRE-TRENDS (the fourteen-year file): adopters were already declining -0.5 to -0.6pp/yr relative
+to non-adopters across 2017-2023 (p<0.05), gap -2.0 (2017) -> -5.9 (2023, Anima cohort);
+continuity gap -4 -> -7 pre-adoption. Parallel trends VIOLATED: adoption is selected by
+struggle. The one-year penalty is ~3x the historical slope and shows as failure-to-bounce
+given baselines, but all change estimates are UPPER BOUNDS on causal harm. Size decomposition
+(AMC asked): adopters are bigger (13.2k vs 9.8k); size explains ~1pp of the 2023 gap of -5.8,
+deprivation/region ~0.7pp; the divergence survives full adjustment (-0.35pp/yr, p=0.044).
+
+BOUNCE-BACK (AMC): 2024->25 digital-heavy fallers (>=3pp) recovered in 2026 at the same rate as
+all fallers (regression to the mean; adjusted recovery gap +0.5pp ns) and remain 2-3pp below
+their 2024 baseline. DE-ADOPTION: of 1,350 surge adopters, 5 reversed - effectively a one-way
+door; practice-level "try it and see" is not reversible in practice.
+
+## 4.4 Continuity under triage is configurable (AMC: "triage might mean that people are
+definitely matched to usual hcp - check")
+
+She was right to challenge the mechanism claim. 46% of surge adopters IMPROVED continuity >2pp
+(vs 49% of non-adopters) - the -3pp mean is a shifted distribution, not a universal effect.
+Largest adopter gains are +38 to +51pp (from single-digit baselines to 51-81%), across Accurx,
+PATCHS, Silicon AND one Anima practice - so no platform, including the worst-on-average one,
+precludes rebuilding continuity. Adopter continuity-risers also gained MORE access satisfaction
+(+4.6) than continuity-fallers (+1.1) - no observed trade-off. Caveats: risers had lower
+baselines (29 vs 42; mean-reversion on a noisy conditional measure inflates extremes), and the
+continuity question's denominator (patients with a preferred GP) can shift. Banked conclusion:
+the average continuity loss under total triage is real but ROUTING-DEPENDENT - implementation
+choices dominate the software.
+
+## 4.5 Deflection: replication and the LLR test
+
+The 3.5 inverse-care-law anatomy REPLICATES on the independently banked 2026 measure: IMD
++0.147/point (2025: +0.158), capacity -0.53/SD, GP FTE -0.69/SD, list +0.60/SD, corr with
+access satisfaction -0.64. New: OC volume -0.83/SD - heavier online intake predicts LESS
+deflection net of capacity. Now a two-wave replicated result.
+
+LLR/Shepherd hypothesis (AMC: LLR ICB weighted funding toward deprived practices - is their
+deflection-deprivation gradient flatter?): NO on 2026 data - level +2.4pp higher than expected
+(p=0.07), gradient interaction ns, rank 31/42 ICBs; proxies agreed. Caveats: implementation
+date unknown; ICB funding may not reach practice level; survey response bias. Re-test as a
+gradient TREND when the 2027 wave lands.
+
+## 4.6 The deflection tail: escape and the fourteen-year arc
+
+Of 421 practices deflecting >=20% in 2025: 108 escaped (<10% in 2026), 200 stuck (>=15%).
+Escape flow was one-directional (108 out, 15 in) - the year's improvement was tail-drainage.
+Escapers vs stuck (within-tail logit): OC growth OR 1.58/SD, established OC base OR 1.64/SD,
+cloud telephony OR 2.15; raw appointment growth ns once intake controlled. Escapers gained
+d_acc +12.2 / d_sat +7.0 vs stuck +5.3 / +2.5 (mean-reversion inflates both; the escaped-vs-
+stuck contrast is the fair one). HETEROGENEITY NOTE: OC surges predict worse experience overall
+(4.3) but escape and large gains within the failing tail - digital intake helps where the front
+door was already failing, and coincides with harm where it wasn't.
+
+The stuck are more deprived than escapers (IMD 32.7 vs 27.9). Fourteen-year arc: today's stuck
+cohort was already -8.4pp phone ease in June 2012, eroding monotonically every wave to -14.6
+(2016), -16 (2017), -25 (2022) - no kink, a steady slide through the funding squeeze, then the
+2022 demand shock landed disproportionately on them. Escapers by contrast held a FLAT mild
+deficit (-4.8 to -6.6) until 2022 shocked them into the tail, and dug out in 2025-26.
+LEVEL TELLS YOU WHO IS IN THE TAIL; TRAJECTORY TELLS YOU WHO GETS OUT. 194/200 stuck and
+106/108 escaped trace to 2012 - the history is near-complete.
+
+## 4.7 Whole-population trajectories
+
+Per-practice 12-year slope of phone-ease gap vs national (>=10 of 16 waves, n=5,964): the
+distribution is polarised - 2,180 practices in steep relative decline (<-0.5pp/yr), 2,619 in
+steep relative rise, only ~1,150 stable. Twelve-year trajectory correlates +0.40 with 2026
+satisfaction and -0.28 with deflection - among the strongest single predictors of present-day
+experience we have. Steep decliners are bigger (12.0k vs 8.9k) and slightly more deprived.
+Being big predicts decline (-0.85pp/yr per log-list); becoming big does not explain it (4.8).
+
+## 4.8 Closures and growth, on real list sizes
+
+Registered-list history (April 2013-2026) replaced the invalid survey-based size proxy (see
+4.9). CLOSURES: 2,304 practices present in June 2012 no longer exist. They were SMALL - median
+3,608 patients in 2013 vs 7,114 for survivors; 68% under 5k vs 29% - and their size at final
+April (median 3,552) was essentially unchanged from 2013: they did not wither. Their survey
+event-time profile: satisfaction gap -0.24 four years pre-disappearance, -2.0 at last
+observation; phone ease ABOVE average (+3.5 -> +1.3) throughout. Practices that vanish are
+small and near-average; the fourteen-year decliners persist. Failure has no exit in this
+system - it accumulates in large practices that cannot close - while closure removes small,
+adequate ones. (Why they closed is not observable here.)
+
+GROWTH: 2013->2023 real list growth has no adverse association with trajectory across four of
+five quintiles (shrank/flat/modest/strong all fine); only the top quintile (median +83% -
+merger-scale growth) declines (traj -0.44pp/yr) and now scores worst (satisfaction 75.8,
+continuity 40.2). Linear: -0.034pp/yr per +10% growth (p=6e-9) - small. The being-big gradient
+survives growth control (-0.83 -> -0.75), so scale's penalty is mostly not a legacy of growing.
+
+## 4.9 Corrections and retractions ledger (this session)
+
+(1) "436 practices record all OC as admin" (first census) - WRONG, caught by AMC ("all labeled
+0 for admin"): the file has an UNKNOWN_OTHER category I ignored; 409 practices report NO
+clinical/admin split at all (Evergreen 183, Silicon/FootFall 130 - supplier pipeline gap);
+only 22 have a real split that is admin-dominant. 9.4% of national weekday submissions are
+uncategorised; "% clinical" is 65.9% of total but 72.8% of categorised.
+(2) "Anima effect" - reframed to total-triage/intake-model effect after AMC's challenge;
+per-platform tests confirmed (4.3).
+(3) "Queue doesn't know your doctor" mechanism - WRONG as universal claim; AMC's challenge led
+to 4.4 (continuity configurable).
+(4) Surveys-distributed as size proxy - INVALID (AMC queried the "floor" claim; distributed is
+~constant across all list sizes, r=-0.04 with list size; probably tracks response-rate
+targeting). The interim "growth dilution dead" and "growth buys the destination penalty"
+claims from that measure are both WITHDRAWN and replaced by 4.8 on real lists.
+(5) 2025 deflection extraction had never been banked - now saved (4.1).
+
+## 4.10 Files added this session
+
+xsec_master_2026.{csv,parquet} (90 cols; explorer now serves this), wave3_gpps.csv,
+gpps_long.{csv,parquet}, practice_list_history.{csv,parquet}, admin_only_oc_cohort.csv
+(431 rows, two-cohort category column), did_anima_results.csv, ingest_gpps2026.py.
+Explorer: six views, 2026 schema + KEY_FINDINGS 9-11, portrait template with both waves and
+deflection, series-break/era-confounding guards, example chips incl. AMC's closure and merger
+questions. PENDING: KEY_FINDINGS 9 amendment (exposure fade + pre-trend caveat) drafted,
+awaiting AMC sign-off; CBT/phone-ease mechanism test; graveyard cause-of-closure unknowable
+from these data; 2027 wave: LLR gradient trend, adopter stabilisation test (does the adopters'
+gap stop widening).

@@ -53,7 +53,8 @@
         patient survey they centre on was fielded in early 2025; the matching appointment measures cover the same
         year so that like is compared with like. The July 2026 patient-survey wave (fieldwork Jan–Mar 2026) is
         included as <code>_2026</code> columns — including, for the first time, the share of patients told to
-        contact their practice again another day.</p>
+        contact their practice again another day. Survey results back to 2012 and registered list sizes back
+        to 2013 are included for every practice — including around 2,300 that have since closed.</p>
         <p style="margin:.4rem 0">Built entirely from open data:</p>
         <ul style="margin:.4rem 0 .4rem 1.2rem; padding:0">
           <li><a href="https://digital.nhs.uk/data-and-information/publications/statistical/appointments-in-general-practice">Appointments in General Practice</a> — volumes, booking-to-appointment waits, mode, staff type</li>
@@ -184,6 +185,8 @@ const TABLES = {
   panel: "panel_merged.parquet",
   waits: "waits_panel.parquet",
   rush:  "rush_both_sameday.csv",
+  history: "gpps_long.parquet",
+  lists: "practice_list_history.parquet",
 };
 
 const SCHEMA_DOC = `
@@ -241,8 +244,32 @@ rush — one row per practice (~4,700 with cloud telephony), phone & OC demand t
   practice-name columns — for places or names, JOIN xsec USING (gp_code) and filter on
   xsec.postcode / pcn_name / icb_name as usual.
 
-Rules: DuckDB syntax. SELECT statements only. The four views are named exactly xsec, panel,
-waits, rush — use these bare names in FROM; never invent file paths like 'xsec.parquet'.
+history — practice x survey wave, 2012–2023 (120,370 rows): gp_code, year, wave
+  ('2012-06'...'2016-07' = biannual-era publications; 'annual' = 2017-2023 annual waves),
+  satisfaction (% good overall experience), phone_easy (% easy to get through on phone),
+  continuity (% see preferred GP, asked only of patients with a preference).
+  SERIES BREAKS — CRITICAL: the 2024 survey redesign started a NEW time series, so history
+  STOPS at 2023 and must NEVER be spliced level-to-level with xsec's survey columns;
+  within history, 2016->2017 (biannual->annual) and 2017->2018 (sampling change) are soft
+  breaks — trends across them are fine, exact level comparisons are not. January and July
+  publications sample different seasons: order by year+wave; for clean trends use one
+  publication per year or note the seasonality. history includes ~2,300 practices that have
+  since closed. Use for: long-term trends, practice trajectories, warning signs before
+  closure, "was this practice always like this".
+  ERA CONFOUNDING GUARD: national scores fell sharply over 2012-2023, so NEVER pool raw
+  levels across different calendar years when comparing groups observed in different periods
+  (e.g. closed practices' final years vs survivors' recent years). Always compare each
+  practice to the national mean OF THE SAME wave: compute gap = value - AVG(value) OVER
+  (PARTITION BY year, wave), then compare gaps.
+
+lists — practice x year, April 2013–2026 (98,277 rows): gp_code, year, list_size
+  (registered patients, NHS Digital April snapshots). Includes since-closed practices —
+  use for growth, merger and closure questions.
+
+Rules: DuckDB syntax. SELECT statements only. The six views are named exactly xsec, panel,
+waits, rush, history, lists — use these bare names in FROM; never invent file paths like
+'xsec.parquet'. Joining history or lists to xsec: JOIN ON gp_code; xsec only contains
+practices open in 2026, so closed practices appear in history/lists but not xsec.
 Always aggregate or LIMIT (max 500 rows).
 Percentages of counts: 100.0*SUM(x)/SUM(y). Weight GPPS outcomes by gpps_n when averaging.
 KEEP RESULTS COMPACT AND READABLE: for trends broken down by group (e.g. region x month),
@@ -295,6 +322,8 @@ const EXAMPLES = [
   "Do rural practices have fewer staff than urban ones?",
   "What does this data tell us about how practices choose their appointment systems?",
   "Did access satisfaction improve more in deprived areas between 2025 and 2026?",
+  "Were there warning signs before practices closed over the last decade?",
+  "What happens to satisfaction when a practice grows rapidly by merger?",
 ];
 
 const KEY_FINDINGS = `ADJUSTED FINDINGS from the researcher's models (controls: deprivation,
