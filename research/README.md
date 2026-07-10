@@ -23,9 +23,8 @@ logged), or a local Ollama model (fully offline).
 
 **[mypractice.html](https://amcunningham.github.io/gp-oc-dashboard/research/mypractice.html)** —
 a practice-facing diagnostic: enter an ODS code or practice name and see, against practices of
-the same size and deprivation, what stands out — continuity, phone answering, calls ended within
-the IVR, demand against appointments — ranked by how strongly each measure relates to what
-patients report, with the evidence behind every claim. No login, nothing uploaded; all queries
+the same size and deprivation, what stands out — continuity, being told to contact again, phone
+answering, capacity — with the evidence behind every claim. No login, nothing uploaded; all queries
 run in the browser over the published data. Design and rationale:
 [PRACTICE_TOOL_DESIGN.md](PRACTICE_TOOL_DESIGN.md).
 

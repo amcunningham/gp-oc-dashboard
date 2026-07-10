@@ -1,4 +1,7 @@
-# Design note: a practice-facing access diagnostic
+# Design note: "How does my practice compare?" — a practice-facing diagnostic
+
+Originally framed as an access diagnostic; renamed when continuity emerged as the strongest
+finding and the scope grew to contact, continuity and capacity together.
 
 v1.0 as built, 10 July 2026 (supersedes draft v0.1, same date). Shipped as
 [mypractice.html](mypractice.html). AMC approved v0.1 conceptually; v1.0 records what was
