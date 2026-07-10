@@ -930,3 +930,14 @@ LITERATURE POSITION (checked 10 Jul 2026): existing work is cross-sectional GPPS
 validated adoption risk scores, or pre-registered selection-corrected designs. Candidate
 venues: BMJ Quality & Safety (methods/selection angle) or BJGP (substantive). AMC to lead;
 analyses reproducible from repo scripts + public data.
+
+ADDENDUM to 4.11 (10 Jul 2026, evening): practices have been contractually required to keep
+online consultation tools open throughout core hours since 1 OCTOBER 2025 (25/26 access
+changes) - inside the between-waves adoption window. Part of the 2025-26 surge cohort is
+therefore mandate-nudged rather than purely distress-selected; the 26/27 contract (same-day
+urgent duty, call-back ban, no capping) will push further. Selection regimes: structural
+(pioneers) -> distress (2024-26) -> compliance (Oct 2025 onward, accelerating 2026-27).
+NHSE publicly attributed the 2026 satisfaction rise to expanding online access on publication
+day (Pulse, 9 Jul 2026) - a between-year national correlation credited to a tool without
+adjustment for who adopted; our change models contradict the general claim and support it
+only within the former high-deflection group.
