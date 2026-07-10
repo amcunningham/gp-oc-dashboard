@@ -205,6 +205,13 @@ const distLine = (lo, hi, b10, b90, med, sizeVal, you, label) => {
 
 $("go").onclick = run;
 $("q").addEventListener("keydown", e => { if (e.key==="Enter") run(); });
+// if any section throws, say so on the page instead of failing silently
+window.addEventListener("unhandledrejection", e => {
+  $("error").textContent = "Something went wrong rendering part of this page: " + (e.reason && e.reason.message || e.reason);
+});
+window.addEventListener("error", e => {
+  $("error").textContent = "Something went wrong rendering part of this page: " + e.message;
+});
 
 async function run() {
   if (!ready) { $("error").textContent = "Data still loading — try again in a moment."; return; }
@@ -312,7 +319,7 @@ async function run() {
     $("phones").innerHTML = `
       <p><b>Your patients' verdict first:</b> ${f1(p.phone_easy_2026)}% report finding it easy to get
       through to you on the phone${hasCell ? ` — similar practices: ${f1(cell.pe)}%` : ""}. Everything below
-      is the machinery behind that number, and the phone data predicts it well
+      shows what sits behind that number, and the phone data predicts it well
       (<a href="predictors.html">the models behind this page</a>).</p>
       <p>Two things happen to a call after it is picked up by your phone system: it either ends during the
       automated menu stage (the IVR — answered by a recorded message, redirected to another service, or
@@ -529,7 +536,7 @@ async function run() {
              x.nurse_per10k n10k, x.dpc_per10k d10k, x.admin_per10k a10k, x.appts_percap ap1k
       FROM wf w JOIN xsec x USING(gp_code) WHERE x.list_size > 0)
     SELECT MEDIAN(fq10k) mfq, MEDIAN(tr10k) mtr, MEDIAN(n10k) mn, MEDIAN(d10k) md,
-           MEDIAN(a10k) ma, MEDIAN(ap1k) map FROM j`);
+           MEDIAN(a10k) ma, MEDIAN(ap1k) mapp FROM j`);
   if (capMe && capNat) {
     const isTraining = Number(capMe.tr_fte) > 0.25;
     $("capacity").innerHTML = `
@@ -539,16 +546,18 @@ async function run() {
       <tr><th></th><th class="num">Your practice</th><th class="num">Typical practice</th></tr>
       <tr><td>Fully-qualified GPs (FTE per 10,000)</td><td class="num big">${f1(capMe.fq10k)}</td><td class="num">${f1(capNat.mfq)}</td></tr>
       <tr><td>GP registrars in training (FTE per 10,000)</td><td class="num">${f1(capMe.tr10k)}</td><td class="num">${f1(capNat.mtr)}</td></tr>
-      <tr><td>Training practice (hosted a registrar)</td><td class="num">${isTraining ? "yes" : "no"}</td><td class="num">59% do</td></tr>
+      <tr><td>Designated here as a training practice (registrar in post, Mar 2025)</td><td class="num">${isTraining ? "yes" : "no"}</td><td class="num">59% do</td></tr>
       <tr><td>Nurses (FTE per 10,000)</td><td class="num">${f1(p.nurse_per10k)}</td><td class="num">${f1(capNat.mn)}</td></tr>
       <tr><td>Other clinical staff (FTE per 10,000)</td><td class="num">${f1(p.dpc_per10k)}</td><td class="num">${f1(capNat.md)}</td></tr>
       <tr><td>Admin staff (FTE per 10,000)</td><td class="num">${f1(p.admin_per10k)}</td><td class="num">${f1(capNat.ma)}</td></tr>
-      <tr><td>Appointments per 1,000 patients per month</td><td class="num">${f0(p.appts_percap)}</td><td class="num">${f0(capNat.map)}</td></tr>
+      <tr><td>Appointments per 1,000 patients per month</td><td class="num">${f0(p.appts_percap)}</td><td class="num">${f0(capNat.mapp)}</td></tr>
       </table>
       <p class="ev">In the combined models, fully-qualified GPs per patient is the strongest staffing term on
       every outcome, and training practices score about two points higher than their staffing and
       circumstances would predict. Admin staffing does not predict better answering or better scores
-      (<a href="predictors.html">the models behind this page</a>).</p>`;
+      (<a href="predictors.html">the models behind this page</a>). We infer training status from a registrar
+      being in post in the March 2025 census, so it can be wrong in either direction — if it is wrong for
+      your practice, the feedback box at the end of your summary is the place to tell us.</p>`;
   } else { $("capacity").innerHTML = "<p>No workforce data for this practice.</p>"; }
 
   // ---- survey ----
@@ -825,9 +834,9 @@ async function run() {
     if (myPe < cellPe - 5) flags.push({ pri:2, grp:"rep", html:`
       <p><b>${f1(myPe)}% of your patients report finding it easy to get through on the phone, against
       ${f1(cellPe)}% at similar practices.</b> This is the survey's verdict on your phones${diag.ans != null
-        ? `; the phone data shows the machinery behind it — ${f1(diag.ans)}% of queueing calls answered
+        ? `; the phone data shows what sits behind it — ${f1(diag.ans)}% of queueing calls answered
       (typical for your size: ${f1(diag.sizeAns)}%), ${f1(diag.ivr)}% of calls ending within the IVR`
-        : `; your phone supplier does not report to the national collection, so the machinery behind it
+        : `; your phone supplier does not report to the national collection, so what sits behind it
       cannot be shown here`}. ${link("d-phones","See the phone evidence")}.</p>`});
     else if (myPe > cellPe + 5) oks.push(`Your patients find the phone easier than at similar practices
       (${f1(myPe)}% against ${f1(cellPe)}% reporting it easy).`);
@@ -904,8 +913,9 @@ async function run() {
     ${repTop.length ? `<p><b>What your patients report</b>, ordered by how much of each is within a
       practice's gift:</p>`
       + repTop.map(f=>`<div class="flagbox">${f.html}</div>`).join("") : ""}
-    ${opTop.length ? `<p><b>What the operational data shows</b> — the machinery a practice can inspect
-      directly:</p>` + opTop.map(f=>`<div class="flagbox">${f.html}</div>`).join("") : ""}
+    ${opTop.length ? `<p><b>What the operational data shows</b> — objective measures, recorded by systems
+      rather than reported by patients:</p>`
+      + opTop.map(f=>`<div class="flagbox">${f.html}</div>`).join("") : ""}
     ${top.length ? ""
       : `<p>Nothing stands out as a priority. On the measures most strongly tied to what patients report —
          seeing a preferred clinician, being told to contact again, ease of getting through on the phone —

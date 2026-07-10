@@ -50,10 +50,10 @@
     <p><b class="q">Easy to contact on the phone</b> — Q1: "Generally, how easy or difficult is it to
     contact your GP practice on the phone?" (% very or fairly easy). The phone-specific report, and the
     outcome the operational data should predict best.</p>
-    <p><b>How to read the tables.</b> Every predictor except the training flag is standardised, so each
-    figure is the difference in the outcome (percentage points) associated with being one standard deviation
-    higher on that predictor; the training flag is the difference associated with hosting at least a quarter
-    of a full-time GP registrar. "Alone" looks at one predictor at a time. "Together" puts the operational
+    <p><b>How to read the tables.</b> Every predictor except training-practice status is standardised, so
+    each figure is the difference in the outcome (percentage points) associated with being one standard
+    deviation higher on that predictor; training-practice status is the difference associated with hosting
+    at least a quarter of a full-time GP registrar. "Alone" looks at one predictor at a time. "Together" puts the operational
     measures and the practice's circumstances in one model. "+ patients report" adds the three measures
     patients themselves report: seeing a preferred clinician (Q7, Q6) and being told to contact the practice
     again (Q12). Figures in grey are not statistically distinguishable from zero (p&ge;0.05).</p>
@@ -220,8 +220,8 @@
     accreditation marks organisational quality the other variables cannot see; the same association was
     reported from the 2012 survey by
     <a href="https://bjgp.org/content/64/620/e168">Ahluwalia and colleagues (BJGP 2014)</a>, when 29% of
-    practices trained. Our flag is cruder: hosting at least a quarter of a full-time registrar in the March
-    2025 census (59% of practices), which misses accredited practices between placements.</p>
+    practices trained. Our designation is cruder: hosting at least a quarter of a full-time registrar in the
+    March 2025 census (59% of practices), which misses accredited practices between placements.</p>
     <p><b>The same-day share might seem counterintuitive.</b> Alone it looks slightly unfavourable; with the
     patient-reported measures held constant it turns slightly favourable (+0.49 / +0.58). Booking models
     built around same-day access tend to cost continuity and turn more people away when the day fills; once
@@ -252,9 +252,9 @@
       practice. The patient-reported measures (Q6, Q7, Q12) come from the same survey respondents as the
       outcomes, so part of their strength reflects the same voices answering both questions; the operational
       and workforce measures do not share this problem. Contacts per appointment, calls per 1,000 and
-      appointments per 1,000 share ingredients and should be read as a family rather than separately. The
-      training flag and trainee FTE are derived from the difference between all-GP and fully-qualified-GP
-      FTE in the March 2025 census — a placement snapshot, not an accreditation register. Phone measures are
+      appointments per 1,000 share ingredients and should be read as a family rather than separately.
+      Training-practice status and trainee FTE are derived from the difference between all-GP and
+      fully-qualified-GP FTE in the March 2025 census — a placement snapshot, not an accreditation register. Phone measures are
       from May 2026; survey fieldwork ran January–April 2026. Coefficients in grey have p&ge;0.05; with this
       many terms, isolated marginal results should be treated as unconfirmed. Methods and the underlying
       findings: <a href="PANEL_NOTES.md">PANEL_NOTES.md</a>.
@@ -279,7 +279,7 @@
     <tr><td>Deprivation (IMD)</td><td class="num">&minus;0.37</td><td class="num">&minus;0.54</td><td class="num">&minus;1.13</td></tr>
     <tr><td>Fully-qualified GPs per 10k</td><td class="num">+1.09</td><td class="num">+0.78</td><td class="num">+0.71</td></tr>
     <tr><td>Trainee GPs per 10k</td><td class="num">+0.69</td><td class="num">+0.65</td><td class="num">+0.92</td></tr>
-    <tr><td>Training practice (flag)</td><td class="num">+1.70</td><td class="num">+1.70</td><td class="num">+1.78</td></tr>
+    <tr><td>Designated a training practice (hosted a registrar)</td><td class="num">+1.70</td><td class="num">+1.70</td><td class="num">+1.78</td></tr>
     <tr><td>Nurses per 10k</td><td class="num">+0.28</td><td class="num">+0.36</td><td class="num ns">+0.28</td></tr>
     <tr><td>Other clinical per 10k</td><td class="num ns">&minus;0.08</td><td class="num ns">+0.16</td><td class="num">+0.50</td></tr>
     <tr><td>Admin per 10k</td><td class="num">&minus;0.37</td><td class="num">&minus;0.35</td><td class="num">&minus;0.60</td></tr>
