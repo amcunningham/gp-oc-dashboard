@@ -114,6 +114,35 @@ def clean(expr, x100):
     return f"({safe})*100" if x100 else safe
 
 
+# Headline items to report as a respondent-weighted England figure (official convention).
+HEADLINE = {
+    "overallexp":               "overall experience",
+    "localgpservicesphone":     "phone easy",
+    "localgpserviceswebsite":   "website easy",
+    "localgpservicesapp":       "NHS App easy",
+    "localgpservicesprefhpsee": "continuity (see preferred)",
+    "localgpservicesprefhp":    "has preferred HCP",
+}
+
+
+def national_figure(con, stem):
+    """Respondent-weighted England headline for a GPPS item.
+
+    Weights each practice's positive % (`.pcteval`) by its survey-weighted evaluative
+    base (`.baseevalw`) -- i.e. each PATIENT counts equally, matching the official GPPS
+    national figure. A plain mean across practices ("practice-mean") counts each PRACTICE
+    equally and runs high on access items, where small practices score better.
+    Returns (national_weighted_pct, practice_mean_pct).
+    """
+    pe, be = f'"{stem}.pcteval"', f'"{stem}.baseevalw"'
+    q = f"""
+      SELECT SUM(v*w)/NULLIF(SUM(w),0)*100 AS natw, AVG(v)*100 AS pmean
+      FROM (SELECT TRY_CAST({pe} AS DOUBLE) v, TRY_CAST({be} AS DOUBLE) w FROM raw)
+      WHERE v >= 0 AND w > 0
+    """
+    return con.execute(q).fetchone()
+
+
 def main():
     src = locate_input(sys.argv)
     con = duckdb.connect()
@@ -144,10 +173,19 @@ def main():
         mean = con.execute(f"SELECT ROUND(AVG({out}),2) FROM g26").fetchone()[0]
         print(f"    {out:26s} n={c:<6d} mean={mean}")
 
+    # respondent-weighted England headlines (official convention) vs the practice-mean.
+    # Quote the 'national' column publicly; the practice-mean is QC only and runs high.
+    print("\n[national headline] respondent-weighted (each patient counts equally):")
+    for stem, label in HEADLINE.items():
+        if f"{stem}.pcteval" in present_cols and f"{stem}.baseevalw" in present_cols:
+            natw, pmean = national_figure(con, stem)
+            if natw is not None:
+                print(f"    {label:28s} national={natw:5.1f}   (practice-mean={pmean:4.1f})")
+
     # merge onto the 2025 master (non-destructive; adds *_2026 cols)
     con.execute(f"CREATE TABLE xsec AS SELECT * FROM read_csv_auto('{XSEC}')")
     con.execute("CREATE TABLE merged AS SELECT xsec.*, "
-                + ", ".join(f"g26.{c}" for c in list(QSET.keys()))
+                + ", ".join(f"g26.{c}"                            for c in list(QSET.keys()))
                 + " FROM xsec LEFT JOIN g26 USING (gp_code)")
     con.execute(f"COPY merged TO '{OUT_XSEC}.csv' (HEADER)")
     con.execute(f"COPY merged TO '{OUT_XSEC}.parquet' (FORMAT parquet)")
@@ -158,8 +196,6 @@ def main():
           f"({with_sat} with a non-suppressed satisfaction score).")
     print(f"        -> {OUT_XSEC}.csv / .parquet")
 
-    # 3-wave change file for the pre-registered DiD (2024 / 2025 / 2026)
-    # 2024 & 2025 come from the existing master (satisfaction_2024, satisfaction, ...)
     con.execute(f"""
         COPY (
           SELECT gp_code,
@@ -173,6 +209,13 @@ def main():
                  imd_score, rural, region
           FROM merged
         ) TO '{OUT_WAVE3}' (HEADER)
+    """)
+    print(f"[wave3] 3-wave satisfaction/continuity panel -> {OUT_WAVE3}")
+
+
+if __name__ == "__main__":
+    main()
+ (HEADER)
     """)
     print(f"[wave3] 3-wave satisfaction/continuity panel -> {OUT_WAVE3}")
 
