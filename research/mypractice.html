@@ -63,6 +63,9 @@
   <div id="results" style="display:none">
     <div class="card" id="ident"></div>
     <div class="card" id="standout"></div>
+    <details id="d-cont"><summary>Continuity — the evidence</summary>
+      <div class="card" id="continuity"></div>
+    </details>
     <details id="d-phones"><summary>Phones — the evidence</summary>
       <div class="card" id="phones"></div>
       <div class="card" id="daytime"></div>
@@ -211,6 +214,45 @@ async function run() {
   $("ident").innerHTML = `<span class="big">${p.gp_name}</span> (${code}, ${p.postcode})<br>
     ${f0(p.list_size)} patients · ${p.pcn_name||""} · ${p.region||""} · IMD ${f1(p.imd_score)}
     ${smallSurvey ? ' · <span class="note">small survey sample — treat survey figures cautiously</span>' : ""}`;
+
+  // ---- continuity: the strongest survey correlate of overall experience ----
+  const cd = await one(`SELECT MEDIAN(continuity_2026) med, QUANTILE_CONT(continuity_2026, 0.1) p10,
+      QUANTILE_CONT(continuity_2026, 0.9) p90,
+      SUM(continuity_2026*continuity_basew)/SUM(continuity_basew) eng,
+      SUM(has_pref_hcp_2026*gpps_n_2026)/SUM(gpps_n_2026) engh
+    FROM xsec WHERE continuity_2026 IS NOT NULL AND gpps_n_2026>=30`);
+  const myCont0 = Number(p.continuity_2026);
+  if (cd && !Number.isNaN(myCont0)) {
+    const cLo = Math.max(0, Math.floor(Math.min(Number(cd.p10), myCont0)/10)*10 - 5);
+    const cHi = Math.min(100, Math.ceil(Math.max(Number(cd.p90), myCont0)/10)*10 + 5);
+    $("continuity").innerHTML = `
+      <p>Two survey questions measure continuity: whether patients have a particular clinician they prefer
+      to see (Q6), and whether those who do get to see them when they ask (Q7). Across England, Q7 is the
+      survey measure most strongly tied to patients reporting a good overall experience
+      (<a href="predictors.html">the models behind this page</a>) — and it is substantially a matter of how
+      appointments are allocated, not something fixed by a practice's size or circumstances.</p>
+      <table>
+      <tr><th></th><th class="num">2025</th><th class="num">2026</th><th class="num">England 2026</th>
+        ${hasCell?`<th class="num">Practices like yours<br>(n=${f0(cell.n)})</th>`:""}</tr>
+      <tr><td>Have a clinician they prefer to see (Q6)</td><td class="num">${f1(p.has_pref_hcp)}%</td>
+        <td class="num">${f1(p.has_pref_hcp_2026)}%</td><td class="num">${f1(cd.engh)}%</td>
+        ${hasCell?`<td class="num">${f1(cell.hp)}%</td>`:""}</tr>
+      <tr><td>Get to see them when they ask (Q7)</td><td class="num">${f1(p.continuity)}%</td>
+        <td class="num big">${f1(p.continuity_2026)}%</td><td class="num">${f1(cd.eng)}%</td>
+        ${hasCell?`<td class="num">${f1(cell.c)}%</td>`:""}</tr>
+      </table>
+      <p>Where you sit on Q7 among all practices — the bar covers the middle 80%, the notch is the typical
+      (median) practice${hasCell ? `, the <span class="note">◆</span> is the average for practices like
+      yours` : ""}, and the dot is you.</p>
+      ${distLine(cLo, cHi, cd.p10, cd.p90, cd.med, hasCell ? cell.c : null, myCont0,
+        "Where your practice sits among all practices on patients seeing their preferred clinician")}
+      <p class="ev">The reviewable question: when a patient asks for a particular clinician, does your
+      booking process — reception, triage, or the online form — try that clinician first, or offer the next
+      free slot with anyone?${smallSurvey ? ` With ${f0(p.gpps_n_2026)} survey responses, treat your figures
+      as indicative.` : ""}</p>`;
+  } else {
+    $("continuity").innerHTML = "<p>No 2026 continuity figures for this practice.</p>";
+  }
 
   // ---- phones: May 2026 vs May 2025 vs national, with distribution lines ----
   const b = await one(`SELECT * FROM bench WHERE gp_code='${code}'`);
@@ -449,17 +491,13 @@ async function run() {
       ${hasCell?`<td class="num">${f1(cell.pe)}%</td>`:""}</tr>
     <tr><td>Told to contact again another day</td><td class="num">${f1(p.deflection_2025)}%</td><td class="num">${f1(p.deflection_2026)}%</td><td class="num">${f1(eng.d26)}%</td>
       ${hasCell?`<td class="num">${f1(cell.d)}%</td>`:""}</tr>
-    <tr><td>Have a clinician they prefer to see (Q6)</td><td class="num">${f1(p.has_pref_hcp)}%</td><td class="num">${f1(p.has_pref_hcp_2026)}%</td><td class="num">${f1(eng.h26)}%</td>
-      ${hasCell?`<td class="num">${f1(cell.hp)}%</td>`:""}</tr>
-    <tr><td>Get to see their preferred clinician when they ask (Q7)</td><td class="num">${f1(p.continuity)}%</td><td class="num">${f1(p.continuity_2026)}%</td><td class="num">${f1(eng.c26)}%</td>
-      ${hasCell?`<td class="num">${f1(cell.c)}%</td>`:""}</tr>
     </table>
     <p class="ev">GP Patient Survey, ${f0(p.gpps_n_2026)} responses in 2026${smallSurvey?' — small sample, wide uncertainty':''}.
     "Practices like yours" means the same fifth of England for both list size and deprivation.
-    Across all practices, getting to see a preferred clinician (Q7) is the survey measure most strongly
-    related to overall experience, and "told to contact again" the most strongly related to poor experience
-    of access; both are reported by the same patients who answer the experience questions, so these
-    relationships partly reflect the same voices.</p>`;
+    Across all practices, "told to contact again" is the survey measure most strongly related to patients
+    reporting a poor experience of access; continuity has its own section above. These measures are reported
+    by the same patients who answer the experience questions, so the relationships partly reflect the same
+    voices.</p>`;
 
   // ---- history sparkline ----
   const h = await all(`SELECT year, AVG(satisfaction) s FROM history WHERE gp_code='${code}' GROUP BY 1 ORDER BY 1`);
@@ -675,7 +713,7 @@ async function run() {
       for your practice: when a patient asks for a particular clinician, does your booking process —
       reception, triage, or the online form — try that clinician first, or offer the next free slot with
       anyone?${contSample}
-      ${link("d-survey","See the survey evidence")}.</p>`});
+      ${link("d-cont","See the continuity evidence")}.</p>`});
     else if (myCont > Number(cell.c) + 5) oks.push(`More of your patients report seeing their preferred
       clinician than at practices like yours (${f1(myCont)}% against ${f1(cell.c)}%) — the survey measure
       most strongly tied to patients reporting a good overall experience.`);
