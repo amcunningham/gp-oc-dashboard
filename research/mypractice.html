@@ -642,11 +642,18 @@ async function run() {
       </table>`;
   }
   $("context").innerHTML = `
-    <p>Each line below takes the fifth of England's practices your practice belongs to for one characteristic
-    — its size, its deprivation, and so on — and shows how many patients at those practices report a good
-    overall experience (2026 survey). The bar covers the middle 80% of those practices, the notch is their
-    average, and the dot is your practice's own figure. All five lines use the same scale, so you can see
-    which comparisons sit high or low for you.</p>
+    <div class="fb" style="border-top:none; margin-top:0; padding-top:0">
+    <p class="ev">We are unsure how useful this section is — tell us whether it helps:</p>
+    <textarea id="fb-ctx" rows="1" maxlength="1000" placeholder="Optional comment"></textarea>
+    <button onclick="sendFb(this,'mp-context','${code}','fb-ctx','up')">Helpful</button>
+    <button onclick="sendFb(this,'mp-context','${code}','fb-ctx','down')">Not helpful</button>
+    </div>
+    <p>Every line below shows the same measure: <b>the share of patients reporting a good overall experience
+    of their practice</b> (Q32, 2026 survey). Each line takes the fifth of England's practices yours belongs
+    to for one characteristic — its size, its deprivation, and so on — and shows the range of that measure
+    among those practices. The bar covers the middle 80% of them, the notch is their average, and the dot is
+    your practice's own figure. All five lines use the same scale, so you can see which comparisons sit high
+    or low for you.</p>
     <p><b>Two of these you cannot change — though one of them works through things you can.</b> Patients at
     larger practices, and at practices serving more deprived populations, report lower satisfaction on
     average (table below). Deprivation remains a headwind in every model we have run. Size behaves
