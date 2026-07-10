@@ -28,6 +28,10 @@
   svg text { font-family:inherit; }
   .factor { border:1px solid #eee; border-radius:6px; padding:.6rem .8rem .3rem; margin:.6rem 0; }
   .factor p { margin:.2rem 0 .3rem; font-size:.92rem; }
+  .fb { margin-top:.7rem; border-top:1px dashed var(--line); padding-top:.5rem; }
+  .fb textarea { width:100%; box-sizing:border-box; border:1px solid var(--line); border-radius:6px;
+                 padding:.4rem; font:inherit; font-size:.9rem; margin:.3rem 0; }
+  .fb button { margin-right:.5rem; font-size:.9rem; padding:.3rem .8rem; }
   details { margin:.8rem 0; }
   summary { font-size:1.05rem; font-weight:600; cursor:pointer; padding:.4rem 0;
             border-bottom:1px solid var(--line); }
@@ -164,6 +168,21 @@ const f1 = v => v==null||Number.isNaN(Number(v)) ? "–" : Number(v).toFixed(1);
 const f0 = v => v==null||Number.isNaN(Number(v)) ? "–" : Math.round(Number(v)).toLocaleString();
 const esc = s => String(s||"").replace(/[^a-zA-Z0-9 &'-]/g,"").replace(/'/g,"''").trim();
 const SIZE_FIFTHS = ["smallest fifth","second-smallest fifth","middle fifth","second-largest fifth","largest fifth"];
+// feedback goes to the same worker that runs the explorer demo (anonymised, rate-limited)
+const FB_URL = "https://gp-explorer-demo.anne-marie-cunningham.workers.dev/feedback";
+window.sendFb = async (btn, kind, ctx, taId, verdict) => {
+  const comment = taId ? (document.getElementById(taId)?.value || "") : "";
+  btn.disabled = true;
+  try {
+    const r = await fetch(FB_URL, { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ verdict, comment, question: ctx, kind }) });
+    btn.closest(".fb").innerHTML = r.ok
+      ? "<span class='ev'>Thank you — received.</span>"
+      : "<span class='ev'>Could not send just now — sorry.</span>";
+  } catch {
+    btn.closest(".fb").innerHTML = "<span class='ev'>Could not send just now — sorry.</span>";
+  }
+};
 // distribution line: light axis, band = middle 80%, notch = typical practice,
 // diamond = typical practice of your size (optional), dot = you (optional)
 const distLine = (lo, hi, b10, b90, med, sizeVal, you, label) => {
@@ -408,6 +427,14 @@ async function run() {
       <tr><td>Rest of the day</td><td class="num">${f1(rateRest)}%</td></tr>
       </table>
       <p><b>When calls end in the menus.</b> ${ivrText}</p>
+      ${mx > 5 ? `<div class="fb">
+      <p class="ev">We cannot tell from the published data why your practice shows this morning pattern —
+      but you may know: what your menu plays at the Monday peak, or how your booking works. A line here goes
+      only to the site author, anonymously, and helps make sense of the national picture.</p>
+      <textarea id="fb-ivr" rows="2" maxlength="1000"
+        placeholder="e.g. our 8am message tells callers we are full and to call back / directs to 111 / offers our online form…"></textarea>
+      <button onclick="sendFb(this,'mp-ivr','${code}','fb-ivr','up')">Send anonymously</button>
+      </div>` : ""}
       <p class="ev">May 2026 weekdays, with May 2025 alongside where your practice reported then. The two
       bank-holiday Mondays in each May are excluded, leaving two ordinary Mondays and four Wednesdays per
       year. A note on how much this matters: once a practice's overall answer rate is accounted for, the
@@ -751,8 +778,9 @@ async function run() {
       8–10am rush, which is the pattern a capacity-triggered message would produce. Reviewing the recorded
       messages your menu plays during the Monday-morning peak would establish which explanation applies —
       and if the message is telling callers you are full, the finding is really about capacity at that time,
-      not about the message; though what the message offers instead (a callback, an online submission, or
-      "try again tomorrow") remains yours to choose.` : ""}
+      not about the message. Even then, one thing remains yours to choose: whether the caller leaves with an
+      appointment on another day, or is told to try again — that is, who carries the demand forward, the
+      practice or the patient.` : ""}
       ${link("d-phones","See the phone evidence")}.</p>`});
   }
   // (No standalone Monday flag: once the overall answer rate is accounted for, the
@@ -803,7 +831,15 @@ async function run() {
     "Similar practices" means the same twenty-fifth of England's practices as yours: the same fifth for list
     size and the same fifth for deprivation${hasCell ? ` (${f0(cell.n)} practices in your case — the cells
     vary in size because size and deprivation are related)` : ""}. These are associations, not guarantees — the evidence for every
-    claim is in the sections below.</p>`;
+    claim is in the sections below.</p>
+    <div class="fb">
+    <p class="ev">Does this summary match your experience of the practice? Anonymous, one line, and it helps
+    improve the tool.</p>
+    <textarea id="fb-sum" rows="2" maxlength="1000"
+      placeholder="Optional: what did we get wrong, or miss?"></textarea>
+    <button onclick="sendFb(this,'mp-summary','${code}','fb-sum','up')">Broadly right</button>
+    <button onclick="sendFb(this,'mp-summary','${code}','fb-sum','down')">Not really</button>
+    </div>`;
 }
 </script>
 </body>

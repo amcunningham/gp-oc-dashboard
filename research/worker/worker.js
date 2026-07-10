@@ -48,7 +48,7 @@ export default {
               const e = JSON.parse(v);
               rows.push(prefix === "log:"
                 ? [e.t, e.who, e.kind, e.ok, clean(String(e.q).replace(/^Question:\s*/i, "")), clean(e.a), "", ""]
-                : [e.t, e.who, "feedback", "", clean(e.q), "", e.verdict, clean(e.comment)]);
+                : [e.t, e.who, e.kind || "feedback", "", clean(e.q), "", e.verdict, clean(e.comment)]);
             } catch {}
           }
           cursor = page.list_complete ? null : page.cursor;
