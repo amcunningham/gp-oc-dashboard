@@ -293,6 +293,10 @@ async function run() {
     const ansLo = Math.max(0, Math.floor(Math.min(Number(nat.a10), Number(b.ans_queue))/10)*10 - 5);
     const ivrHi = Math.min(100, Math.ceil(Math.max(Number(nat.i90), Number(b.ivr_share))/10)*10 + 5);
     $("phones").innerHTML = `
+      <p><b>Your patients' verdict first:</b> ${f1(p.phone_easy_2026)}% report finding it easy to get
+      through to you on the phone${hasCell ? ` — similar practices: ${f1(cell.pe)}%` : ""}. Everything below
+      is the machinery behind that number, and the phone data predicts it well
+      (<a href="predictors.html">the models behind this page</a>).</p>
       <p>Two things happen to a call after it is picked up by your phone system: it either ends during the
       automated menu stage (the IVR — answered by a recorded message, redirected to another service, or
       abandoned by the caller), or it joins the queue to speak to a person. Of the calls that join the queue,
@@ -485,10 +489,11 @@ async function run() {
       ${hasCalls ? "" : `<p class="ev">Your phone supplier does not report to the national collection, so
       calls — and therefore the contacts-per-appointment ratio — cannot be shown; appointments and online
       submissions are complete.</p>`}
-      <p class="ev">Practices with more contacts per appointment have fewer patients reporting a good
-      experience of getting in touch, and more told to contact the practice again another day. Unanswered
-      calls generate repeat calls, so this ratio partly reflects phone answering itself — and May 2026
-      online-submission counts are incomplete for five suppliers (see notes below).</p>`;
+      <p class="ev">Read this as a demand diagnostic, not a verdict: we built it as a proxy for capacity
+      under pressure, but once phone answering and call volume are accounted for it shows no independent
+      relationship with what patients report (<a href="predictors.html">the models behind this page</a>).
+      Unanswered calls generate repeat calls, so the ratio partly reflects phone answering itself — and
+      May 2026 online-submission counts are incomplete for five suppliers (see notes below).</p>`;
     if (ratio != null) diag.ratio = ratio;
   } else { $("demand").innerHTML = "<p>Insufficient data to compute demand against delivery.</p>"; }
 
@@ -704,22 +709,24 @@ async function run() {
       ? ` With ${f0(p.gpps_n_2026)} survey responses, this percentage rests on a small number of patients and should be read as indicative.`
       : "";
     if (myDefl > Number(cell.d) + 3) {
-      if (accGood) flags.push({ pri:8, html:`
+      if (accGood) flags.push({ pri:8, grp:"rep", html:`
         <p><b>${f1(myDefl)}% of your patients report being told to contact you again another day</b>
         (practices like yours: ${f1(cell.d)}%). Nationally this measure carries the strongest link with
         patients reporting a poor experience of access — but your patients' reported experience of access
         (${f1(myAcc)}% against ${f1(cell.a)}% in practices like yours) suggests it is not doing damage in
         your case.${sampleNote} Noted for completeness. ${link("d-survey","See the survey evidence")}.</p>`});
-      else flags.push({ pri:1, html:`
+      else flags.push({ pri:3, name:"defl", grp:"rep", html:`
         <p><b>${f1(myDefl)}% of your patients report being told to contact you again another day, against
         ${f1(cell.d)}% in practices like yours.</b> Across England this is the survey measure most strongly
-        tied to patients reporting a poor experience of access.${satGood ? ` Overall, your patients rate you
-        highly — ${f1(mySat2)}% report a good experience, against ${f1(cell.m)}% at similar practices. But
-        fewer report a good experience of contacting you: ${f1(myAcc)}%, against ${f1(cell.a)}%.` : ""}
-        The survey does not record what patients are offered at that point. A review of what your team offers
-        when no slot is available — a callback, an online submission, signposting to another service, or
-        advice to call again — would establish what lies behind the figure.${sampleNote}
-        ${link("d-survey","See the survey evidence")}.</p>`});
+        tied to patients reporting a poor experience of access — and also the one most bound up with
+        capacity: deprivation, unanswered calls and GP numbers predict a fifth of it
+        (<a href="predictors.html">the models behind this page</a>), so a high figure partly reflects demand
+        outstripping the appointments available, not only how the practice responds.${satGood ? ` Overall, your patients rate you highly — ${f1(mySat2)}% report a good
+        experience, against ${f1(cell.m)}% at similar practices. But fewer report a good experience of
+        contacting you: ${f1(myAcc)}%, against ${f1(cell.a)}%.` : ""} The choice inside it is what patients
+        are offered when no slot is left — an appointment on another day, an online submission, signposting,
+        or "try again tomorrow": that is, whether the practice or the patient carries the demand
+        forward.${sampleNote} ${link("d-survey","See the survey evidence")}.</p>`});
     }
     else if (myDefl < Number(cell.d) - 3) oks.push(`Few patients report being told to contact you again
       another day (${f1(myDefl)}% against ${f1(cell.d)}% in practices like yours) — the measure most strongly
@@ -730,7 +737,7 @@ async function run() {
   if (hasCell && !Number.isNaN(myCont) && cell.c != null) {
     const contSample = smallSurvey
       ? ` With ${f0(p.gpps_n_2026)} survey responses this should be read as indicative.` : "";
-    if (myCont < Number(cell.c) - 5) flags.push({ pri:1.5, html:`
+    if (myCont < Number(cell.c) - 5) flags.push({ pri:1, grp:"rep", html:`
       <p><b>${f1(myCont)}% of your patients who have a preferred clinician report getting to see them when
       they ask, against ${f1(cell.c)}% in practices like yours.</b> Across England this is the survey measure
       most strongly tied to patients reporting a good overall experience, and it is substantially a matter of
@@ -743,12 +750,32 @@ async function run() {
       clinician than at practices like yours (${f1(myCont)}% against ${f1(cell.c)}%) — the survey measure
       most strongly tied to patients reporting a good overall experience.`);
   }
-  // 2. queue answering vs practices of the same size
+  // 3 (reported). phone ease: the survey's phone verdict
+  const myPe = Number(p.phone_easy_2026);
+  const cellPe = hasCell && cell.pe != null ? Number(cell.pe) : null;
+  if (cellPe != null && !Number.isNaN(myPe)) {
+    if (myPe < cellPe - 5) flags.push({ pri:2, grp:"rep", html:`
+      <p><b>${f1(myPe)}% of your patients report finding it easy to get through on the phone, against
+      ${f1(cellPe)}% at similar practices.</b> This is the survey's verdict on your phones${diag.ans != null
+        ? `; the phone data shows the machinery behind it — ${f1(diag.ans)}% of queueing calls answered
+      (typical for your size: ${f1(diag.sizeAns)}%), ${f1(diag.ivr)}% of calls ending within the IVR`
+        : `; your phone supplier does not report to the national collection, so the machinery behind it
+      cannot be shown here`}. ${link("d-phones","See the phone evidence")}.</p>`});
+    else if (myPe > cellPe + 5) oks.push(`Your patients find the phone easier than at similar practices
+      (${f1(myPe)}% against ${f1(cellPe)}% reporting it easy).`);
+  }
+  // 2 (operational). queue answering vs practices of the same size
+  const ansFlagged = diag.ans != null && diag.sizeAns != null && diag.ans < diag.sizeAns - 5;
+  const peAgrees = cellPe != null && !Number.isNaN(myPe)
+    ? (myPe < cellPe - 2
+      ? ` Your patients notice: ${f1(myPe)}% report finding the phone easy, against ${f1(cellPe)}% at similar practices.`
+      : ` Your patients' reports do not yet show it — ${f1(myPe)}% find the phone easy, in line with similar practices (${f1(cellPe)}%).`)
+    : "";
   if (diag.ans != null && diag.sizeAns != null) {
-    if (diag.ans < diag.sizeAns - 5) flags.push({ pri:2, html:`
+    if (ansFlagged) flags.push({ pri:1, grp:"op", html:`
       <p><b>Calls answered from the queue: ${f1(diag.ans)}%, where practices your size typically answer
       ${f1(diag.sizeAns)}%.</b> This is the phone measure most strongly tied to patients reporting you easy
-      to reach.${diag.gap != null && diag.gap > 10 ? ` Your Monday gap is also wide: ${f1(diag.aqMon)}%
+      to reach.${peAgrees}${diag.gap != null && diag.gap > 10 ? ` Your Monday gap is also wide: ${f1(diag.aqMon)}%
       answered against ${f1(diag.aqWed)}% on Wednesdays (typical gap: 3.7 points)${diag.monPattern
         ? `, and your Monday ${diag.monPattern} — the hour-by-hour figures are in the day-of-week table`
         : ""}.` : ""} A review of reception staffing against call volumes — particularly
@@ -757,20 +784,14 @@ async function run() {
     else if (diag.ans > diag.sizeAns + 5) oks.push(`You answer more of your queue than is typical for
       practices of your size (${f1(diag.ans)}% against ${f1(diag.sizeAns)}%).`);
   }
-  // 3. contacts per appointment
-  if (diag.ratio != null) {
-    if (diag.ratio > 1.81) flags.push({ pri:3, html:`
-      <p><b>Contacts per appointment: ${diag.ratio.toFixed(2)}, where the typical practice has 1.47.</b>
-      More attempts to reach you than appointments delivered.${diag.ans != null && diag.sizeAns != null && diag.ans < diag.sizeAns - 5
-        ? " Some of this will be the phones themselves: unanswered calls come back as repeat calls, so this finding and the answering finding above are linked."
-        : " The published data does not separate new demand from repeat attempts; your telephone system's own reports can distinguish first calls from repeat callers."}
-      ${link("d-demand","See the demand evidence")}.</p>`});
-    else if (diag.ratio < 1.47) oks.push(`Demand and delivery are comparatively well matched
-      (${diag.ratio.toFixed(2)} contacts per appointment, below the national 1.47).`);
-  }
-  // 4. calls ended within the IVR
+  // (Contacts per appointment no longer flags: intended as a capacity proxy, it shows no
+  // independent relationship with what patients report once answering and call volume are
+  // separated. It remains in the demand evidence card as a demand diagnostic.)
+  if (diag.ratio != null && diag.ratio < 1.47) oks.push(`Demand and delivery are comparatively well matched
+    (${diag.ratio.toFixed(2)} contacts per appointment, below the national 1.47).`);
+  // 2 (operational). calls ended within the IVR
   if (diag.ivr != null && diag.i75 != null && diag.ivr > diag.i75) {
-    flags.push({ pri:4, html:`
+    flags.push({ pri:2, grp:"op", html:`
       <p><b>Calls ended within the IVR: ${f1(diag.ivr)}%, where practices ${diag.sizeIvr != null
         ? `your size typically have ${f1(diag.sizeIvr)}%`
         : `typically have ${f1(diag.natIvr)}%`} of calls ending at this stage.</b> The data cannot say
@@ -780,23 +801,23 @@ async function run() {
       and if the message is telling callers you are full, the finding is really about capacity at that time,
       not about the message. Even then, one thing remains yours to choose: whether the caller leaves with an
       appointment on another day, or is told to try again — that is, who carries the demand forward, the
-      practice or the patient.` : ""}
+      practice or the patient.` : ""}${!ansFlagged ? peAgrees : ""}
       ${link("d-phones","See the phone evidence")}.</p>`});
   }
   // (No standalone Monday flag: once the overall answer rate is accounted for, the
   // Monday-Wednesday gap shows no further relationship with what patients report.
   // Monday detail appears inside the answering flag as diagnosis, and in the day-of-week card.)
-  // 6. capacity context (lowest fifth for GPs per patient)
+  // 3 (operational). capacity context (lowest fifth for GPs per patient)
   if (diag.gpFifth === 0) {
-    flags.push({ pri:6, html:`
+    flags.push({ pri:3, grp:"op", html:`
       <p><b>You are in the fifth of practices with the fewest GPs per patient.</b> In that fifth,
       ${f1(diag.gpLowAvg)}% of patients report a good overall experience, against ${f1(diag.gpHighAvg)}% at
       the best-staffed — the steepest gradient on this page, and the slowest to change. The operational
       findings above should be read in that context. ${link("d-context","See what shapes these scores")}.</p>`});
   }
-  // 7. channel option (only when deflection is flagged and online intake is in the lowest third)
-  if (flags.some(f=>f.pri===1) && diag.ocNow != null && diag.ocNow < 32) {
-    flags.push({ pri:7, html:`
+  // 4 (operational). channel option (only when deflection is flagged and online intake is in the lowest third)
+  if (flags.some(f=>f.name==="defl") && diag.ocNow != null && diag.ocNow < 32) {
+    flags.push({ pri:4, grp:"op", html:`
       <p><b>Your online intake is in the lowest third of practices (${f0(diag.ocNow)} submissions per 1,000
       patients per month).</b> In the national data, moving intake online was the most common route out of
       high told-to-contact-again figures, and it cut morning phone traffic — but it also brought net
@@ -805,13 +826,22 @@ async function run() {
       ${link("d-demand","See demand and delivery")}.</p>`});
   }
   flags.sort((a,b)=>a.pri-b.pri);
-  const top = flags.slice(0,3), rest = flags.slice(3);
+  const repF = flags.filter(f=>f.grp==="rep" && f.pri < 8);
+  const opF = flags.filter(f=>f.grp==="op");
+  const repTop = repF.slice(0,3), opTop = opF.slice(0,2);
+  const rest = [...repF.slice(3), ...opF.slice(2), ...flags.filter(f=>f.pri >= 8)];
+  const top = [...repTop, ...opTop];
   $("standout").innerHTML = `
     <p class="big" style="font-size:1.15rem">What stands out for your practice</p>
-    ${top.length ? top.map(f=>`<div class="flagbox">${f.html}</div>`).join("")
+    ${repTop.length ? `<p><b>What your patients report</b>, ordered by how much of each is within a
+      practice's gift:</p>`
+      + repTop.map(f=>`<div class="flagbox">${f.html}</div>`).join("") : ""}
+    ${opTop.length ? `<p><b>What the operational data shows</b> — the machinery a practice can inspect
+      directly:</p>` + opTop.map(f=>`<div class="flagbox">${f.html}</div>`).join("") : ""}
+    ${top.length ? ""
       : `<p>Nothing stands out as a priority. On the measures most strongly tied to what patients report —
-         seeing a preferred clinician, being told to contact again, phone answering, demand against
-         appointments — you are at or better than practices like yours.</p>`}
+         seeing a preferred clinician, being told to contact again, ease of getting through on the phone —
+         and on the phone data behind them, you are at or better than practices like yours.</p>`}
     ${(() => {
       // when operational findings fire but patients' reports are at or above similar practices, say so
       if (!top.length || !hasCell || p.satisfaction_2026 == null
@@ -826,8 +856,9 @@ async function run() {
     })()}
     ${rest.length ? `<p class="ev">Also noted: ${rest.map((f,i)=>f.html.replace(/<\/?p>|<\/?b>/g,"")).join(" ")}</p>` : ""}
     ${oks.length ? `<p class="okline"><b>What you are doing well:</b> ${oks.join(" ")}</p>` : ""}
-    <p class="ev">Ranked by how strongly each measure relates to patient experience across ~5,000 practices
-    (<a href="predictors.html">the models behind this ranking</a>).
+    <p class="ev">The patient-reported findings are ordered by how much of each is within a practice's gift;
+    the operational findings by strength of evidence across ~5,000 practices
+    (<a href="predictors.html">the models behind this page</a>).
     "Similar practices" means the same twenty-fifth of England's practices as yours: the same fifth for list
     size and the same fifth for deprivation${hasCell ? ` (${f0(cell.n)} practices in your case — the cells
     vary in size because size and deprivation are related)` : ""}. These are associations, not guarantees — the evidence for every
