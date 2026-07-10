@@ -46,7 +46,7 @@ explorer serves; `xsec_master.*` is the frozen pre-2026-wave version. Key column
 |---|---|---|
 | Identity | `gp_code`, `region` | NHS England |
 | Access model (GPAD, 12m) | `same_day_pct_12m`, `sd_share`, `sd_percap`, `appts_percap`, `phone_pct_12m`, `f2f_pct_12m`, `dna_pct_12m`, `appts_12m` | Appointments in General Practice |
-| GP vs other staff | `gp_sd`, `oth_sd`, `gp_15p`, `oth_15p`, `gp_share`, `high80` (no-booking cohort flag) | GPAD |
+| GP vs other staff | `gp_sd`, `oth_sd`, `gp_15p`, `oth_15p`, `gp_share` (`high80` retained in file but deprecated — a booking-pattern flag, not an access-model marker) | GPAD |
 | Wait bands (12m) | `sd_pct`, `d1_7_pct`, `d8_14_pct`, `d15plus_pct`, `gp_d15plus_pct` | GPAD |
 | Online consultation | `oc_rate_12m`, `oc_tertile_feb26` | OC Submissions publication |
 | Structure | `list_size`, `log_list`, `rural`, `dispensing_f`, `imd_score`, `imd_quintile`, `pct65plus`, `nonwhite_pct` | NHS Payments 24/25, IMD, GP Workforce census, GPPS |

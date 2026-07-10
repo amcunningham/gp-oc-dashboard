@@ -941,3 +941,40 @@ NHSE publicly attributed the 2026 satisfaction rise to expanding online access o
 day (Pulse, 9 Jul 2026) - a between-year national correlation credited to a tool without
 adjustment for who adopted; our change models contradict the general claim and support it
 only within the former high-deflection group.
+
+## 4.12 Weighting conventions and late additions (10 Jul 2026)
+
+WEIGHTING: published national GPPS headlines weight each PATIENT equally (survey-weighted
+evaluative bases). AMC upgraded ingest_gpps2026.py to extract these bases (*_basew columns);
+weighting practice estimates by gpps_n (responses) instead runs ~1.5pp HIGH vs published
+figures (e.g. satisfaction 78.3 response-weighted vs 76.7 published, 2026). Use *_basew for
+any figure quoted against national publications. Same-day press check: GPonline reported the
+2025 baseline correctly (75.4); Pulse attributed the 2024 figure (73.9) to 2025, doubling the
+apparent one-year improvement.
+
+LATE ADDITIONS: website_easy and app_easy banked for both waves (Q2/Q3 pcteval; England means
+52.1->57.6 website, 52.2->56.6 app - the survey's largest movers alongside phones, and the
+items NHSE's public attribution of the 2026 improvement leans on). deflection_2025/
+couldnt_contact_2025 re-banked after the ingest re-run regenerated xsec_master_2026 (the
+ingest script does not yet carry them - add to QSET if re-running). Practice workload from
+always-open online intake is NOT observable in any dataset here - patient experience and
+practice workload need separate evidence; noted in briefing v1.1.
+
+## 4.13 Deprecation: the "no-booking cohort" (high80) as any kind of model marker (10 Jul 2026)
+
+The tool's notes route cited the high80 cohort (>=80% GP same-day) when a visitor asked what
+proportion of practices run total triage. AMC: wrong adjacency - same-day dominance is a
+booking-pattern outcome that neither implies nor is implied by triage-first working (heavy-
+triage practices can book ahead extensively; recording practices can produce high80 without
+any triage at all). high80 removed from the explorer schema and deprecated in the README;
+retained in the data file and in earlier notes sections as historical record. The honest
+answer to triage prevalence, added as KEY_FINDINGS 12: no national data identifies the model;
+nearest proxy is online-intake volume (2,771/6,144 practices at >=100 subs/1k/month, Jan-Mar
+2026; 58% at >=50, 29% at >=200), which misses telephone-based triage and includes non-triage
+heavy users. The contract's request-level data provisions (26/27 para 15) are the first
+mechanism that could make the question answerable.
+
+AMENDMENT to 4.13: per AMC, prevalence framing reworked from arbitrary thresholds to TERTILES
+(her Substack convention, consistent with oc_tertile_feb26). Jan-Mar 2026, n=6,144: low third
+<33 subs/1k/month (median 15), middle 33-178 (median 76), high >178 (median 257). Presented
+as a continuum, not a classification. KEY_FINDINGS 12 updated accordingly.

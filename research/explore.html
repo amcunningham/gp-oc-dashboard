@@ -200,7 +200,7 @@ xsec — one row per practice (n=6007), exposure year Apr 2024–Mar 2025 unless
   same_day_pct_12m (% appts booked+delivered same day), sd_share (same), sd_percap (same-day appts
   /1k patients/month), appts_percap (all appts /1k/month), phone_pct_12m, f2f_pct_12m, dna_pct_12m,
   gp_sd (% of GP appts same-day), oth_sd, gp_15p (% GP appts booked 15+ days ahead), oth_15p,
-  gp_share (% of appts GP-delivered), high80 (1 = 'no-booking' cohort, >=80% GP same-day),
+  gp_share (% of appts GP-delivered),
   d1_7_pct, d8_14_pct, d15plus_pct (wait-band shares), oc_rate_12m (online consultations /1k/month),
   closure_exposed, merger_recipient,
   satisfaction (GPPS % good overall experience), satisfaction_2024 (last year's),
@@ -223,7 +223,12 @@ xsec — one row per practice (n=6007), exposure year Apr 2024–Mar 2025 unless
   nextstep_immediate_2026, wait_too_long_2026, gpps_n_2026,
   deflection_2026 and deflection_2025 (% of patients told to contact the practice again
   another day at last contact — England mean fell 8.8 to 7.1),
-  couldnt_contact_2026 and couldnt_contact_2025 (% unable to make contact at all).
+  couldnt_contact_2026 and couldnt_contact_2025 (% unable to make contact at all),
+  website_easy / website_easy_2026 and app_easy / app_easy_2026 (% finding it easy to
+  contact the practice via its website / the NHS App; unsuffixed = 2025 wave),
+  satisfaction_basew, continuity_basew, access_basew, phone_basew (survey-weighted
+  evaluative bases — use these as weights for national headline figures so each patient
+  counts equally; gpps_n weighting runs ~1.5pp above published national figures).
   For change questions use e.g. satisfaction_2026 - satisfaction. Weight by gpps_n_2026.
 
 panel — practice x month, 2023-03..2026-05 (month as 'YYYY-MM' varchar):
@@ -278,6 +283,9 @@ prefer quarterly or yearly averages, or a first-period vs last-period comparison
 monthly rows. PREFER AGGREGATED ANSWERS over raw practice lists: for "what is access like in <place>"
 questions, return summary stats (mean/median of key measures, n of practices) for the place
 alongside the same stats for England, in one result (e.g. GROUP BY a CASE place/England label).
+COVERAGE IS ENGLAND ONLY: there are no practices from Scotland, Wales or Northern Ireland
+in any view. If the question is about a place or practice outside England (e.g. Ballymena,
+Cardiff, Glasgow), return NOT_A_QUERY so the page can explain the coverage.
 Places: match with ILIKE on icb_name, sub_icb_name, pcn_name, gp_name, or postcode prefix
 (Brighton -> postcode LIKE 'BN%' or sub_icb_name/pcn_name ILIKE '%brighton%'). Town names are
 often in pcn_name.
@@ -294,6 +302,12 @@ PORTRAIT: <practice name fragment> ~ <place hint if any>
 e.g. "PORTRAIT: st leonards ~ exeter" or "PORTRAIT: beacon medical group ~ plymouth" or
 "PORTRAIT: wells road surgery" (no place). The page expands this into a tested three-row
 comparison (practice / rest of PCN / England). Use lowercase fragments, no punctuation.
+SURVEY COMPARISON: when asked how a single named practice did in the patient survey ("how did
+X do in this year's survey", "X's patient survey results", "did X improve"), return instead:
+SURVEY: <practice name fragment> ~ <place hint if any>
+The page expands this into a tested three-row comparison of both survey waves (2025 and 2026:
+satisfaction, contact experience, phone/website ease, continuity, told-to-contact-again,
+responses). Same fragment rules as PORTRAIT.
 ENTITY-VS-GROUP COMPARISONS (a practice vs its PCN/area/England): return LONG format — one row
 per group with a text label column as the FIRST column (e.g. 'St Leonards Practice' /
 'Rest of Exeter City PCN (n=4)' / 'England'), measures as columns. Never one wide row mixing
@@ -314,6 +328,7 @@ waits, regions, trends, comparisons) ARE data queries. When in doubt, write the 
 
 const EXAMPLES = [
   "Tell me about [your practice's name]",
+  "How did [your practice's name] compare in this year's patient survey?",
   "What is GP access like in Levenshulme?",
   "Do practices in Brighton have more of an 8am rush than Bristol?",
   "What types of practices have more on-the-day access?",
@@ -360,7 +375,16 @@ list size, rurality, staffing, age structure, ethnicity, region; details in PANE
     (regression to the mean; recovery gap +0.5pp, ns) and remain ~2-3pp below their 2024 baseline.
 11. 2026 national picture: access satisfaction +2.6pp, phone ease +3.5pp, satisfaction +1.2pp
     on 2025. Deflection (deflection_2026, mean 7.1%) is now directly measured and rises with
-    deprivation net of capacity.`;
+    deprivation net of capacity.
+12. NO variable in any view identifies a "total triage" model, and no booking-pattern measure
+    (same-day share included) can stand in for one - heavy-triage practices can book ahead
+    extensively. The nearest available description is the distribution of online-intake volume,
+    best presented as tertiles (Jan-Mar 2026, n=6,144 reporting): LOW third under 33 online
+    submissions per 1,000 patients per month (median 15 - occasional use), MIDDLE third 33-178
+    (median 76), HIGH third above 178 (median 257 - intake-scale volumes). This is a continuum,
+    not a classification: it misses telephone-based triage entirely and the high tertile
+    includes heavy online users who are not triage-first. Say so when asked about triage
+    prevalence.`;
 
 const INTERPRET_SYS = `You are helping a reader understand a query result from a practice-level
 open dataset on GP appointment access in England (GPAD, GPPS, workforce, IMD; details in the
@@ -605,7 +629,7 @@ function buildPortraitSql(name, place) {
   ${w('p.access_satisfaction_2026')}, ${w('p.deflection_2025')}, ${w('p.deflection_2026')},
   ${w('p.wait_too_long_2026')}, ROUND(AVG(p.gpps_n_2026),0)`;
   return `WITH target AS (
-  SELECT * FROM xsec WHERE gp_name ILIKE '%${n}%' ${placeCond}
+  SELECT * FROM xsec WHERE ${nameMatchCond(n)} ${placeCond}
   ORDER BY list_size DESC LIMIT 1
 )
 SELECT t.gp_name || ' (' || t.postcode || ')' AS entity,
@@ -630,6 +654,61 @@ UNION ALL
 SELECT 'England (all practices)',
   ${M.replace(/p\./g, "")}, (SELECT ROUND(AVG(rush_pct),1) FROM rush), (SELECT ROUND(AVG(oc_rush_pct),1) FROM rush),
   ${E.replace(/p\./g, "")}
+FROM xsec p;`;
+}
+
+// A named-practice fragment may be, or contain, an ODS practice code (e.g. "J82112",
+// "steel city general practice c88037"). Match codes on gp_code, the rest on gp_name.
+function nameMatchCond(n) {
+  const toks = n.split(/\s+/).filter(Boolean);
+  const codeTok = toks.find(t => /^[a-z][0-9a-z]{5}$/i.test(t) && /\d/.test(t));
+  const nameOnly = toks.filter(t => t !== codeTok).join(" ").trim();
+  const parts = [];
+  if (nameOnly) parts.push(`gp_name ILIKE '%${nameOnly}%'`);
+  if (codeTok) parts.push(`gp_code = '${codeTok.toUpperCase()}'`);
+  if (!parts.length) parts.push(`gp_name ILIKE '%${n}%'`);
+  return "(" + parts.join(" OR ") + ")";
+}
+
+function buildSurveySql(name, place) {
+  const esc = s => String(s || "").replace(/[^a-z0-9 &'-]/gi, "").replace(/'/g, "''").trim();
+  const n = esc(name), p = esc(place);
+  const placeCond = p
+    ? `AND (pcn_name ILIKE '%${p}%' OR sub_icb_name ILIKE '%${p}%' OR icb_name ILIKE '%${p}%'
+           OR postcode ILIKE '${p}%' OR gp_name ILIKE '%${p}%')`
+    : "";
+  // GPPS outcomes respondent-weighted (gpps_n_2026) in group rows, matching buildPortraitSql.
+  const w = x => `ROUND(SUM((${x})*p.gpps_n_2026)/NULLIF(SUM(CASE WHEN (${x}) IS NULL THEN 0 ELSE p.gpps_n_2026 END),0),1)`;
+  const S = `${w('p.satisfaction')}, ${w('p.satisfaction_2026')}, ${w('p.satisfaction_2026 - p.satisfaction')},
+  ${w('p.access_satisfaction')}, ${w('p.access_satisfaction_2026')},
+  ${w('p.phone_easy')}, ${w('p.phone_easy_2026')},
+  ${w('p.website_easy')}, ${w('p.website_easy_2026')},
+  ${w('p.continuity')}, ${w('p.continuity_2026')},
+  ${w('p.deflection_2025')}, ${w('p.deflection_2026')}, ROUND(AVG(p.gpps_n_2026),0)`;
+  return `WITH target AS (
+  SELECT * FROM xsec WHERE ${nameMatchCond(n)} ${placeCond}
+  ORDER BY list_size DESC LIMIT 1
+)
+SELECT t.gp_name || ' (' || t.postcode || ')' AS entity,
+  ROUND(t.satisfaction,1) AS satisfaction_2025, ROUND(t.satisfaction_2026,1) AS satisfaction_2026,
+  ROUND(t.satisfaction_2026 - t.satisfaction,1) AS satisfaction_change_25_26,
+  ROUND(t.access_satisfaction,1) AS contact_experience_2025, ROUND(t.access_satisfaction_2026,1) AS contact_experience_2026,
+  ROUND(t.phone_easy,1) AS phone_easy_2025, ROUND(t.phone_easy_2026,1) AS phone_easy_2026,
+  ROUND(t.website_easy,1) AS website_easy_2025, ROUND(t.website_easy_2026,1) AS website_easy_2026,
+  ROUND(t.continuity,1) AS continuity_2025, ROUND(t.continuity_2026,1) AS continuity_2026,
+  ROUND(t.deflection_2025,1) AS told_contact_again_2025, ROUND(t.deflection_2026,1) AS told_contact_again_2026,
+  ROUND(t.gpps_n_2026,0) AS survey_responses_2026
+FROM target t
+UNION ALL
+SELECT CASE WHEN t.pcn_name IS NULL OR t.pcn_name = 'Unallocated'
+            THEN 'Rest of ' || t.sub_icb_name || ' (n=' || COUNT(*) || ')'
+            ELSE 'Rest of ' || t.pcn_name || ' (n=' || COUNT(*) || ')' END, ${S}
+FROM target t JOIN xsec p ON p.gp_code <> t.gp_code AND
+  (CASE WHEN t.pcn_name IS NULL OR t.pcn_name = 'Unallocated'
+        THEN p.sub_icb_name = t.sub_icb_name ELSE p.pcn_name = t.pcn_name END)
+GROUP BY t.pcn_name, t.sub_icb_name
+UNION ALL
+SELECT 'England (all practices)', ${S.replace(/p\./g, "")}
 FROM xsec p;`;
 }
 
@@ -735,6 +814,8 @@ async function ask() {
     let proposed = await nlToSql($("q").value);
     const pm = proposed.match(/^\s*PORTRAIT:\s*([^~\n]+?)\s*(?:~\s*(.+?)\s*)?$/im);
     if (pm) proposed = buildPortraitSql(pm[1], pm[2]);   // tested template, not freehand SQL
+    const sm = proposed.match(/^\s*SURVEY:\s*([^~\n]+?)\s*(?:~\s*(.+?)\s*)?$/im);
+    if (sm) proposed = buildSurveySql(sm[1], sm[2]);     // tested template, not freehand SQL
     if (/^\s*NOT_A_QUERY\s*$/.test(proposed) || /NOT_A_QUERY/.test(proposed.slice(0, 40))) {
       // narrative question -> answer from the analysis notes instead of the database
       $("llmstatus").textContent = "Not a data query — answering from the analysis notes…";
