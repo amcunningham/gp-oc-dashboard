@@ -67,6 +67,7 @@
   <div id="results" style="display:none">
     <div class="card" id="ident"></div>
     <div class="card" id="standout"></div>
+    <div class="card" id="transition" style="display:none"></div>
     <details id="d-cont"><summary>Continuity — the evidence</summary>
       <div class="card" id="continuity"></div>
     </details>
@@ -74,8 +75,9 @@
       <div class="card" id="phones"></div>
       <div class="card" id="daytime"></div>
     </details>
-    <details id="d-demand"><summary>Demand and delivery — the evidence</summary>
+    <details id="d-demand"><summary>Demand and capacity — the evidence</summary>
       <div class="card" id="demand"></div>
+      <div class="card" id="capacity"></div>
     </details>
     <details id="d-survey"><summary>What your patients reported — the evidence</summary>
       <div class="card" id="survey"></div>
@@ -84,7 +86,6 @@
     <details id="d-context"><summary>What shapes these scores — size, deprivation, staffing</summary>
       <div class="card" id="context"></div>
     </details>
-    <div class="card" id="transition" style="display:none"></div>
     <h2>Reading this page</h2>
     <div class="card cav" id="caveats">
       These are associations, not guarantees: practices that improved a measure were not always rewarded, and
@@ -115,6 +116,7 @@ const TABLES = {
   cbt: "cbt_ivr_panel.csv",
   daytime: "cbt_daytime_may.parquet",
   history: "gpps_long.parquet",
+  wf: "practice_workforce_2019_latest.csv",
 };
 let conn, ready = false;
 (async () => {
@@ -229,6 +231,14 @@ async function run() {
     FROM s WHERE sq=(SELECT sq FROM s WHERE gp_code='${code}')
       AND iq=(SELECT iq FROM s WHERE gp_code='${code}')`);
   const hasCell = cell && Number(cell.n) >= 30;
+  // online-consultation intake, used by the continuity card and the transition note
+  const oc = await one(`SELECT
+     AVG(CASE WHEN month IN ('2025-01','2025-02','2025-03') THEN oc_rate_1k END) o25,
+     AVG(CASE WHEN month IN ('2026-01','2026-02','2026-03') THEN oc_rate_1k END) o26,
+     AVG(CASE WHEN month IN ('2026-02','2026-03','2026-04') THEN oc_rate_1k END) onow
+     FROM panel WHERE gp_code='${code}'`);
+  diag.ocNow = oc && oc.onow != null ? Number(oc.onow) : null;
+  const ocRamp = oc && Number(oc.o26||0) - Number(oc.o25||0) >= 100;
 
   $("ident").innerHTML = `<span class="big">${p.gp_name}</span> (${code}, ${p.postcode})<br>
     ${f0(p.list_size)} patients · ${p.pcn_name||""} · ${p.region||""} · IMD ${f1(p.imd_score)}
@@ -260,11 +270,16 @@ async function run() {
         <td class="num big">${f1(p.continuity_2026)}%</td><td class="num">${f1(cd.eng)}%</td>
         ${hasCell?`<td class="num">${f1(cell.c)}%</td>`:""}</tr>
       </table>
-      <p>Where you sit on Q7 among all practices — the bar covers the middle 80%, the notch is the typical
-      (median) practice${hasCell ? `, the <span class="note">◆</span> is the average for practices like
-      yours` : ""}, and the dot is you.</p>
+      <p>Where you sit on Q7 among all practices — the bar covers the middle 80%, the vertical line marks the
+      typical (median) practice${hasCell ? `, the <span class="note">◆</span> is the average for practices
+      like yours` : ""}, and the dot is you.</p>
       ${distLine(cLo, cHi, cd.p10, cd.p90, cd.med, hasCell ? cell.c : null, myCont0,
         "Where your practice sits among all practices on patients seeing their preferred clinician")}
+      ${ocRamp && Number(p.continuity_2026) > Number(p.continuity) ? `<p><b>Worth noting:</b> your reported
+      continuity rose (${f1(p.continuity)}% to ${f1(p.continuity_2026)}%) across the same period in which
+      your online intake grew substantially. Nationally, continuity more often falls with that move.
+      Practices that hold or improve it are typically those whose booking tries the usual clinician first —
+      on the national evidence, this part of your model is working.</p>` : ""}
       <p class="ev">The reviewable question: when a patient asks for a particular clinician, does your
       booking process — reception, triage, or the online form — try that clinician first, or offer the next
       free slot with anyone?${smallSurvey ? ` With ${f0(p.gpps_n_2026)} survey responses, treat your figures
@@ -282,6 +297,8 @@ async function run() {
     QUANTILE_CONT(ivr_share, 0.75) i75 FROM bench`);
   if (b) {
     const noPrior = b.ans_queue0 == null;
+    const cv = await one(`SELECT MEDIAN(1000.0*b.inb/x.list_size) m26, MEDIAN(1000.0*b.inb0/x.list_size) m25
+      FROM bench b JOIN xsec x USING(gp_code) WHERE x.list_size > 0`);
     // typical practice of the same size (same fifth of England by list size)
     const sz = await one(`WITH s AS (
         SELECT gp_code, NTILE(5) OVER (ORDER BY list_size) qt FROM xsec WHERE list_size IS NOT NULL)
@@ -308,10 +325,14 @@ async function run() {
         <td class="num big">${f1(b.ans_queue)}%</td><td class="num">${f1(nat.mq0)}%</td><td class="num">${f1(nat.mq)}%</td></tr>
       <tr><td>Calls ended within the IVR (before the queue)</td><td class="num">${f1(b.ivr_share0)}%</td>
         <td class="num big">${f1(b.ivr_share)}%</td><td class="num">${f1(nat.mi0)}%</td><td class="num">${f1(nat.mi)}%</td></tr>
+      <tr><td>Calls received per 1,000 patients</td>
+        <td class="num">${b.inb0 != null && p.list_size > 0 ? f0(1000*Number(b.inb0)/Number(p.list_size)) : "–"}</td>
+        <td class="num">${p.list_size > 0 ? f0(1000*Number(b.inb)/Number(p.list_size)) : "–"}</td>
+        <td class="num">${f0(cv ? cv.m25 : null)}</td><td class="num">${f0(cv ? cv.m26 : null)}</td></tr>
       </table>
       ${noPrior ? '<p class="ev">No May 2025 figures for your practice — your supplier joined the national collection later.</p>' : ""}
       <p>The lines below show where you sit among all ~4,900 practices in May 2026. The bar covers the middle
-      80% of practices, the notch is the typical practice${hasSz ? `, and the
+      80% of practices, the vertical line marks the typical practice${hasSz ? `, and the
       <span class="note">◆</span> is the typical practice of your size (the ${szName})` : ""}.</p>
       <p><b>Calls answered from the queue.</b> You answered ${f1(b.ans_queue)}%${hasSz ? `; the typical
       practice of your size answered ${f1(sz.sa)}%` : ""}.</p>
@@ -497,6 +518,39 @@ async function run() {
     if (ratio != null) diag.ratio = ratio;
   } else { $("demand").innerHTML = "<p>Insufficient data to compute demand against delivery.</p>"; }
 
+  // ---- capacity: the staffing the demand meets ----
+  const capMe = await one(`SELECT 10000.0*gp_fq_fte_latest/${Number(p.list_size)||1} AS fq10k,
+      10000.0*GREATEST(gp_fte_latest - gp_fq_fte_latest, 0)/${Number(p.list_size)||1} AS tr10k,
+      GREATEST(gp_fte_latest - gp_fq_fte_latest, 0) AS tr_fte
+    FROM wf WHERE gp_code='${code}'`);
+  const capNat = await one(`WITH j AS (
+      SELECT 10000.0*w.gp_fq_fte_latest/x.list_size fq10k,
+             10000.0*GREATEST(w.gp_fte_latest - w.gp_fq_fte_latest, 0)/x.list_size tr10k,
+             x.nurse_per10k n10k, x.dpc_per10k d10k, x.admin_per10k a10k, x.appts_percap ap1k
+      FROM wf w JOIN xsec x USING(gp_code) WHERE x.list_size > 0)
+    SELECT MEDIAN(fq10k) mfq, MEDIAN(tr10k) mtr, MEDIAN(n10k) mn, MEDIAN(d10k) md,
+           MEDIAN(a10k) ma, MEDIAN(ap1k) map FROM j`);
+  if (capMe && capNat) {
+    const isTraining = Number(capMe.tr_fte) > 0.25;
+    $("capacity").innerHTML = `
+      <p><b>The capacity that demand meets.</b> Staffing from the March 2025 workforce census, per 10,000
+      registered patients; appointments from May 2026.</p>
+      <table>
+      <tr><th></th><th class="num">Your practice</th><th class="num">Typical practice</th></tr>
+      <tr><td>Fully-qualified GPs (FTE per 10,000)</td><td class="num big">${f1(capMe.fq10k)}</td><td class="num">${f1(capNat.mfq)}</td></tr>
+      <tr><td>GP registrars in training (FTE per 10,000)</td><td class="num">${f1(capMe.tr10k)}</td><td class="num">${f1(capNat.mtr)}</td></tr>
+      <tr><td>Training practice (hosted a registrar)</td><td class="num">${isTraining ? "yes" : "no"}</td><td class="num">59% do</td></tr>
+      <tr><td>Nurses (FTE per 10,000)</td><td class="num">${f1(p.nurse_per10k)}</td><td class="num">${f1(capNat.mn)}</td></tr>
+      <tr><td>Other clinical staff (FTE per 10,000)</td><td class="num">${f1(p.dpc_per10k)}</td><td class="num">${f1(capNat.md)}</td></tr>
+      <tr><td>Admin staff (FTE per 10,000)</td><td class="num">${f1(p.admin_per10k)}</td><td class="num">${f1(capNat.ma)}</td></tr>
+      <tr><td>Appointments per 1,000 patients per month</td><td class="num">${f0(p.appts_percap)}</td><td class="num">${f0(capNat.map)}</td></tr>
+      </table>
+      <p class="ev">In the combined models, fully-qualified GPs per patient is the strongest staffing term on
+      every outcome, and training practices score about two points higher than their staffing and
+      circumstances would predict. Admin staffing does not predict better answering or better scores
+      (<a href="predictors.html">the models behind this page</a>).</p>`;
+  } else { $("capacity").innerHTML = "<p>No workforce data for this practice.</p>"; }
+
   // ---- survey ----
   const eng = await one(`SELECT
     SUM(satisfaction_2026*satisfaction_basew)/SUM(satisfaction_basew) s26,
@@ -604,7 +658,7 @@ async function run() {
       <p><b>${r.fac.title}.</b> Yours is ${r.fac.fmt(r.myVal)}${r.fac.unit}, which puts you among the
       ${f0(q.n)} practices in the ${r.fac.fifths[r.bi]} (${r.fac.fmt(q.lo)} to ${r.fac.fmt(q.hi)}).
       The share of their patients reporting a good overall experience mostly sits between ${f1(q.p10)}% and
-      ${f1(q.p90)}% (the middle 80%, shown as the bar), averaging ${f1(q.m)}% (the notch).${Number.isNaN(mySat)?"":" The dot is your practice's figure."}</p>
+      ${f1(q.p90)}% (the middle 80%, shown as the bar), averaging ${f1(q.m)}% (the vertical line).${Number.isNaN(mySat)?"":" The dot is your practice's figure."}</p>
       <svg viewBox="0 0 540 48" width="100%" role="img"
         aria-label="Range of satisfaction scores for practices in the same ${r.fac.fifths[r.bi]} by ${r.fac.title}, with your practice marked">
         <line x1="30" y1="24" x2="510" y2="24" stroke="#eceef1" stroke-width="2"/>
@@ -651,9 +705,11 @@ async function run() {
     <p>Every line below shows the same measure: <b>the share of patients reporting a good overall experience
     of their practice</b> (Q32, 2026 survey). Each line takes the fifth of England's practices yours belongs
     to for one characteristic — its size, its deprivation, and so on — and shows the range of that measure
-    among those practices. The bar covers the middle 80% of them, the notch is their average, and the dot is
-    your practice's own figure. All five lines use the same scale, so you can see which comparisons sit high
-    or low for you.</p>
+    among those practices. The bar covers the middle 80% of them, the vertical line marks their average, and
+    the dot is your practice's own figure. All five lines use the same scale, so you can see which
+    comparisons sit high or low for you. The point of this section is to let you read your feedback in the
+    context of practices like yours, rather than against an England average your circumstances may make
+    unfair.</p>
     <p><b>Two of these you cannot change — though one of them works through things you can.</b> Patients at
     larger practices, and at practices serving more deprived populations, report lower satisfaction on
     average (table below). Deprivation remains a headwind in every model we have run. Size behaves
@@ -683,22 +739,27 @@ async function run() {
     one practice's score would do if a factor changed.</p>`;
 
   // ---- transition note if online intake rose substantially between fieldworks ----
-  const oc = await one(`SELECT
-     AVG(CASE WHEN month IN ('2025-01','2025-02','2025-03') THEN oc_rate_1k END) o25,
-     AVG(CASE WHEN month IN ('2026-01','2026-02','2026-03') THEN oc_rate_1k END) o26,
-     AVG(CASE WHEN month IN ('2026-02','2026-03','2026-04') THEN oc_rate_1k END) onow
-     FROM panel WHERE gp_code='${code}'`);
-  diag.ocNow = oc && oc.onow != null ? Number(oc.onow) : null;
-  if (oc && Number(oc.o26||0) - Number(oc.o25||0) >= 100) {
+  if (ocRamp) {
     $("transition").style.display = "block";
-    $("transition").innerHTML = `<p><b>Your online intake rose substantially between the last two survey years
-      (${f0(oc.o25)} to ${f0(oc.o26)} submissions per 1,000 patients per month).</b>
-      Nationally, at practices making this move the share of patients reporting a good contact experience
+    $("transition").innerHTML = `<p><b>Your practice moved substantially online between the last two survey
+      years: from ${oc.o25 == null ? "no recorded online intake" : f0(oc.o25) + " submissions per 1,000 patients per month"}
+      to ${f0(oc.o26)} per 1,000 per month.</b> A change this size usually leaves marks in the survey, so
+      read your year-on-year changes with the move in mind:</p>
+      <table>
+      <tr><th>What your patients report</th><th class="num">2025</th><th class="num">2026</th></tr>
+      <tr><td>Overall experience good</td><td class="num">${f1(p.satisfaction)}%</td><td class="num">${f1(p.satisfaction_2026)}%</td></tr>
+      <tr><td>Experience of contacting the practice</td><td class="num">${f1(p.access_satisfaction)}%</td><td class="num">${f1(p.access_satisfaction_2026)}%</td></tr>
+      <tr><td>Easy to get through on the phone</td><td class="num">${f1(p.phone_easy)}%</td><td class="num">${f1(p.phone_easy_2026)}%</td></tr>
+      <tr><td>Get to see their preferred clinician (Q7)</td><td class="num">${f1(p.continuity)}%</td><td class="num">${f1(p.continuity_2026)}%</td></tr>
+      </table>
+      <p>Nationally, at practices making this move the share of patients reporting a good contact experience
       dipped in the first year and largely recovered after about a year; the fall in patients reporting they
       see their preferred GP did not recover on average — but it was not universal: in 46% of moving
       practices that share rose, on every software platform, which suggests routing patients to their usual
       clinician is a configuration choice. Each 100 extra submissions per 1,000 patients is associated with
-      about 59 fewer phone calls, half of them from the 8–10am rush — and about 40 net additional contacts.</p>`;
+      about 59 fewer phone calls, half of them from the 8–10am rush — and about 40 net additional contacts.
+      If your falls above coincide with the move, the national pattern suggests some recovery in the next
+      survey year.</p>`;
   }
 
   // ---- what stands out: ranked flags built from the evidence above ----
