@@ -90,7 +90,8 @@
       NHS England flagged May 2026 online-consultation submissions as incomplete for five suppliers (Blinx,
       Evergreen Life, iPlato, Silicon Practice, PATCHS), so online contact counts may be undercounted for
       some practices. Sources: Cloud Based Telephony (May 2025, May 2026), Online Consultation Submissions,
-      Appointments in General Practice, GP Patient Survey 2012–2026. Evidence for each claim: PANEL_NOTES.md.
+      Appointments in General Practice, GP Patient Survey 2012–2026. Evidence for each claim:
+      <a href="predictors.html">the models behind this page</a> and PANEL_NOTES.md.
     </div>
   </div>
 </div>
@@ -198,11 +199,11 @@ async function run() {
   // practices like yours: same fifth of England for both list size and deprivation
   const cell = await one(`WITH s AS (
       SELECT gp_code, satisfaction_2026 sat, access_satisfaction_2026 acc, phone_easy_2026 pe,
-        deflection_2026 d, continuity_2026 cont,
+        deflection_2026 d, continuity_2026 cont, has_pref_hcp_2026 hp,
         NTILE(5) OVER (ORDER BY list_size) sq, NTILE(5) OVER (ORDER BY imd_score) iq
       FROM xsec WHERE satisfaction_2026 IS NOT NULL AND gpps_n_2026>=30
         AND list_size IS NOT NULL AND imd_score IS NOT NULL)
-    SELECT AVG(sat) m, AVG(acc) a, AVG(pe) pe, AVG(d) d, AVG(cont) c, COUNT(*) n
+    SELECT AVG(sat) m, AVG(acc) a, AVG(pe) pe, AVG(d) d, AVG(cont) c, AVG(hp) hp, COUNT(*) n
     FROM s WHERE sq=(SELECT sq FROM s WHERE gp_code='${code}')
       AND iq=(SELECT iq FROM s WHERE gp_code='${code}')`);
   const hasCell = cell && Number(cell.n) >= 30;
@@ -430,7 +431,8 @@ async function run() {
     SUM(access_satisfaction_2026*access_basew)/SUM(access_basew) a26,
     SUM(phone_easy_2026*phone_basew)/SUM(phone_basew) p26,
     SUM(deflection_2026*gpps_n_2026)/SUM(gpps_n_2026) d26,
-    SUM(continuity_2026*continuity_basew)/SUM(continuity_basew) c26 FROM xsec`);
+    SUM(continuity_2026*continuity_basew)/SUM(continuity_basew) c26,
+    SUM(has_pref_hcp_2026*gpps_n_2026)/SUM(gpps_n_2026) h26 FROM xsec`);
   $("survey").innerHTML = `
     <table>
     <tr><th></th><th class="num">2025</th><th class="num">2026</th><th class="num">England 2026</th>
@@ -443,13 +445,17 @@ async function run() {
       ${hasCell?`<td class="num">${f1(cell.pe)}%</td>`:""}</tr>
     <tr><td>Told to contact again another day</td><td class="num">${f1(p.deflection_2025)}%</td><td class="num">${f1(p.deflection_2026)}%</td><td class="num">${f1(eng.d26)}%</td>
       ${hasCell?`<td class="num">${f1(cell.d)}%</td>`:""}</tr>
-    <tr><td>See preferred GP (continuity)</td><td class="num">${f1(p.continuity)}%</td><td class="num">${f1(p.continuity_2026)}%</td><td class="num">${f1(eng.c26)}%</td>
+    <tr><td>Have a clinician they prefer to see (Q6)</td><td class="num">${f1(p.has_pref_hcp)}%</td><td class="num">${f1(p.has_pref_hcp_2026)}%</td><td class="num">${f1(eng.h26)}%</td>
+      ${hasCell?`<td class="num">${f1(cell.hp)}%</td>`:""}</tr>
+    <tr><td>Get to see their preferred clinician when they ask (Q7)</td><td class="num">${f1(p.continuity)}%</td><td class="num">${f1(p.continuity_2026)}%</td><td class="num">${f1(eng.c26)}%</td>
       ${hasCell?`<td class="num">${f1(cell.c)}%</td>`:""}</tr>
     </table>
     <p class="ev">GP Patient Survey, ${f0(p.gpps_n_2026)} responses in 2026${smallSurvey?' — small sample, wide uncertainty':''}.
     "Practices like yours" means the same fifth of England for both list size and deprivation.
-    "Told to contact again" is the survey measure most strongly related to poor reported experience of access
-    nationally, and rises with deprivation after adjusting for capacity.</p>`;
+    Across all practices, getting to see a preferred clinician (Q7) is the survey measure most strongly
+    related to overall experience, and "told to contact again" the most strongly related to poor experience
+    of access; both are reported by the same patients who answer the experience questions, so these
+    relationships partly reflect the same voices.</p>`;
 
   // ---- history sparkline ----
   const h = await all(`SELECT year, AVG(satisfaction) s FROM history WHERE gp_code='${code}' GROUP BY 1 ORDER BY 1`);
@@ -585,8 +591,9 @@ async function run() {
       experience, against ${f1(g.bins[0].m)}% at the fifth with the fewest — a bigger difference than size or
       deprivation makes. By contrast, whether a practice books most of its appointments same-day or ahead
       makes almost no difference to what patients report (${f1(s.bins[0].m)}% against ${f1(s.bins[4].m)}%
-      between the extreme fifths), and how many admin staff a practice has makes none once phone answering is
-      taken into account.</p>`;
+      between the extreme fifths). Admin staffing sits between the two: small and medium practices with more
+      admin staff per patient report somewhat higher satisfaction, but this does not run through phone
+      answering, which is flat across admin staffing levels (see the phones section).</p>`;
     })()}
     <p class="ev">These are cross-practice averages, unadjusted and overlapping — deprived areas also have
     fewer GPs per head, so the gradients partly restate each other. They describe the terrain, not what any
@@ -646,6 +653,24 @@ async function run() {
     else if (myDefl < Number(cell.d) - 3) oks.push(`Few patients report being told to contact you again
       another day (${f1(myDefl)}% against ${f1(cell.d)}% in practices like yours) — the measure most strongly
       tied to patients reporting a good experience of access.`);
+  }
+  // 1.5 continuity: the strongest single correlate of overall experience, and changeable
+  const myCont = Number(p.continuity_2026);
+  if (hasCell && !Number.isNaN(myCont) && cell.c != null) {
+    const contSample = smallSurvey
+      ? ` With ${f0(p.gpps_n_2026)} survey responses this should be read as indicative.` : "";
+    if (myCont < Number(cell.c) - 5) flags.push({ pri:1.5, html:`
+      <p><b>${f1(myCont)}% of your patients who have a preferred clinician report getting to see them when
+      they ask, against ${f1(cell.c)}% in practices like yours.</b> Across England this is the survey measure
+      most strongly tied to patients reporting a good overall experience, and it is substantially a matter of
+      how appointments are allocated — not something fixed by size or circumstances. The reviewable question
+      for your practice: when a patient asks for a particular clinician, does your booking process —
+      reception, triage, or the online form — try that clinician first, or offer the next free slot with
+      anyone?${contSample}
+      ${link("d-survey","See the survey evidence")}.</p>`});
+    else if (myCont > Number(cell.c) + 5) oks.push(`More of your patients report seeing their preferred
+      clinician than at practices like yours (${f1(myCont)}% against ${f1(cell.c)}%) — the survey measure
+      most strongly tied to patients reporting a good overall experience.`);
   }
   // 2. queue answering vs practices of the same size
   if (diag.ans != null && diag.sizeAns != null) {
@@ -716,8 +741,8 @@ async function run() {
     <p class="big" style="font-size:1.15rem">What stands out for your practice</p>
     ${top.length ? top.map(f=>`<div class="flagbox">${f.html}</div>`).join("")
       : `<p>Nothing stands out as a priority. On the measures most strongly tied to what patients report —
-         being told to contact again, phone answering, demand against appointments — you are at or better
-         than practices like yours.</p>`}
+         seeing a preferred clinician, being told to contact again, phone answering, demand against
+         appointments — you are at or better than practices like yours.</p>`}
     ${(() => {
       // when operational findings fire but patients' reports are at or above similar practices, say so
       if (!top.length || !hasCell || p.satisfaction_2026 == null

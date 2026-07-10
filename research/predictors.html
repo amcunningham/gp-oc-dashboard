@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What predicts patient experience? The models behind the practice lookup</title>
+<style>
+  :root { --ink:#1a1a1a; --mut:#667; --line:#ddd; --bg:#fafafa; --card:#fff; --acc:#155fa0; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg);
+         margin:0; padding:1.2rem; line-height:1.55; }
+  .wrap { max-width: 880px; margin:0 auto; }
+  h1 { font-size:1.45rem; margin:.2rem 0 .3rem; }
+  h2 { font-size:1.1rem; margin:1.5rem 0 .4rem; border-bottom:1px solid var(--line); padding-bottom:.2rem; }
+  .sub { color:var(--mut); font-size:.92rem; margin:0 0 1rem; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:1rem 1.2rem; margin:.8rem 0; }
+  table { border-collapse:collapse; font-size:.9rem; margin:.5rem 0; width:100%; }
+  th, td { text-align:left; padding:.22rem .5rem .22rem 0; border-bottom:1px solid #eee; }
+  th { color:var(--mut); font-weight:600; }
+  td.num, th.num { text-align:right; white-space:nowrap; }
+  td.ns { color:#99a; }
+  .cav { color:var(--mut); font-size:.87rem; border-left:3px solid var(--line); padding-left:.7rem; margin:.5rem 0; }
+  b.q { font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>What predicts patient experience?</h1>
+  <p class="sub">The models behind <a href="mypractice.html">the practice lookup</a>. Practice-level analysis
+  of English practices; full analysis notes in <a href="PANEL_NOTES.md">PANEL_NOTES.md</a>.
+  Everything here is association across practices, not cause and effect.</p>
+
+  <div class="card">
+    <p><b>The two outcomes</b>, from the GP Patient Survey 2026 (fieldwork January–April 2026; practices
+    with at least 30 responses):</p>
+    <p><b class="q">Overall experience</b> — Q32: "Overall, how would you describe your experience of your
+    GP practice?" (% very or fairly good).</p>
+    <p><b class="q">Most recent contact</b> — Q16: "Overall, how would you describe your experience of
+    contacting your GP practice on this occasion?" (% very or fairly good). This is about the last attempt
+    to get in touch, not access in general.</p>
+    <p><b>How to read the tables.</b> Every predictor except the training flag is standardised, so each
+    figure is the difference in the outcome (percentage points) associated with being one standard deviation
+    higher on that predictor; the training flag is the difference associated with hosting at least a quarter
+    of a full-time GP registrar. "Alone" looks at one predictor at a time. "Together" puts the operational
+    measures and the practice's circumstances in one model. "+ continuity" adds what patients report about
+    seeing a preferred clinician. Figures in grey are not statistically distinguishable from zero
+    (p&ge;0.05).</p>
+  </div>
+
+  <h2>Overall experience (Q32)</h2>
+  <div class="card">
+    <table>
+    <tr><th>Predictor</th><th class="num">Alone</th><th class="num">Together</th><th class="num">+ continuity</th></tr>
+    <tr><td colspan="4"><b>What patients report about continuity</b></td></tr>
+    <tr><td>Get to see preferred clinician when they ask (Q7)</td><td class="num">+5.80</td><td class="num">–</td><td class="num">+4.45</td></tr>
+    <tr><td>Have a clinician they prefer to see (Q6)</td><td class="num">+2.26</td><td class="num">–</td><td class="num">+1.17</td></tr>
+    <tr><td colspan="4"><b>Operational measures</b></td></tr>
+    <tr><td>Queue-answer rate (May 2026)</td><td class="num">+2.81</td><td class="num">+2.28</td><td class="num">+1.66</td></tr>
+    <tr><td>Calls ended within the IVR, % (May 2026)</td><td class="num">&minus;2.25</td><td class="num">&minus;1.16</td><td class="num">&minus;0.88</td></tr>
+    <tr><td>Monday&ndash;Wednesday answering gap</td><td class="num">&minus;0.66</td><td class="num ns">&minus;0.03</td><td class="num ns">&minus;0.03</td></tr>
+    <tr><td>Contacts per appointment (May 2026)</td><td class="num">&minus;1.03</td><td class="num ns">&minus;0.01</td><td class="num ns">&minus;0.28</td></tr>
+    <tr><td>Calls received per 1,000 patients (May 2026)</td><td class="num">+1.11</td><td class="num">+0.74</td><td class="num">+0.97</td></tr>
+    <tr><td>Online submissions per 1,000 per month (Feb&ndash;Apr)</td><td class="num">&minus;1.91</td><td class="num">&minus;1.54</td><td class="num">&minus;0.38</td></tr>
+    <tr><td>Share of appointments booked same-day</td><td class="num">&minus;0.68</td><td class="num ns">&minus;0.12</td><td class="num">+0.38</td></tr>
+    <tr><td colspan="4"><b>Circumstances and staffing</b></td></tr>
+    <tr><td>Practice size (log list)</td><td class="num">&minus;2.31</td><td class="num">&minus;1.59</td><td class="num ns">&minus;0.28</td></tr>
+    <tr><td>Deprivation (IMD score)</td><td class="num">&minus;2.29</td><td class="num">&minus;1.65</td><td class="num">&minus;1.25</td></tr>
+    <tr><td>Fully-qualified GPs per 10,000 (FTE)</td><td class="num">+3.00</td><td class="num">+1.74</td><td class="num">+1.12</td></tr>
+    <tr><td>Trainee GPs per 10,000 (FTE)</td><td class="num">+1.49</td><td class="num">+0.37</td><td class="num">+0.87</td></tr>
+    <tr><td>Training practice (hosted a GP registrar, Mar 2025)</td><td class="num">+1.68</td><td class="num">+2.37</td><td class="num">+2.17</td></tr>
+    <tr><td>Nurses per 10,000</td><td class="num">+1.00</td><td class="num ns">+0.32</td><td class="num">+0.37</td></tr>
+    <tr><td>Other clinical staff per 10,000</td><td class="num">+0.89</td><td class="num ns">+0.14</td><td class="num ns">+0.05</td></tr>
+    <tr><td>Admin staff per 10,000</td><td class="num">+0.97</td><td class="num">&minus;1.06</td><td class="num">&minus;0.56</td></tr>
+    <tr><td>Appointments per 1,000 per month</td><td class="num">+1.50</td><td class="num">+0.73</td><td class="num">+0.44</td></tr>
+    <tr><td>Patients 65+, %</td><td class="num">+2.92</td><td class="num ns">+0.38</td><td class="num ns">+0.22</td></tr>
+    <tr><td>Non-white patients, %</td><td class="num">&minus;2.77</td><td class="num">&minus;1.29</td><td class="num">&minus;1.21</td></tr>
+    <tr><td colspan="4"><b>Interactions</b></td></tr>
+    <tr><td>Admin staffing &times; practice size</td><td class="num">–</td><td class="num">&minus;0.28</td><td class="num ns">&minus;0.03</td></tr>
+    <tr><td>Admin staffing &times; online volume</td><td class="num">–</td><td class="num ns">&minus;0.01</td><td class="num ns">&minus;0.12</td></tr>
+    <tr><td>R&sup2; (share of variation explained)</td><td class="num"></td><td class="num">0.275</td><td class="num">0.438</td></tr>
+    <tr><td>Practices in model</td><td class="num"></td><td class="num">4,768</td><td class="num">4,768</td></tr>
+    </table>
+  </div>
+
+  <h2>Most recent contact (Q16)</h2>
+  <div class="card">
+    <table>
+    <tr><th>Predictor</th><th class="num">Alone</th><th class="num">Together</th><th class="num">+ continuity</th></tr>
+    <tr><td colspan="4"><b>What patients report about continuity</b></td></tr>
+    <tr><td>Get to see preferred clinician when they ask (Q7)</td><td class="num">+7.06</td><td class="num">–</td><td class="num">+5.44</td></tr>
+    <tr><td>Have a clinician they prefer to see (Q6)</td><td class="num">+2.39</td><td class="num">–</td><td class="num">+0.61</td></tr>
+    <tr><td colspan="4"><b>Operational measures</b></td></tr>
+    <tr><td>Queue-answer rate (May 2026)</td><td class="num">+4.10</td><td class="num">+3.23</td><td class="num">+2.49</td></tr>
+    <tr><td>Calls ended within the IVR, % (May 2026)</td><td class="num">&minus;3.10</td><td class="num">&minus;1.71</td><td class="num">&minus;1.38</td></tr>
+    <tr><td>Monday&ndash;Wednesday answering gap</td><td class="num">&minus;0.97</td><td class="num ns">+0.04</td><td class="num ns">+0.07</td></tr>
+    <tr><td>Contacts per appointment (May 2026)</td><td class="num">&minus;1.24</td><td class="num ns">+0.09</td><td class="num ns">&minus;0.21</td></tr>
+    <tr><td>Calls received per 1,000 patients (May 2026)</td><td class="num">+1.06</td><td class="num">+0.67</td><td class="num">+0.93</td></tr>
+    <tr><td>Online submissions per 1,000 per month (Feb&ndash;Apr)</td><td class="num">&minus;2.58</td><td class="num">&minus;2.10</td><td class="num">&minus;0.84</td></tr>
+    <tr><td>Share of appointments booked same-day</td><td class="num">&minus;0.79</td><td class="num ns">&minus;0.10</td><td class="num">+0.44</td></tr>
+    <tr><td colspan="4"><b>Circumstances and staffing</b></td></tr>
+    <tr><td>Practice size (log list)</td><td class="num">&minus;3.33</td><td class="num">&minus;2.24</td><td class="num">&minus;0.78</td></tr>
+    <tr><td>Deprivation (IMD score)</td><td class="num">&minus;2.45</td><td class="num">&minus;2.26</td><td class="num">&minus;1.72</td></tr>
+    <tr><td>Fully-qualified GPs per 10,000 (FTE)</td><td class="num">+2.96</td><td class="num">+1.61</td><td class="num">+0.95</td></tr>
+    <tr><td>Trainee GPs per 10,000 (FTE)</td><td class="num">+1.36</td><td class="num ns">+0.30</td><td class="num">+0.83</td></tr>
+    <tr><td>Training practice (hosted a GP registrar, Mar 2025)</td><td class="num">+0.76</td><td class="num">+2.65</td><td class="num">+2.40</td></tr>
+    <tr><td>Nurses per 10,000</td><td class="num">+0.78</td><td class="num">+0.45</td><td class="num">+0.49</td></tr>
+    <tr><td>Other clinical staff per 10,000</td><td class="num">+0.97</td><td class="num">+0.48</td><td class="num">+0.33</td></tr>
+    <tr><td>Admin staff per 10,000</td><td class="num">+0.85</td><td class="num">&minus;1.11</td><td class="num">&minus;0.57</td></tr>
+    <tr><td>Appointments per 1,000 per month</td><td class="num">+1.38</td><td class="num">+0.88</td><td class="num">+0.57</td></tr>
+    <tr><td>Patients 65+, %</td><td class="num">+2.64</td><td class="num ns">&minus;0.35</td><td class="num ns">&minus;0.35</td></tr>
+    <tr><td>Non-white patients, %</td><td class="num">&minus;2.55</td><td class="num">&minus;1.30</td><td class="num">&minus;0.89</td></tr>
+    <tr><td colspan="4"><b>Interactions</b></td></tr>
+    <tr><td>Admin staffing &times; practice size</td><td class="num">&ndash;</td><td class="num">&minus;0.53</td><td class="num ns">&minus;0.22</td></tr>
+    <tr><td>Admin staffing &times; online volume</td><td class="num">&ndash;</td><td class="num ns">+0.21</td><td class="num ns">+0.06</td></tr>
+    <tr><td>R&sup2; (share of variation explained)</td><td class="num"></td><td class="num">0.304</td><td class="num">0.467</td></tr>
+    <tr><td>Practices in model</td><td class="num"></td><td class="num">4,768</td><td class="num">4,768</td></tr>
+    </table>
+  </div>
+
+  <h2>Reading these tables</h2>
+  <div class="card">
+    <p>The two strongest predictors in these tables are both things a practice does. The strongest is
+    continuity — whether patients who have a preferred clinician get to see them when they ask — which is
+    substantially a matter of how appointments are allocated, not a fixed circumstance. The second is
+    answering the phone reliably, which matters most for how patients describe their most recent contact.
+    Where more calls end in the phone menus without reaching the queue, scores are lower — separately from
+    answering. The difference between Monday and Wednesday answering looked important on its own but stops
+    mattering once the overall answer rate is in the model — its apparent effect was the answer rate showing
+    through. Contacts per appointment similarly stops mattering once calls per patient are counted
+    separately, because the two share ingredients. The same-day share is discussed below.</p>
+    <p>The tables' "circumstances and staffing" block covers the things a practice cannot change quickly:
+    how big it is, how deprived its area is, who its patients are, and how many staff it has. Of these,
+    fully-qualified GPs per patient matters most. Larger practices, practices in more deprived areas, and
+    practices serving more non-white patients all have lower reported scores, whatever they do
+    operationally.</p>
+    <p><b>Continuity dominates both models.</b> Whether patients get to see the clinician they prefer (Q7)
+    carries the largest coefficient in either table, and simply having a preferred clinician (Q6) adds its
+    own smaller association. Adding these two variables also changes what the rest of the table means: the
+    size disadvantage largely disappears (fully, for overall experience; by two-thirds, for the most recent
+    contact), most of the online-consultation disadvantage disappears, and the admin-staffing-by-size
+    interaction dissolves. Read cautiously, much of what looked like a cost of being large, or of moving
+    intake online, is the loss of continuity that tends to accompany both — and continuity, unlike size, is
+    something practices can influence through how appointments are allocated when a patient names a
+    clinician.</p>
+    <p><b>Training practices score higher — robustly.</b> Practices hosting a GP registrar score about
+    2.2–2.7 points higher in every combined model, on both questions, over and above all their staffing and
+    circumstances — one of the most stable results in these tables. Point for point of full-time equivalent,
+    trainee GPs are associated with experience much as fully-qualified GPs are. Notably, the training
+    advantage is not carried by continuity — trainees rotate, and trainee staffing goes with slightly
+    <i>lower</i> reported continuity — so training practices score higher despite that, not because of it.
+    The likeliest reading is that training accreditation marks organisational quality the other variables
+    cannot see; the same association was reported from the 2012 survey by
+    <a href="https://bjgp.org/content/64/620/e168">Ahluwalia and colleagues (BJGP 2014)</a>, when 29% of
+    practices trained. Our flag is cruder: hosting at least a quarter of a full-time registrar in the March
+    2025 census (59% of practices), which misses accredited practices between placements.</p>
+    <p><b>The same-day share might seem counterintuitive.</b> Alone it looks slightly unfavourable; with
+    continuity held constant it turns slightly favourable. Booking models built around same-day access tend
+    to cost continuity; once that cost is accounted for separately, the configuration itself is not the
+    problem.</p>
+    <p><b>Admin staffing might seem counterintuitive.</b> Alone, more admin staff goes with higher scores
+    (+0.97). The combined model asks a narrower question: of two practices the same on everything else
+    measured — size, deprivation, GPs, nurses, appointments — does the one with more admin staff score
+    higher? It scores slightly lower (&minus;1.06, or &minus;0.56 with continuity in the model). We tested
+    the obvious explanations. It is not phone workload: adding calls per patient to the model leaves the
+    result unchanged. It is not reception quality: patients at practices with more admin staff rate their
+    reception teams as <i>more</i> helpful, not less (Q4), and allowing for that barely moves it. So we do
+    not know what this remaining association reflects — possibly workload we don't measure, differences in
+    which roles get counted as admin, or the difficulty of dividing credit among staffing numbers that rise
+    and fall together. It should not be read as admin staff lowering scores — and equally, the table gives
+    no support for expecting more admin staff alone to raise them.</p>
+    <div class="cav">
+      <b>Cautions.</b> These are practice-level associations, not causes, and not predictions for any one
+      practice. The continuity variables (Q6, Q7) come from the same survey respondents as the outcomes, so
+      part of their strength reflects the same voices answering both questions; the operational and workforce
+      measures do not share this problem. Contacts per appointment, calls per 1,000 and appointments per
+      1,000 share ingredients and should be read as a family rather than separately. The training flag and
+      trainee FTE are derived from the difference between all-GP and fully-qualified-GP FTE in the March
+      2025 census — a placement snapshot, not an accreditation register. Phone measures are from May 2026;
+      survey fieldwork ran January–April 2026. Coefficients in grey have p&ge;0.05; with this many terms,
+      isolated marginal results should be treated as unconfirmed. Methods and the underlying findings:
+      <a href="PANEL_NOTES.md">PANEL_NOTES.md</a>.
+    </div>
+  </div>
+
+  <h2>All practices — without the phone measures</h2>
+  <div class="card">
+    <p>The tables above cover the ~4,800 practices whose telephony supplier reports to the national
+    collection. Dropping the phone measures allows every surveyed practice in (n=5,935) and checks that the
+    conclusions are not an artefact of which practices have phone data.</p>
+    <table>
+    <tr><th>Predictor</th><th class="num">Overall (Q32)</th><th class="num">Most recent contact (Q16)</th></tr>
+    <tr><td>Get to see preferred clinician (Q7)</td><td class="num">+4.80</td><td class="num">+5.97</td></tr>
+    <tr><td>Have a preferred clinician (Q6)</td><td class="num">+1.18</td><td class="num">+0.65</td></tr>
+    <tr><td>Online submissions per 1,000</td><td class="num">&minus;0.59</td><td class="num">&minus;0.95</td></tr>
+    <tr><td>Same-day share %</td><td class="num">+0.30</td><td class="num">+0.32</td></tr>
+    <tr><td>Size (log list)</td><td class="num">&minus;1.12</td><td class="num">&minus;1.90</td></tr>
+    <tr><td>Deprivation (IMD)</td><td class="num">&minus;1.37</td><td class="num">&minus;1.97</td></tr>
+    <tr><td>Fully-qualified GPs per 10k</td><td class="num">+1.34</td><td class="num">+1.14</td></tr>
+    <tr><td>Trainee GPs per 10k</td><td class="num">+0.87</td><td class="num">+0.91</td></tr>
+    <tr><td>Training practice (flag)</td><td class="num">+2.15</td><td class="num">+2.37</td></tr>
+    <tr><td>Nurses per 10k</td><td class="num">+0.37</td><td class="num">+0.47</td></tr>
+    <tr><td>Other clinical per 10k</td><td class="num ns">&minus;0.02</td><td class="num ns">+0.26</td></tr>
+    <tr><td>Admin per 10k</td><td class="num">&minus;0.51</td><td class="num">&minus;0.54</td></tr>
+    <tr><td>Appointments per 1,000</td><td class="num">+0.73</td><td class="num">+0.86</td></tr>
+    <tr><td>Patients 65+ %</td><td class="num ns">+0.08</td><td class="num">&minus;0.54</td></tr>
+    <tr><td>Non-white %</td><td class="num">&minus;1.25</td><td class="num">&minus;0.96</td></tr>
+    <tr><td>Admin &times; size</td><td class="num ns">&minus;0.05</td><td class="num">&minus;0.22</td></tr>
+    <tr><td>Admin &times; online volume</td><td class="num ns">&minus;0.15</td><td class="num ns">&minus;0.11</td></tr>
+    <tr><td>R&sup2; / practices</td><td class="num">0.421</td><td class="num">0.430 (n=5,935)</td></tr>
+    </table>
+    <p>The main conclusions replicate in the full population at almost identical size — continuity, GP
+    staffing, the training-practice result, the admin result and the same-day result are not artefacts of
+    which practices have phone data. One instructive difference: practice size is unfavourable again here
+    (&minus;1.12 / &minus;1.90), where in the tables above — with the phone measures included — it was near
+    zero. The reason is that large practices answer fewer of their calls, and this model has no phone
+    variable to carry that fact, so it shows up attached to size instead. Reading the two models together:
+    being large goes with lower scores for two identifiable reasons — patients less often get to see their
+    preferred clinician, and fewer calls get answered. Account for both, and little further disadvantage of
+    size remains.</p>
+  </div>
+</div>
+</body>
+</html>
