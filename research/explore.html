@@ -597,10 +597,13 @@ function buildPortraitSql(name, place) {
   const M = `ROUND(AVG(p.list_size),0), ROUND(AVG(p.pct65plus),1), ROUND(AVG(p.imd_score),1), ROUND(AVG(p.nonwhite_pct),1),
   ROUND(AVG(p.same_day_pct_12m),1), ROUND(AVG(p.appts_percap),1), ROUND(AVG(p.f2f_pct_12m),1), ROUND(AVG(p.d15plus_pct),1),
   ROUND(AVG(p.oc_rate_12m),1)`;
-  const E = `ROUND(AVG(p.satisfaction),1), ROUND(AVG(p.satisfaction_2026),1), ROUND(AVG(p.satisfaction_2026 - p.satisfaction),1),
-  ROUND(AVG(p.continuity),1), ROUND(AVG(p.continuity_2026),1), ROUND(AVG(p.continuity_2026 - p.continuity),1),
-  ROUND(AVG(p.access_satisfaction_2026),1), ROUND(AVG(p.deflection_2025),1), ROUND(AVG(p.deflection_2026),1),
-  ROUND(AVG(p.wait_too_long_2026),1), ROUND(AVG(p.gpps_n_2026),0)`;
+  // GPPS outcomes are RESPONDENT-weighted (by gpps_n_2026) so each PATIENT counts equally;
+  // a plain AVG across practices over-weights small practices and runs a few points high.
+  const w = x => `ROUND(SUM((${x})*p.gpps_n_2026)/NULLIF(SUM(CASE WHEN (${x}) IS NULL THEN 0 ELSE p.gpps_n_2026 END),0),1)`;
+  const E = `${w('p.satisfaction')}, ${w('p.satisfaction_2026')}, ${w('p.satisfaction_2026 - p.satisfaction')},
+  ${w('p.continuity')}, ${w('p.continuity_2026')}, ${w('p.continuity_2026 - p.continuity')},
+  ${w('p.access_satisfaction_2026')}, ${w('p.deflection_2025')}, ${w('p.deflection_2026')},
+  ${w('p.wait_too_long_2026')}, ROUND(AVG(p.gpps_n_2026),0)`;
   return `WITH target AS (
   SELECT * FROM xsec WHERE gp_name ILIKE '%${n}%' ${placeCond}
   ORDER BY list_size DESC LIMIT 1
