@@ -410,8 +410,11 @@ async function run() {
       <p><b>When calls end in the menus.</b> ${ivrText}</p>
       <p class="ev">May 2026 weekdays, with May 2025 alongside where your practice reported then. The two
       bank-holiday Mondays in each May are excluded, leaving two ordinary Mondays and four Wednesdays per
-      year. At practices with bigger Monday gaps, slightly fewer patients report the phone easy; the
-      overall answer rate matters far more.</p>`;
+      year. A note on how much this matters: once a practice's overall answer rate is accounted for, the
+      Monday–Wednesday gap shows no further relationship with what patients report
+      (<a href="predictors.html">the models behind this page</a>). This card shows when your answering falls
+      furthest behind — which day, and which hours. If you want to start working on the answering of phones,
+      this might be a good place to start.</p>`;
       diag.gap = gap; diag.mx = mx; diag.aqMon = aq(mon); diag.aqWed = aq(wed);
     } else {
       $("daytime").innerHTML = "<p>Too few Monday calls recorded in May 2026 for a reliable day-of-week comparison.</p>";
@@ -746,19 +749,15 @@ async function run() {
         : `typically have ${f1(diag.natIvr)}%`} of calls ending at this stage.</b> The data cannot say
       whether these are automated self-service, redirection, or callers giving up in your menus.${diag.mx != null && diag.mx > 5 ? ` In your case they cluster in the
       8–10am rush, which is the pattern a capacity-triggered message would produce. Reviewing the recorded
-      messages your menu plays during the Monday-morning peak would establish which explanation applies.` : ""}
+      messages your menu plays during the Monday-morning peak would establish which explanation applies —
+      and if the message is telling callers you are full, the finding is really about capacity at that time,
+      not about the message; though what the message offers instead (a callback, an online submission, or
+      "try again tomorrow") remains yours to choose.` : ""}
       ${link("d-phones","See the phone evidence")}.</p>`});
   }
-  // 5. Monday answering gap (only when overall answering is not already flagged)
-  if (diag.gap != null && diag.gap > 10 && !(diag.ans != null && diag.sizeAns != null && diag.ans < diag.sizeAns - 5)) {
-    flags.push({ pri:5, html:`
-      <p><b>Your Mondays fall behind: ${f1(diag.aqMon)}% of queueing calls answered against ${f1(diag.aqWed)}%
-      on Wednesdays.</b> Nearly every practice answers fewer calls on Mondays — the typical gap is 3.7 points
-      — and yours ${diag.monPattern || "is set out hour by hour in the day-of-week table"}${diag.monPattern
-        ? " (hour-by-hour figures in the day-of-week table)" : ""}. A review of Monday reception staffing
-      against Monday call volumes would establish whether cover is the constraint.
-      ${link("d-phones","See the day-of-week evidence")}.</p>`});
-  }
+  // (No standalone Monday flag: once the overall answer rate is accounted for, the
+  // Monday-Wednesday gap shows no further relationship with what patients report.
+  // Monday detail appears inside the answering flag as diagnosis, and in the day-of-week card.)
   // 6. capacity context (lowest fifth for GPs per patient)
   if (diag.gpFifth === 0) {
     flags.push({ pri:6, html:`
