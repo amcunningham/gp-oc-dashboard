@@ -295,26 +295,17 @@ async function run() {
       ${distLine(ansLo, 100, nat.a10, nat.a90, nat.mq, hasSz ? sz.sa : null, b.ans_queue,
         "Where your queue-answer rate sits among all practices")}
       <p><b>Calls ended within the IVR.</b> ${f1(b.ivr_share)}% of your calls ended in the menus before
-      reaching the queue${hasSz ? `; typical for practices your size is ${f1(sz.si)}%` : ""}. Three-quarters
-      of practices are below ${f1(nat.i75)}%.</p>
+      reaching the queue${hasSz ? `; typical for practices your size is ${f1(sz.si)}%` : ""}.</p>
       ${distLine(0, ivrHi, nat.i10, nat.i90, nat.mi, hasSz ? sz.si : null, b.ivr_share,
         "Where your share of calls ended within the IVR sits among all practices")}
       <p class="ev">At practices that answer more of their queue, more patients report the phone easy to
       use; where more calls end within the IVR, fewer do — the strongest and second-strongest phone patterns
-      in the 2026 survey.</p>
-      <table>
-      <tr><th>A surprising null: admin staff per 10,000 patients (fifths of practices)</th>
-        <th class="num">Fewest</th><th class="num">2nd</th><th class="num">Middle</th><th class="num">4th</th><th class="num">Most</th></tr>
-      <tr><td>Median queue-answer rate, May 2026</td>
-        <td class="num">84.1%</td><td class="num">82.6%</td><td class="num">81.0%</td><td class="num">81.4%</td><td class="num">81.8%</td></tr>
-      </table>
-      <p class="ev">Practices with more admin staff per patient do not answer more of their calls — the
-      pattern is flat, and it stays flat comparing practices of similar size. That does not mean reception
-      cover is irrelevant: admin headcount includes many roles besides answering phones, and practices under
-      pressure may hire more. It does mean total admin staffing is a poor guide to how well a practice's
-      phones are answered.</p>`;
+      in the 2026 survey. How staffing, size and the other measures relate to answering and to what patients
+      report — including the perhaps surprising result that practices with more admin staff do not answer
+      more of their calls — is set out in <a href="predictors.html">the models behind this page</a>.</p>`;
     diag.ans = Number(b.ans_queue); diag.ivr = Number(b.ivr_share);
-    diag.sizeAns = hasSz ? Number(sz.sa) : null; diag.szName = szName; diag.i75 = Number(nat.i75);
+    diag.sizeAns = hasSz ? Number(sz.sa) : null; diag.sizeIvr = hasSz ? Number(sz.si) : null;
+    diag.natIvr = Number(nat.mi); diag.szName = szName; diag.i75 = Number(nat.i75);
   } else {
     $("phones").innerHTML = `<p>No telephony data for this practice — its phone supplier does not submit to the
       national collection (which covered 85.4% of open practices in May 2026).</p>`;
@@ -375,10 +366,10 @@ async function run() {
         capacity would fire hardest on Monday mornings (compare your Monday and Wednesday morning rows with
         the national table); an automated prescription line would not. Reviewing the messages your menu plays
         during the Monday-morning peak would establish which.`;
-      else if (mx > -5) ivrText = `Your IVR endings are spread fairly evenly across the day, where the typical
-        practice ends more outside the rush (national table) — slightly more of your morning callers than
-        usual end in the menus. Automated self-service, redirection, and callers giving up are not
-        distinguishable in the published data.`;
+      else if (mx > -5) ivrText = `Your IVR endings are spread fairly evenly across the day, where at the
+        typical practice more calls end in the IVR outside the rush (national table) — so slightly more of
+        your morning callers than usual end in the menus. Automated self-service, redirection, and callers
+        giving up are not distinguishable in the published data.`;
       else ivrText = `More of your calls end within the IVR outside the 8–10am rush than during it — the most
         common national pattern (national table). Automated self-service, redirection, and callers giving up
         are not distinguishable in the published data.`;
@@ -491,8 +482,12 @@ async function run() {
       ${hasCell?`<td class="num">${f1(cell.pe)}%</td>`:""}</tr>
     <tr><td>Told to contact again another day</td><td class="num">${f1(p.deflection_2025)}%</td><td class="num">${f1(p.deflection_2026)}%</td><td class="num">${f1(eng.d26)}%</td>
       ${hasCell?`<td class="num">${f1(cell.d)}%</td>`:""}</tr>
+    <tr><td>Survey responses at your practice</td><td class="num">${f0(p.gpps_n)}</td><td class="num">${f0(p.gpps_n_2026)}</td><td class="num"></td>
+      ${hasCell?`<td class="num"></td>`:""}</tr>
     </table>
-    <p class="ev">GP Patient Survey, ${f0(p.gpps_n_2026)} responses in 2026${smallSurvey?' — small sample, wide uncertainty':''}.
+    <p class="ev">GP Patient Survey${smallSurvey?' — small sample, wide uncertainty':''}. Each question's
+    base is smaller than the response count, because not every respondent answers every question — the
+    continuity questions especially, which only those with a preferred clinician reach.
     "Practices like yours" means the same fifth of England for both list size and deprivation.
     Across all practices, "told to contact again" is the survey measure most strongly related to patients
     reporting a poor experience of access; continuity has its own section above. These measures are reported
@@ -735,8 +730,8 @@ async function run() {
   // 3. contacts per appointment
   if (diag.ratio != null) {
     if (diag.ratio > 1.81) flags.push({ pri:3, html:`
-      <p><b>Contacts per appointment: ${diag.ratio.toFixed(2)} — three-quarters of practices are below
-      1.81.</b> More attempts to reach you than appointments delivered.${diag.ans != null && diag.sizeAns != null && diag.ans < diag.sizeAns - 5
+      <p><b>Contacts per appointment: ${diag.ratio.toFixed(2)}, where the typical practice has 1.47.</b>
+      More attempts to reach you than appointments delivered.${diag.ans != null && diag.sizeAns != null && diag.ans < diag.sizeAns - 5
         ? " Some of this will be the phones themselves: unanswered calls come back as repeat calls, so this finding and the answering finding above are linked."
         : " The published data does not separate new demand from repeat attempts; your telephone system's own reports can distinguish first calls from repeat callers."}
       ${link("d-demand","See the demand evidence")}.</p>`});
@@ -746,9 +741,10 @@ async function run() {
   // 4. calls ended within the IVR
   if (diag.ivr != null && diag.i75 != null && diag.ivr > diag.i75) {
     flags.push({ pri:4, html:`
-      <p><b>Calls ended within the IVR: ${f1(diag.ivr)}% — three-quarters of practices are below
-      ${f1(diag.i75)}%.</b> The data cannot say whether these are automated self-service, redirection, or
-      callers giving up in your menus.${diag.mx != null && diag.mx > 5 ? ` In your case they cluster in the
+      <p><b>Calls ended within the IVR: ${f1(diag.ivr)}%, where practices ${diag.sizeIvr != null
+        ? `your size typically have ${f1(diag.sizeIvr)}%`
+        : `typically have ${f1(diag.natIvr)}%`} of calls ending at this stage.</b> The data cannot say
+      whether these are automated self-service, redirection, or callers giving up in your menus.${diag.mx != null && diag.mx > 5 ? ` In your case they cluster in the
       8–10am rush, which is the pattern a capacity-triggered message would produce. Reviewing the recorded
       messages your menu plays during the Monday-morning peak would establish which explanation applies.` : ""}
       ${link("d-phones","See the phone evidence")}.</p>`});
