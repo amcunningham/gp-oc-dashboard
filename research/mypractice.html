@@ -390,12 +390,13 @@ async function run() {
     SELECT b.inb*1.0 AS calls, COALESCE(pn.oc_rate_1k,0)*${Number(p.list_size)||0}/1000 AS oc_subs, pn.total AS appts,
            b.inb0*1.0 AS calls0, COALESCE(pn0.oc_rate_1k,0)*COALESCE(pn0.list_size,${Number(p.list_size)||0})/1000 AS oc_subs0,
            pn0.total AS appts0
-    FROM bench b
-    JOIN panel pn ON pn.gp_code=b.gp_code AND pn.month='2026-05' AND pn.total>100
-    LEFT JOIN panel pn0 ON pn0.gp_code=b.gp_code AND pn0.month='2025-05' AND pn0.total>100
-    WHERE b.gp_code='${code}'`);
+    FROM panel pn
+    LEFT JOIN bench b ON b.gp_code=pn.gp_code
+    LEFT JOIN panel pn0 ON pn0.gp_code=pn.gp_code AND pn0.month='2025-05' AND pn0.total>100
+    WHERE pn.gp_code='${code}' AND pn.month='2026-05' AND pn.total>100`);
   if (dd && dd.appts) {
-    const ratio = (Number(dd.calls)+Number(dd.oc_subs))/Number(dd.appts);
+    const hasCalls = dd.calls != null;
+    const ratio = hasCalls ? (Number(dd.calls)+Number(dd.oc_subs))/Number(dd.appts) : null;
     const has0 = dd.calls0 != null && dd.appts0 != null;
     const ratio0 = has0 ? (Number(dd.calls0)+Number(dd.oc_subs0))/Number(dd.appts0) : null;
     $("demand").innerHTML = `
@@ -413,16 +414,19 @@ async function run() {
       <tr><td>Online submissions</td><td class="num">${f0(dd.oc_subs0)}</td><td class="num">${f0(dd.oc_subs)}</td></tr>
       <tr><td>Appointments delivered</td><td class="num">${f0(dd.appts0)}</td><td class="num">${f0(dd.appts)}</td></tr>
       <tr><td>Your contacts per appointment</td><td class="num">${ratio0==null?"–":ratio0.toFixed(2)}</td>
-        <td class="num big">${ratio.toFixed(2)}</td></tr>
+        <td class="num big">${ratio==null?"–":ratio.toFixed(2)}</td></tr>
       <tr><td>Typical practice (national median)</td><td class="num">1.57</td><td class="num">1.47</td></tr>
       <tr><td>Three-quarters of practices are below</td><td class="num"></td><td class="num">1.81</td></tr>
       <tr><td>Middle 80% of practices, May 2026</td><td class="num"></td><td class="num">0.99 – 2.17</td></tr>
       </table>
+      ${hasCalls ? "" : `<p class="ev">Your phone supplier does not report to the national collection, so
+      calls — and therefore the contacts-per-appointment ratio — cannot be shown; appointments and online
+      submissions are complete.</p>`}
       <p class="ev">Practices with more contacts per appointment have fewer patients reporting a good
       experience of getting in touch, and more told to contact the practice again another day. Unanswered
       calls generate repeat calls, so this ratio partly reflects phone answering itself — and May 2026
       online-submission counts are incomplete for five suppliers (see notes below).</p>`;
-    diag.ratio = ratio;
+    if (ratio != null) diag.ratio = ratio;
   } else { $("demand").innerHTML = "<p>Insufficient data to compute demand against delivery.</p>"; }
 
   // ---- survey ----
@@ -757,7 +761,8 @@ async function run() {
     })()}
     ${rest.length ? `<p class="ev">Also noted: ${rest.map((f,i)=>f.html.replace(/<\/?p>|<\/?b>/g,"")).join(" ")}</p>` : ""}
     ${oks.length ? `<p class="okline"><b>What you are doing well:</b> ${oks.join(" ")}</p>` : ""}
-    <p class="ev">Ranked by how strongly each measure relates to patient experience across ~5,000 practices.
+    <p class="ev">Ranked by how strongly each measure relates to patient experience across ~5,000 practices
+    (<a href="predictors.html">the models behind this ranking</a>).
     "Similar practices" means the same twenty-fifth of England's practices as yours: the same fifth for list
     size and the same fifth for deprivation${hasCell ? ` (${f0(cell.n)} practices in your case — the cells
     vary in size because size and deprivation are related)` : ""}. These are associations, not guarantees — the evidence for every

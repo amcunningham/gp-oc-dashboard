@@ -19,6 +19,21 @@ The explorer has three model options: a **shared demo** (rate-limited, questions
 anonymously — see `worker/SETUP.md` for how it's run), your own Anthropic API key (nothing
 logged), or a local Ollama model (fully offline).
 
+## How does my practice compare?
+
+**[mypractice.html](https://amcunningham.github.io/gp-oc-dashboard/research/mypractice.html)** —
+a practice-facing diagnostic: enter an ODS code or practice name and see, against practices of
+the same size and deprivation, what stands out — continuity, phone answering, calls ended within
+the IVR, demand against appointments — ranked by how strongly each measure relates to what
+patients report, with the evidence behind every claim. No login, nothing uploaded; all queries
+run in the browser over the published data. Design and rationale:
+[PRACTICE_TOOL_DESIGN.md](PRACTICE_TOOL_DESIGN.md).
+
+**[predictors.html](https://amcunningham.github.io/gp-oc-dashboard/research/predictors.html)** —
+the models behind the lookup: what predicts patients' reported overall experience and experience
+of their most recent contact, each variable alone and in combined models, across ~4,800 practices
+with phone data and all ~6,000 without.
+
 ## Query this data without downloading anything
 
 All tables are plain CSV/Parquet, so they can be queried in the browser:
