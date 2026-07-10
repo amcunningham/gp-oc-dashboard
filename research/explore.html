@@ -231,7 +231,9 @@ xsec — one row per practice (n=6007), exposure year Apr 2024–Mar 2025 unless
   counts equally; gpps_n weighting runs ~1.5pp above published national figures).
   For change questions use e.g. satisfaction_2026 - satisfaction. Weight by gpps_n_2026.
 
-panel — practice x month, 2023-03..2026-05 (month as 'YYYY-MM' varchar):
+panel — practice x month, 2023-03..2026-05 (month as 'YYYY-MM' varchar; NB the OC columns
+  for 2026-05 are incomplete for several suppliers (Blinx, Evergreen, iPlato, Silicon, PATCHS
+  submitted partial data) — prefer 2026-04 or earlier as an endpoint for OC trends):
   gp_code, month, total, same_day, next_day, gp, gp_same_day, f2f, phone, online, dna, attended,
   oc_total, oc_clinical, oc_admin, oc_rate_1k, list_size, supplier, imd_score, region,
   same_day_pct, gp_same_day_pct.
@@ -384,7 +386,15 @@ list size, rurality, staffing, age structure, ethnicity, region; details in PANE
     (median 76), HIGH third above 178 (median 257 - intake-scale volumes). This is a continuum,
     not a classification: it misses telephone-based triage entirely and the high tertile
     includes heavy online users who are not triage-first. Say so when asked about triage
-    prevalence.`;
+    prevalence.
+13. Online intake partially SUBSTITUTES for phone demand: practices that rose an online-intake
+    tertile year-on-year saw weekday calls fall ~81-96/1k/month more than stable practices,
+    with over half the fall in the 8-10am window; practices whose intake fell saw calls rise.
+    Substitution is partial: each +100 online submissions/1k is associated with ~59 fewer
+    calls (~30 of them 8-10am), so roughly 40 of every 100 submissions are ADDITIONAL recorded
+    contact volume (unmet, induced, or shifted demand - indistinguishable). Replicated across
+    two independent year-pairs (Jan-Mar and April). Sample: early-onboarded cloud-telephony
+    practices (~2,800-3,000); within-practice, observational.`;
 
 const INTERPRET_SYS = `You are helping a reader understand a query result from a practice-level
 open dataset on GP appointment access in England (GPAD, GPPS, workforce, IMD; details in the

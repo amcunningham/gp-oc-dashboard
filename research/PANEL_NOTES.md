@@ -978,3 +978,46 @@ AMENDMENT to 4.13: per AMC, prevalence framing reworked from arbitrary threshold
 (her Substack convention, consistent with oc_tertile_feb26). Jan-Mar 2026, n=6,144: low third
 <33 subs/1k/month (median 15), middle 33-178 (median 76), high >178 (median 257). Presented
 as a continuum, not a classification. KEY_FINDINGS 12 updated accordingly.
+
+## 4.14 Online intake and phone volumes: partial substitution, concentrated in the 8-10am
+window (10 Jul 2026; AMC's hypothesis and qualifications)
+
+DATA: cbt_rush_panel.csv (weekday inbound calls + 8-10am calls per practice-month, Oct 2024 -
+May 2026, from CBT By Day and Time files; 2024-11 and 2025-04 missing - corrupt at source) and
+cbt_volumes_panel.csv (monthly totals, all 19 months). The CBT PUBLICATION began Oct 2025 but
+NHSE's supplementary "historic practice level data" release extends the practice-level series
+back to Oct 2024 (AMC challenged this - verified against published Oct 2025 totals, 31.44M
+match). Early months cover ~2,800-3,100 practices vs ~5,000 now: the analysis sample is the
+EARLY-ONBOARDED CBT estate, a supplier-patterned selection.
+
+DESIGN: within-practice change, seasonally matched year-pairs (Jan-Mar 2025 vs Jan-Mar 2026,
+n=2,839; replication Apr 2025 vs Apr 2026, n=3,005). Window choice was forced by OC data
+availability at first run and retained for the seasonal match and GPPS-window alignment; the
+April pair became possible when the May 2026 OC release (25 Jun) supplied the full back-series.
+Exposure: OC intake tertile shift / continuous change. Controls: baseline calls/1k, IMD, list,
+region.
+
+RESULTS: tertile-up practices' weekday calls fell 81/1k/month (Jan-Mar pair; 96 April pair)
+more than stable practices; tertile-down practices' calls ROSE (+20 / +8) - substitution runs
+in both directions. Over half the excess fall is in the 8-10am window (-43 of -81) from a
+window carrying 29% of calls; morning-rush share fell 3.1pp in tertile-up practices. Dose:
+-58.6 (Jan-Mar) and -58.5 (April) calls per +100 submissions/1k - identical to one decimal.
+
+AMC'S QUALIFICATION (central): substitution is ~0.6:1 overall and ~0.3:1 in the morning window
+- roughly 40 of every 100 additional submissions are NET ADDITIONAL recorded contact volume,
+not displaced calls. Cannot distinguish previously unmet demand, induced demand, and shifted
+walk-ins. This is the quantitative footing for the practice-workload concern about always-open
+intake, and rhymes with Newbould 2017 (telephone-first: 12-fold phone rise, +28% total
+consultations). Mechanism links: explains the escape route from the high-deflection tail (3.6/
+4.6), and contributes to national phone-ease improvement (+3.5pp) without workforce growth.
+
+VISIBA WATCH: the May 2026 OC release's supplier field contains NO Visiba entry anywhere -
+the platform remains wholly absent from the national collection >1 year after first
+documented, while the collection has broadened (Rapid Health, Sensely now present). Wealden
+Ridge shows only Accurx at 7-9 subs/1k. May 2026 OC data flagged incomplete by NHSE for Blinx,
+Evergreen Life, iPlato, Silicon and PATCHS (partial submissions) - avoid May as an exposure
+month.
+
+DIARY: 30 Jul 2026 - CBT June edition adds the two contract call-waiting metrics with
+practice-level time series; next OC release same week. Re-run substitution with waiting-time
+outcomes; first contract-quarter read.
