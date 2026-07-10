@@ -258,7 +258,18 @@ async function run() {
         "Where your share of calls ended within the IVR sits among all practices")}
       <p class="ev">At practices that answer more of their queue, more patients report the phone easy to
       use; where more calls end within the IVR, fewer do — the strongest and second-strongest phone patterns
-      in the 2026 survey. How many admin staff a practice has makes no difference to answering.</p>`;
+      in the 2026 survey.</p>
+      <table>
+      <tr><th>A surprising null: admin staff per 10,000 patients (fifths of practices)</th>
+        <th class="num">Fewest</th><th class="num">2nd</th><th class="num">Middle</th><th class="num">4th</th><th class="num">Most</th></tr>
+      <tr><td>Median queue-answer rate, May 2026</td>
+        <td class="num">84.1%</td><td class="num">82.6%</td><td class="num">81.0%</td><td class="num">81.4%</td><td class="num">81.8%</td></tr>
+      </table>
+      <p class="ev">Practices with more admin staff per patient do not answer more of their calls — the
+      pattern is flat, and it stays flat comparing practices of similar size. That does not mean reception
+      cover is irrelevant: admin headcount includes many roles besides answering phones, and practices under
+      pressure may hire more. It does mean total admin staffing is a poor guide to how well a practice's
+      phones are answered.</p>`;
     diag.ans = Number(b.ans_queue); diag.ivr = Number(b.ivr_share);
     diag.sizeAns = hasSz ? Number(sz.sa) : null; diag.szName = szName; diag.i75 = Number(nat.i75);
   } else {
