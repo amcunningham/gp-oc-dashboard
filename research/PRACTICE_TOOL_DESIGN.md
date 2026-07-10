@@ -5,6 +5,25 @@ v1.0 as built, 10 July 2026 (supersedes draft v0.1, same date). Shipped as
 actually built after a day of iteration against real practices, and where it departs from
 the draft.
 
+## Overview
+
+This tool is written for practices working under sustained pressure. The Royal College of
+General Practitioners describes general practice as under "immense strain", with workforce and
+workload challenges contributing to unsustainable workload and difficulties for patients in
+accessing care ([RCGP, Future of general practice](https://www.rcgp.org.uk/campaign-home));
+in RCGP polling this year, nearly three-quarters of GPs said excessive workload was
+compromising patient safety
+([RCGP, 2026](https://www.rcgp.org.uk/news/workload-concerns-polling)). The data in this
+repository shows the same picture from the other side: more contact volume than delivered
+capacity in most practices, and fewer fully-qualified full-time-equivalent GPs per patient
+than in 2019.
+
+The tool therefore does not treat a poor access measure as a verdict on effort. Its
+comparisons are deliberately fair — a practice is set against practices of the same size and
+deprivation, not against England — and the page states plainly which forces (size,
+deprivation, GP numbers) are outside a practice's control. Where the findings point somewhere,
+they point at reviewable operational specifics, not at working harder.
+
 ## Purpose
 
 A web page where any English practice can see, in plain language with benchmarks, where its
@@ -105,5 +124,4 @@ reduced page; refresh follows the three collections' monthly publication dates (
 2026, when the CBT June edition adds practice-level call-waiting times — a natural addition to
 the phones card and the summary).
 
-Open: naming; whether this stays a page in this repository or is hosted elsewhere (e.g. the
-College) — which changes nothing technically and everything politically.
+Open: naming; whether this stays a page in this repository or is hosted elsewhere.
