@@ -1,0 +1,6 @@
+# Raw source downloads (GPPS practice CSVs etc.) live here locally but must not be
+# committed - they are ~1.3GB and available from the publishers. Processed outputs
+# belong in research/data.
+data/
+~$*
+*.crdownload
