@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>How does my practice's access compare?</title>
 <style>
-  :root { --ink:#1a1a1a; --mut:#667; --line:#ddd; --bg:#fafafa; --card:#fff; --acc:#155fa0; --warn:#8a4b00; }
+  :root { --ink:#1a1a1a; --mut:#667; --line:#ddd; --bg:#fafafa; --card:#fff; --acc:#155fa0; --note:#8a4b00; }
   body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg);
          margin:0; padding:1.2rem; line-height:1.5; }
   .wrap { max-width: 880px; margin:0 auto; }
@@ -16,17 +16,24 @@
   input[type=text] { font-size:1rem; padding:.5rem .7rem; border:1px solid var(--line); border-radius:6px; width:22rem; max-width:100%; }
   button { font-size:1rem; padding:.5rem 1rem; border:1px solid var(--acc); background:var(--acc); color:#fff; border-radius:6px; cursor:pointer; }
   table { border-collapse:collapse; font-size:.92rem; margin:.5rem 0; width:100%; }
-  th, td { text-align:left; padding:.25rem .6rem .25rem 0; border-bottom:1px solid #eee; }
+  th, td { text-align:left; padding:.25rem .6rem .25rem 0; border-bottom:1px solid #eee; vertical-align:top; }
   th { color:var(--mut); font-weight:600; }
-  td.num, th.num { text-align:right; }
-  .big { font-size:1.6rem; font-weight:700; }
-  .decile { color:var(--acc); font-weight:600; }
-  .flag { color:var(--warn); }
+  td.num, th.num { text-align:right; white-space:nowrap; }
+  .big { font-size:1.35rem; font-weight:700; }
+  .note { color:var(--note); }
   .ev { color:var(--mut); font-size:.85rem; margin:.3rem 0 0; }
   .cav { color:var(--mut); font-size:.85rem; border-left:3px solid var(--line); padding-left:.7rem; margin:.5rem 0; }
   .status { color:var(--mut); font-size:.9rem; }
   .err { color:#a00; white-space:pre-wrap; }
   svg text { font-family:inherit; }
+  .factor { border:1px solid #eee; border-radius:6px; padding:.6rem .8rem .3rem; margin:.6rem 0; }
+  .factor p { margin:.2rem 0 .3rem; font-size:.92rem; }
+  details { margin:.8rem 0; }
+  summary { font-size:1.05rem; font-weight:600; cursor:pointer; padding:.4rem 0;
+            border-bottom:1px solid var(--line); }
+  .flagbox { border-left:4px solid var(--acc); padding:.4rem 0 .4rem .8rem; margin:.7rem 0; }
+  .flagbox p { margin:.2rem 0; }
+  .okline { color:#2a6b2a; }
 </style>
 </head>
 <body>
@@ -34,7 +41,8 @@
   <h1>How does my practice's access compare?</h1>
   <p class="sub">Type your practice's ODS code (e.g. A81001) or part of its name. Everything shown comes from
   published NHS England and GP Patient Survey data — nothing is uploaded, and queries run entirely in your
-  browser. Companion to <a href="explore.html">the plain-English data explorer</a>; analysis notes in
+  browser. Where the data allows, each measure is compared with the same month one year earlier. Companion to
+  <a href="explore.html">the plain-English data explorer</a>; analysis notes in
   <a href="PANEL_NOTES.md">PANEL_NOTES.md</a>. All comparisons are associations across ~5,000 practices,
   not predictions for yours.</p>
 
@@ -47,25 +55,35 @@
 
   <div id="results" style="display:none">
     <div class="card" id="ident"></div>
-    <h2>Phones</h2>
-    <div class="card" id="phones"></div>
-    <div class="card" id="daytime"></div>
-    <h2>Demand and delivery</h2>
-    <div class="card" id="demand"></div>
-    <h2>What your patients reported</h2>
-    <div class="card" id="survey"></div>
-    <div class="card" id="history"></div>
+    <div class="card" id="standout"></div>
+    <details id="d-phones"><summary>Phones — the evidence</summary>
+      <div class="card" id="phones"></div>
+      <div class="card" id="daytime"></div>
+    </details>
+    <details id="d-demand"><summary>Demand and delivery — the evidence</summary>
+      <div class="card" id="demand"></div>
+    </details>
+    <details id="d-survey"><summary>What your patients reported — the evidence</summary>
+      <div class="card" id="survey"></div>
+      <div class="card" id="history"></div>
+    </details>
+    <details id="d-context"><summary>What shapes these scores — size, deprivation, staffing</summary>
+      <div class="card" id="context"></div>
+    </details>
     <div class="card" id="transition" style="display:none"></div>
     <h2>Reading this page</h2>
     <div class="card cav" id="caveats">
       These are associations, not guarantees: practices that improved a measure were not always rewarded, and
       your circumstances may differ. Survey estimates for small practices are noisy (flagged where the sample
-      is under 50 responses). "Calls ended within the IVR" blends automated service, redirection to other
+      is under 50 responses). "Calls ended within the IVR" blends automated self-service, redirection to other
       channels, and callers giving up in the menus — published data cannot distinguish them. Phone measures
-      cover only practices whose telephony supplier submits to the national collection (about 85%).
-      Appointment counts reflect what is recorded in appointment books, not total workload.
-      Sources: Cloud Based Telephony (Mar–May 2026), Online Consultation Submissions, Appointments in
-      General Practice, GP Patient Survey 2012–2026. Evidence for each claim: PANEL_NOTES.md.
+      cover only practices whose telephony supplier submits to the national collection (85.4% of open
+      practices in May 2026; coverage a year earlier was smaller, so some practices have no May 2025
+      comparison). Appointment counts reflect what is recorded in appointment books, not total workload.
+      NHS England flagged May 2026 online-consultation submissions as incomplete for five suppliers (Blinx,
+      Evergreen Life, iPlato, Silicon Practice, PATCHS), so online contact counts may be undercounted for
+      some practices. Sources: Cloud Based Telephony (May 2025, May 2026), Online Consultation Submissions,
+      Appointments in General Practice, GP Patient Survey 2012–2026. Evidence for each claim: PANEL_NOTES.md.
     </div>
   </div>
 </div>
@@ -80,7 +98,7 @@ const TABLES = {
   xsec: "xsec_master_2026.parquet",
   panel: "panel_merged.parquet",
   cbt: "cbt_ivr_panel.csv",
-  daytime: "cbt_daytime_mar26.parquet",
+  daytime: "cbt_daytime_may.parquet",
   history: "gpps_long.parquet",
 };
 let conn, ready = false;
@@ -97,16 +115,26 @@ let conn, ready = false;
       const reader = file.endsWith(".csv") ? "read_csv_auto" : "read_parquet";
       await conn.query(`CREATE VIEW ${name} AS SELECT * FROM ${reader}('${DATA_BASE}${file}${bust}')`);
     }
-    // one shared national phone-benchmark table (Mar-May 2026)
+    // shared national phone benchmark: May 2026 with May 2025 comparison where available.
+    // Filters: at least 200 inbound calls, and IVR endings below 95% of inbound (excludes
+    // implausible submissions); answer rate capped at 100.
     await conn.query(`CREATE TABLE bench AS
       WITH p AS (
-        SELECT gp_code, AVG(inbound) inb, AVG(ivr_ended) ivr, AVG(answered) ans
-        FROM cbt WHERE month IN ('2026-03','2026-04','2026-05')
-        GROUP BY 1 HAVING COUNT(DISTINCT month)=3 AND AVG(inbound)>=200)
-      SELECT gp_code, inb, 100*ivr/inb AS ivr_share, 100*ans/GREATEST(inb-ivr,1) AS ans_queue,
-        PERCENT_RANK() OVER (ORDER BY 100*ans/GREATEST(inb-ivr,1)) AS ans_pct,
-        PERCENT_RANK() OVER (ORDER BY 100*ivr/inb) AS ivr_pct
-      FROM p`);
+        SELECT gp_code,
+          MAX(CASE WHEN month='2026-05' THEN inbound END) AS inb,
+          MAX(CASE WHEN month='2026-05' THEN ivr_ended END) AS ivr,
+          MAX(CASE WHEN month='2026-05' THEN answered END) AS ans,
+          MAX(CASE WHEN month='2025-05' THEN inbound END) AS inb0,
+          MAX(CASE WHEN month='2025-05' THEN ivr_ended END) AS ivr0,
+          MAX(CASE WHEN month='2025-05' THEN answered END) AS ans0
+        FROM cbt WHERE month IN ('2025-05','2026-05') GROUP BY 1)
+      SELECT gp_code, inb, inb0,
+        100.0*ivr/inb AS ivr_share, LEAST(100.0*ans/(inb-ivr),100) AS ans_queue,
+        CASE WHEN inb0>=200 AND ivr0<0.95*inb0 THEN 100.0*ivr0/inb0 END AS ivr_share0,
+        CASE WHEN inb0>=200 AND ivr0<0.95*inb0 THEN LEAST(100.0*ans0/(inb0-ivr0),100) END AS ans_queue0,
+        PERCENT_RANK() OVER (ORDER BY LEAST(100.0*ans/(inb-ivr),100)) AS ans_pct,
+        PERCENT_RANK() OVER (ORDER BY 100.0*ivr/inb) AS ivr_pct
+      FROM p WHERE inb>=200 AND ivr<0.95*inb`);
     ready = true;
     $("dbstatus").textContent = "Ready. Data loaded for ~6,000 practices.";
   } catch (e) {
@@ -123,8 +151,25 @@ const all = async sql => { const r = await conn.query(sql); const out=[];
   for (let i=0;i<r.numRows;i++) out.push(Object.fromEntries(r.schema.fields.map((f,j)=>[f.name, r.getChildAt(j).get(i)]))); return out; };
 const f1 = v => v==null||Number.isNaN(Number(v)) ? "–" : Number(v).toFixed(1);
 const f0 = v => v==null||Number.isNaN(Number(v)) ? "–" : Math.round(Number(v)).toLocaleString();
-const pct = v => v==null ? "–" : Math.max(1, Math.round(Number(v)*100)) + "";
 const esc = s => String(s||"").replace(/[^a-zA-Z0-9 &'-]/g,"").replace(/'/g,"''").trim();
+const SIZE_FIFTHS = ["smallest fifth","second-smallest fifth","middle fifth","second-largest fifth","largest fifth"];
+// distribution line: light axis, band = middle 80%, notch = typical practice,
+// diamond = typical practice of your size (optional), dot = you (optional)
+const distLine = (lo, hi, b10, b90, med, sizeVal, you, label) => {
+  const ax = v => 30 + 480*(Number(v)-lo)/(hi-lo);
+  const cl = v => Math.max(30, Math.min(510, ax(v)));
+  return `<svg viewBox="0 0 540 52" width="100%" role="img" aria-label="${label}">
+    <line x1="30" y1="27" x2="510" y2="27" stroke="#eceef1" stroke-width="2"/>
+    <line x1="${cl(b10)}" y1="27" x2="${cl(b90)}" y2="27" stroke="#b9c0c8" stroke-width="8" stroke-linecap="round"/>
+    <line x1="${cl(med)}" y1="18" x2="${cl(med)}" y2="36" stroke="#556" stroke-width="2"/>
+    ${sizeVal==null?"":`<path d="M${cl(sizeVal)},20 l6,7 l-6,7 l-6,-7 Z" fill="var(--note)"/>`}
+    ${you==null?"":`<circle cx="${cl(you)}" cy="27" r="6" fill="var(--acc)"/>
+      <text x="${Math.max(48, Math.min(492, cl(you)))}" y="11" font-size="10" text-anchor="middle"
+        fill="var(--acc)" font-weight="700">you: ${f1(you)}%</text>`}
+    <text x="30" y="50" font-size="9.5" fill="#667">${lo}%</text>
+    <text x="510" y="50" font-size="9.5" fill="#667" text-anchor="end">${hi}%</text>
+  </svg>`;
+};
 
 $("go").onclick = run;
 $("q").addEventListener("keydown", e => { if (e.key==="Enter") run(); });
@@ -142,87 +187,226 @@ async function run() {
   $("results").style.display = "block";
   const code = p.gp_code;
   const smallSurvey = Number(p.gpps_n_2026) < 50;
+  const diag = {};   // values collected across sections for the "what stands out" summary
+  // practices like yours: same fifth of England for both list size and deprivation
+  const cell = await one(`WITH s AS (
+      SELECT gp_code, satisfaction_2026 sat, access_satisfaction_2026 acc, phone_easy_2026 pe,
+        deflection_2026 d, continuity_2026 cont,
+        NTILE(5) OVER (ORDER BY list_size) sq, NTILE(5) OVER (ORDER BY imd_score) iq
+      FROM xsec WHERE satisfaction_2026 IS NOT NULL AND gpps_n_2026>=30
+        AND list_size IS NOT NULL AND imd_score IS NOT NULL)
+    SELECT AVG(sat) m, AVG(acc) a, AVG(pe) pe, AVG(d) d, AVG(cont) c, COUNT(*) n
+    FROM s WHERE sq=(SELECT sq FROM s WHERE gp_code='${code}')
+      AND iq=(SELECT iq FROM s WHERE gp_code='${code}')`);
+  const hasCell = cell && Number(cell.n) >= 30;
 
   $("ident").innerHTML = `<span class="big">${p.gp_name}</span> (${code}, ${p.postcode})<br>
     ${f0(p.list_size)} patients · ${p.pcn_name||""} · ${p.region||""} · IMD ${f1(p.imd_score)}
-    ${smallSurvey ? ' · <span class="flag">small survey sample — treat survey figures cautiously</span>' : ""}`;
+    ${smallSurvey ? ' · <span class="note">small survey sample — treat survey figures cautiously</span>' : ""}`;
 
-  // phones
+  // ---- phones: May 2026 vs May 2025 vs national, with distribution lines ----
   const b = await one(`SELECT * FROM bench WHERE gp_code='${code}'`);
-  const nat = await one(`SELECT MEDIAN(ans_queue) mq, MEDIAN(ivr_share) mi FROM bench`);
+  const nat = await one(`SELECT MEDIAN(ans_queue) mq, MEDIAN(ivr_share) mi,
+    MEDIAN(ans_queue0) mq0, MEDIAN(ivr_share0) mi0,
+    QUANTILE_CONT(ans_queue, 0.1) a10, QUANTILE_CONT(ans_queue, 0.9) a90,
+    QUANTILE_CONT(ivr_share, 0.1) i10, QUANTILE_CONT(ivr_share, 0.9) i90,
+    QUANTILE_CONT(ivr_share, 0.75) i75 FROM bench`);
   if (b) {
+    const noPrior = b.ans_queue0 == null;
+    // typical practice of the same size (same fifth of England by list size)
+    const sz = await one(`WITH s AS (
+        SELECT gp_code, NTILE(5) OVER (ORDER BY list_size) qt FROM xsec WHERE list_size IS NOT NULL)
+      SELECT MEDIAN(bb.ans_queue) sa, MEDIAN(bb.ivr_share) si, ANY_VALUE(me.qt) qt, COUNT(*) n
+      FROM bench bb JOIN s ON s.gp_code=bb.gp_code
+      JOIN (SELECT qt FROM s WHERE gp_code='${code}') me ON me.qt=s.qt`);
+    const hasSz = sz && sz.qt != null;
+    const szName = hasSz ? SIZE_FIFTHS[Number(sz.qt)-1] : "";
+    const ansLo = Math.max(0, Math.floor(Math.min(Number(nat.a10), Number(b.ans_queue))/10)*10 - 5);
+    const ivrHi = Math.min(100, Math.ceil(Math.max(Number(nat.i90), Number(b.ivr_share))/10)*10 + 5);
     $("phones").innerHTML = `
+      <p>Two things happen to a call after it is picked up by your phone system: it either ends during the
+      automated menu stage (the IVR — answered by a recorded message, redirected to another service, or
+      abandoned by the caller), or it joins the queue to speak to a person. Of the calls that join the queue,
+      some are answered and some are given up on or end while waiting.</p>
       <table>
-      <tr><th></th><th class="num">Your practice</th><th class="num">National median</th><th class="num">Your decile</th></tr>
-      <tr><td>Calls reaching the queue that were answered</td><td class="num big">${f1(b.ans_queue)}%</td>
-        <td class="num">${f1(nat.mq)}%</td><td class="num decile">${Math.min(10,Math.ceil(pct(b.ans_pct)/10))} of 10</td></tr>
-      <tr><td>Calls ended within the IVR (before the queue)</td><td class="num big">${f1(b.ivr_share)}%</td>
-        <td class="num">${f1(nat.mi)}%</td><td class="num decile">${Math.min(10,Math.ceil(pct(b.ivr_pct)/10))} of 10 (10 = heaviest)</td></tr>
+      <tr><th></th><th class="num">Your practice<br>May 2025</th><th class="num">Your practice<br>May 2026</th>
+        <th class="num">Typical practice<br>May 2025</th><th class="num">Typical practice<br>May 2026</th></tr>
+      <tr><td>Calls reaching the queue that were answered</td><td class="num">${f1(b.ans_queue0)}%</td>
+        <td class="num big">${f1(b.ans_queue)}%</td><td class="num">${f1(nat.mq0)}%</td><td class="num">${f1(nat.mq)}%</td></tr>
+      <tr><td>Calls ended within the IVR (before the queue)</td><td class="num">${f1(b.ivr_share0)}%</td>
+        <td class="num big">${f1(b.ivr_share)}%</td><td class="num">${f1(nat.mi0)}%</td><td class="num">${f1(nat.mi)}%</td></tr>
       </table>
-      <p class="ev">Across ~4,900 practices, queue answering is the strongest phone correlate of patient-reported
-      ease (+5.6 points per standard deviation); calls ended within the IVR carry an independent negative
-      association (−3.3). Answering is unrelated to admin staffing levels and falls about 6 points per doubling
-      of list size. Mar–May 2026 average.</p>`;
+      ${noPrior ? '<p class="ev">No May 2025 figures for your practice — your supplier joined the national collection later.</p>' : ""}
+      <p>The lines below show where you sit among all ~4,900 practices in May 2026. The bar covers the middle
+      80% of practices, the notch is the typical practice${hasSz ? `, and the
+      <span class="note">◆</span> is the typical practice of your size (the ${szName})` : ""}.</p>
+      <p><b>Calls answered from the queue.</b> You answered ${f1(b.ans_queue)}%${hasSz ? `; the typical
+      practice of your size answered ${f1(sz.sa)}%` : ""}.</p>
+      ${distLine(ansLo, 100, nat.a10, nat.a90, nat.mq, hasSz ? sz.sa : null, b.ans_queue,
+        "Where your queue-answer rate sits among all practices")}
+      <p><b>Calls ended within the IVR.</b> ${f1(b.ivr_share)}% of your calls ended in the menus before
+      reaching the queue${hasSz ? `; typical for practices your size is ${f1(sz.si)}%` : ""}. Three-quarters
+      of practices are below ${f1(nat.i75)}%.</p>
+      ${distLine(0, ivrHi, nat.i10, nat.i90, nat.mi, hasSz ? sz.si : null, b.ivr_share,
+        "Where your share of calls ended within the IVR sits among all practices")}
+      <p class="ev">At practices that answer more of their queue, more patients report the phone easy to
+      use; where more calls end within the IVR, fewer do — the strongest and second-strongest phone patterns
+      in the 2026 survey. How many admin staff a practice has makes no difference to answering.</p>`;
+    diag.ans = Number(b.ans_queue); diag.ivr = Number(b.ivr_share);
+    diag.sizeAns = hasSz ? Number(sz.sa) : null; diag.szName = szName; diag.i75 = Number(nat.i75);
   } else {
     $("phones").innerHTML = `<p>No telephony data for this practice — its phone supplier does not submit to the
-      national collection (true for about 15% of practices).</p>`;
+      national collection (which covered 85.4% of open practices in May 2026).</p>`;
   }
 
-  // day/time: Monday vs Wednesday + morning-excess signature
-  const dt = await all(`SELECT dow, tc, inbound, ivr_ended, answered FROM daytime WHERE gp_code='${code}'`);
-  if (dt.length) {
-    const agg = (dw) => { const r = dt.filter(x=>Number(x.dow)===dw);
+  // ---- day of week and time of day ----
+  const dt = await all(`SELECT yr, dow, tc, inbound, ivr_ended, answered, ndays FROM daytime WHERE gp_code='${code}'`);
+  const dt26 = dt.filter(x=>Number(x.yr)===2026);
+  if (dt26.length) {
+    const agg = (rows, dw) => { const r = rows.filter(x=>Number(x.dow)===dw);
       const s = k => r.reduce((a,x)=>a+Number(x[k]||0),0);
-      return { inb:s("inbound"), ivr:s("ivr_ended"), ans:s("answered") }; };
-    const mon = agg(1), wed = agg(3);
-    const aq = o => 100*o.ans/Math.max(o.inb-o.ivr,1);
-    const drop = aq(wed)-aq(mon);
-    const r810 = dt.filter(x=>x.tc==="08:00-09:59");
-    const s810 = k => r810.reduce((a,x)=>a+Number(x[k]||0),0);
-    const ivrAll = dt.reduce((a,x)=>a+Number(x.ivr_ended||0),0), inbAll = dt.reduce((a,x)=>a+Number(x.inbound||0),0);
-    const rate810 = 100*s810("ivr_ended")/Math.max(s810("inbound"),1);
-    const rateRest = 100*(ivrAll-s810("ivr_ended"))/Math.max(inbAll-s810("inbound"),1);
-    const morningExcess = rate810 - rateRest;
-    $("daytime").innerHTML = `
+      const nd = r.length ? Math.max(...r.map(x=>Number(x.ndays||0))) : 0;
+      return { inb:s("inbound"), ivr:s("ivr_ended"), ans:s("answered"), nd }; };
+    const aq = o => o.inb-o.ivr > 0 ? Math.min(100, 100*o.ans/(o.inb-o.ivr)) : null;
+    const mon = agg(dt26,1), wed = agg(dt26,3);
+    const dt25 = dt.filter(x=>Number(x.yr)===2025);
+    const mon0 = agg(dt25,1), wed0 = agg(dt25,3);
+    const has25 = mon0.inb > 0;
+    if (mon.inb >= 80) {
+      const gap = aq(wed) - aq(mon);
+      // the practice's own Monday vs Wednesday answer rate through the day
+      const BANDS = ["08:00-09:59","10:00-11:59","12:00-13:59","14:00-15:59","16:00-17:59"];
+      const bandAq = (dw, tcv) => { const r = dt26.filter(x=>Number(x.dow)===dw && x.tc===tcv);
+        const s = k => r.reduce((a,x)=>a+Number(x[k]||0),0);
+        return { aq: s("inbound")-s("ivr_ended") > 0 ? Math.min(100, 100*s("answered")/(s("inbound")-s("ivr_ended"))) : null,
+                 inb: s("inbound") }; };
+      const bands = BANDS.map(tcv => { const m = bandAq(1,tcv), w = bandAq(3,tcv);
+        return { tcv, m, w, ok: m.inb >= 30 && w.inb >= 30 && m.aq != null && w.aq != null }; });
+      const okBands = bands.filter(x=>x.ok);
+      const behind = okBands.filter(x=>x.w.aq - x.m.aq > 0).length;
+      diag.monPattern = okBands.length >= 3
+        ? (behind === okBands.length ? "runs behind in every part of the day"
+          : behind >= Math.ceil(okBands.length/2) ? "runs behind for most of the day"
+          : "is concentrated in the morning rush")
+        : null;
+      const bandTable = gap > 10 ? `
       <table>
-      <tr><th></th><th class="num">Monday</th><th class="num">Wednesday</th></tr>
-      <tr><td>Queue-answer rate</td><td class="num">${f1(aq(mon))}%</td><td class="num">${f1(aq(wed))}%</td></tr>
-      <tr><td>Calls received</td><td class="num">${f0(mon.inb/5)}/day</td><td class="num">${f0(wed.inb/4)}/day</td></tr>
+      <tr><th>Your queue-answer rate by time of day, May 2026</th><th class="num">Monday</th><th class="num">Wednesday</th></tr>
+      ${bands.map(x=>`<tr><td>${x.tcv.replace("-"," to ")}</td>
+        <td class="num">${x.ok ? f1(x.m.aq)+"%" : "–"}</td><td class="num">${x.ok ? f1(x.w.aq)+"%" : "–"}</td></tr>`).join("")}
       </table>
-      <p><b>Your Monday answering ${drop>0?"drop":"gain"}: ${f1(Math.abs(drop))} points.</b>
-      The national median drop is 4.6 points; the worst tenth of practices drop more than 16.
-      ${drop>10?'<span class="flag">Your Monday deficit persists in the worst-quintile pattern — in those practices it lasts all day, not just the 8am surge.</span>':""}</p>
-      <p>IVR endings at 8–10am: ${f1(rate810)}% of calls, vs ${f1(rateRest)}% the rest of the day.
-      ${morningExcess>5?'<span class="flag">Terminations concentrate in the morning rush — nationally this pattern tracks Monday demand and is consistent with capacity-triggered messaging rather than automated service.</span>'
-        :"Terminations are concentrated outside the rush — the usual pattern where automation serves prescription-line and message traffic."}</p>
-      <p class="ev">March 2026, weekdays. Monday answering drops show a small independent association with worse
-      phone ease (−0.6/SD); baseline answering matters roughly ten times more.</p>`;
-  } else { $("daytime").innerHTML = "<p>No day-of-week phone detail available.</p>"; }
+      <p class="ev">This answers whether your Monday shortfall is confined to the morning rush or runs through
+      the day. Time bands with fewer than 30 calls on either day are left blank.</p>` : "";
+      const r810 = dt26.filter(x=>x.tc==="08:00-09:59");
+      const s810 = k => r810.reduce((a,x)=>a+Number(x[k]||0),0);
+      const ivrAll = dt26.reduce((a,x)=>a+Number(x.ivr_ended||0),0), inbAll = dt26.reduce((a,x)=>a+Number(x.inbound||0),0);
+      const rate810 = 100*s810("ivr_ended")/Math.max(s810("inbound"),1);
+      const rateRest = 100*(ivrAll-s810("ivr_ended"))/Math.max(inbAll-s810("inbound"),1);
+      const mx = rate810 - rateRest;
+      const amShare = dw => { const r = dt26.filter(x=>Number(x.dow)===dw && x.tc==="08:00-09:59");
+        const s = k => r.reduce((a,x)=>a+Number(x[k]||0),0);
+        return s("inbound") > 0 ? 100*s("ivr_ended")/s("inbound") : null; };
+      const monAm = amShare(1), wedAm = amShare(3);
+      let ivrText;
+      if (mx > 5) ivrText = `A markedly larger share of your calls ends within the IVR during the 8–10am rush
+        — about one practice in five shows this. Automated self-service, redirection, and callers giving up
+        in the menus are counted the same way, so the data cannot say why. A message triggered by full
+        capacity would fire hardest on Monday mornings (compare your Monday and Wednesday morning rows with
+        the national table); an automated prescription line would not. Reviewing the messages your menu plays
+        during the Monday-morning peak would establish which.`;
+      else if (mx > -5) ivrText = `Your IVR endings are spread fairly evenly across the day, where the typical
+        practice ends more outside the rush (national table) — slightly more of your morning callers than
+        usual end in the menus. Automated self-service, redirection, and callers giving up are not
+        distinguishable in the published data.`;
+      else ivrText = `More of your calls end within the IVR outside the 8–10am rush than during it — the most
+        common national pattern (national table). Automated self-service, redirection, and callers giving up
+        are not distinguishable in the published data.`;
+      $("daytime").innerHTML = `
+      <p><b>Monday compared with Wednesday.</b> Monday is the busiest day for practice phones nationally, and
+      Wednesday the most ordinary, so comparing the two shows how your phone response holds up under the
+      week's heaviest demand. The answer rate here is the share of queueing calls (those that got past the
+      menus) that a person answered.</p>
+      <table>
+      <tr><th>Your practice</th>${has25?`<th class="num">Monday<br>May 2025</th><th class="num">Wednesday<br>May 2025</th>`:""}
+        <th class="num">Monday<br>May 2026</th><th class="num">Wednesday<br>May 2026</th></tr>
+      <tr><td>Calls received per day</td>${has25?`<td class="num">${f0(mon0.inb/Math.max(mon0.nd,1))}</td>
+        <td class="num">${f0(wed0.inb/Math.max(wed0.nd,1))}</td>`:""}
+        <td class="num">${f0(mon.inb/Math.max(mon.nd,1))}</td><td class="num">${f0(wed.inb/Math.max(wed.nd,1))}</td></tr>
+      <tr><td>Queue-answer rate</td>${has25?`<td class="num">${f1(aq(mon0))}%</td>
+        <td class="num">${f1(aq(wed0))}%</td>`:""}
+        <td class="num big">${f1(aq(mon))}%</td><td class="num big">${f1(aq(wed))}%</td></tr>
+      <tr><td>Share of 8–10am calls ended within the IVR</td>${has25?`<td class="num">–</td><td class="num">–</td>`:""}
+        <td class="num">${f1(monAm)}%</td><td class="num">${f1(wedAm)}%</td></tr>
+      </table>
+      <p><b>Your Monday–Wednesday answering gap in May 2026: ${f1(Math.abs(gap))} points ${gap>=0?"lower":"higher"} on
+      Monday.</b> A caller who reached your queue on a Monday was ${gap>=0?"less":"more"} likely to get
+      through to a person than the same caller on a Wednesday.</p>
+      ${bandTable}
+      <table>
+      <tr><th colspan="2">The national picture, May 2026 (weekdays, bank holidays excluded)</th></tr>
+      <tr><td>Typical (median) Monday–Wednesday answering gap</td><td class="num">3.7 points</td></tr>
+      <tr><td>One practice in ten has a gap larger than</td><td class="num">16 points</td></tr>
+      <tr><td>Typical share of calls ended within the IVR, 8–10am compared with the rest of the day</td><td class="num">4.1 points lower at 8–10am</td></tr>
+      ${mx>5?`<tr><td>Practices where the IVR share is instead at least 5 points higher at 8–10am, like yours</td><td class="num">about 1 in 5</td></tr>
+      <tr><td>In those practices: typical Monday-morning IVR share minus Wednesday-morning</td><td class="num">2.9 points (under 1 elsewhere)</td></tr>`:""}
+      </table>
+      <table>
+      <tr><th colspan="2">Your calls ended within the IVR, May 2026 (all weekdays)</th></tr>
+      <tr><td>During the 8–10am rush</td><td class="num">${f1(rate810)}%</td></tr>
+      <tr><td>Rest of the day</td><td class="num">${f1(rateRest)}%</td></tr>
+      </table>
+      <p><b>When calls end in the menus.</b> ${ivrText}</p>
+      <p class="ev">May 2026 weekdays, with May 2025 alongside where your practice reported then. The two
+      bank-holiday Mondays in each May are excluded, leaving two ordinary Mondays and four Wednesdays per
+      year. At practices with bigger Monday gaps, slightly fewer patients report the phone easy; the
+      overall answer rate matters far more.</p>`;
+      diag.gap = gap; diag.mx = mx; diag.aqMon = aq(mon); diag.aqWed = aq(wed);
+    } else {
+      $("daytime").innerHTML = "<p>Too few Monday calls recorded in May 2026 for a reliable day-of-week comparison.</p>";
+    }
+  } else { $("daytime").innerHTML = "<p>No day-of-week phone detail available for this practice.</p>"; }
 
-  // demand vs delivery
+  // ---- demand vs delivery: May 2026 with May 2025 comparison ----
   const dd = await one(`
-    SELECT b.inb*1.0 AS calls,
-           COALESCE(pn.oc_rate_1k,0)*pn.list_size/1000 AS oc_subs,
-           pn.total AS appts, pn.list_size AS lst
-    FROM bench b JOIN panel pn ON pn.gp_code=b.gp_code AND pn.month='2026-03'
+    SELECT b.inb*1.0 AS calls, COALESCE(pn.oc_rate_1k,0)*${Number(p.list_size)||0}/1000 AS oc_subs, pn.total AS appts,
+           b.inb0*1.0 AS calls0, COALESCE(pn0.oc_rate_1k,0)*COALESCE(pn0.list_size,${Number(p.list_size)||0})/1000 AS oc_subs0,
+           pn0.total AS appts0
+    FROM bench b
+    JOIN panel pn ON pn.gp_code=b.gp_code AND pn.month='2026-05' AND pn.total>100
+    LEFT JOIN panel pn0 ON pn0.gp_code=b.gp_code AND pn0.month='2025-05' AND pn0.total>100
     WHERE b.gp_code='${code}'`);
   if (dd && dd.appts) {
     const ratio = (Number(dd.calls)+Number(dd.oc_subs))/Number(dd.appts);
+    const has0 = dd.calls0 != null && dd.appts0 != null;
+    const ratio0 = has0 ? (Number(dd.calls0)+Number(dd.oc_subs0))/Number(dd.appts0) : null;
     $("demand").innerHTML = `
+      <p>Contacts per appointment sets the demand reaching your practice (phone calls received plus
+      online-consultation submissions) against the appointments delivered in the same month. It is a rough
+      ratio, not a precise measure of unmet need — but large values mean many more attempts to reach the
+      practice than slots delivered. About one practice in ten delivers more appointments than it receives
+      contacts (a ratio below 1). Appointment books include follow-ups and recalls the practice books itself,
+      nurse and healthcare-assistant clinics, and direct online bookings (which are not online-consultation
+      submissions) — so appointments can outnumber inbound contacts, especially where one triage call becomes
+      several booked slots.</p>
       <table>
-      <tr><th></th><th class="num">Monthly (March 2026)</th></tr>
-      <tr><td>Phone calls received</td><td class="num">${f0(dd.calls)}</td></tr>
-      <tr><td>Online submissions</td><td class="num">${f0(dd.oc_subs)}</td></tr>
-      <tr><td>Appointments delivered</td><td class="num">${f0(dd.appts)}</td></tr>
-      <tr><td>Contacts per appointment</td><td class="num big">${ratio.toFixed(2)}</td></tr>
+      <tr><th></th><th class="num">May 2025</th><th class="num">May 2026</th></tr>
+      <tr><td>Phone calls received</td><td class="num">${f0(dd.calls0)}</td><td class="num">${f0(dd.calls)}</td></tr>
+      <tr><td>Online submissions</td><td class="num">${f0(dd.oc_subs0)}</td><td class="num">${f0(dd.oc_subs)}</td></tr>
+      <tr><td>Appointments delivered</td><td class="num">${f0(dd.appts0)}</td><td class="num">${f0(dd.appts)}</td></tr>
+      <tr><td>Your contacts per appointment</td><td class="num">${ratio0==null?"–":ratio0.toFixed(2)}</td>
+        <td class="num big">${ratio.toFixed(2)}</td></tr>
+      <tr><td>Typical practice (national median)</td><td class="num">1.57</td><td class="num">1.47</td></tr>
+      <tr><td>Three-quarters of practices are below</td><td class="num"></td><td class="num">1.81</td></tr>
+      <tr><td>Middle 80% of practices, May 2026</td><td class="num"></td><td class="num">0.99 – 2.17</td></tr>
       </table>
-      <p class="ev">National median 1.48 (a tenth of practices sit below 0.99, a tenth above 2.23). Higher
-      demand-per-appointment is associated with worse reported experience (−0.9/SD on contact experience)
-      and more patients told to contact again (+0.8/SD) — but unanswered calls generate repeat calls, so a
-      struggling phone system inflates this number by itself.</p>`;
+      <p class="ev">Practices with more contacts per appointment have fewer patients reporting a good
+      experience of getting in touch, and more told to contact the practice again another day. Unanswered
+      calls generate repeat calls, so this ratio partly reflects phone answering itself — and May 2026
+      online-submission counts are incomplete for five suppliers (see notes below).</p>`;
+    diag.ratio = ratio;
   } else { $("demand").innerHTML = "<p>Insufficient data to compute demand against delivery.</p>"; }
 
-  // survey
+  // ---- survey ----
   const eng = await one(`SELECT
     SUM(satisfaction_2026*satisfaction_basew)/SUM(satisfaction_basew) s26,
     SUM(access_satisfaction_2026*access_basew)/SUM(access_basew) a26,
@@ -231,56 +415,310 @@ async function run() {
     SUM(continuity_2026*continuity_basew)/SUM(continuity_basew) c26 FROM xsec`);
   $("survey").innerHTML = `
     <table>
-    <tr><th></th><th class="num">2025</th><th class="num">2026</th><th class="num">England 2026</th></tr>
-    <tr><td>Overall experience good</td><td class="num">${f1(p.satisfaction)}%</td><td class="num big">${f1(p.satisfaction_2026)}%</td><td class="num">${f1(eng.s26)}%</td></tr>
-    <tr><td>Experience of contacting the practice</td><td class="num">${f1(p.access_satisfaction)}%</td><td class="num">${f1(p.access_satisfaction_2026)}%</td><td class="num">${f1(eng.a26)}%</td></tr>
-    <tr><td>Easy to get through on the phone</td><td class="num">${f1(p.phone_easy)}%</td><td class="num">${f1(p.phone_easy_2026)}%</td><td class="num">${f1(eng.p26)}%</td></tr>
-    <tr><td>Told to contact again another day</td><td class="num">${f1(p.deflection_2025)}%</td><td class="num">${f1(p.deflection_2026)}%</td><td class="num">${f1(eng.d26)}%</td></tr>
-    <tr><td>See preferred GP (continuity)</td><td class="num">${f1(p.continuity)}%</td><td class="num">${f1(p.continuity_2026)}%</td><td class="num">${f1(eng.c26)}%</td></tr>
+    <tr><th></th><th class="num">2025</th><th class="num">2026</th><th class="num">England 2026</th>
+      ${hasCell?`<th class="num">Practices like yours<br>2026 (n=${f0(cell.n)})</th>`:""}</tr>
+    <tr><td>Overall experience good</td><td class="num">${f1(p.satisfaction)}%</td><td class="num big">${f1(p.satisfaction_2026)}%</td><td class="num">${f1(eng.s26)}%</td>
+      ${hasCell?`<td class="num">${f1(cell.m)}%</td>`:""}</tr>
+    <tr><td>Experience of contacting the practice</td><td class="num">${f1(p.access_satisfaction)}%</td><td class="num">${f1(p.access_satisfaction_2026)}%</td><td class="num">${f1(eng.a26)}%</td>
+      ${hasCell?`<td class="num">${f1(cell.a)}%</td>`:""}</tr>
+    <tr><td>Easy to get through on the phone</td><td class="num">${f1(p.phone_easy)}%</td><td class="num">${f1(p.phone_easy_2026)}%</td><td class="num">${f1(eng.p26)}%</td>
+      ${hasCell?`<td class="num">${f1(cell.pe)}%</td>`:""}</tr>
+    <tr><td>Told to contact again another day</td><td class="num">${f1(p.deflection_2025)}%</td><td class="num">${f1(p.deflection_2026)}%</td><td class="num">${f1(eng.d26)}%</td>
+      ${hasCell?`<td class="num">${f1(cell.d)}%</td>`:""}</tr>
+    <tr><td>See preferred GP (continuity)</td><td class="num">${f1(p.continuity)}%</td><td class="num">${f1(p.continuity_2026)}%</td><td class="num">${f1(eng.c26)}%</td>
+      ${hasCell?`<td class="num">${f1(cell.c)}%</td>`:""}</tr>
     </table>
     <p class="ev">GP Patient Survey, ${f0(p.gpps_n_2026)} responses in 2026${smallSurvey?' — small sample, wide uncertainty':''}.
-    "Told to contact again" is the single measure most strongly associated with poor experience of access
+    "Practices like yours" means the same fifth of England for both list size and deprivation.
+    "Told to contact again" is the survey measure most strongly related to poor reported experience of access
     nationally, and rises with deprivation after adjusting for capacity.</p>`;
 
-  // history sparkline
+  // ---- history sparkline ----
   const h = await all(`SELECT year, AVG(satisfaction) s FROM history WHERE gp_code='${code}' GROUP BY 1 ORDER BY 1`);
   const he = await all(`SELECT year, AVG(satisfaction) s FROM history GROUP BY 1 ORDER BY 1`);
   if (h.length >= 4) {
     const yrs = he.map(r=>Number(r.year));
+    const vals = [...h, ...he].map(r=>Number(r.s));
+    const lo = Math.max(0, Math.floor(Math.min(...vals)/10)*10 - 10), hi = 100;
     const x = y => 30 + 740*(y-yrs[0])/(yrs[yrs.length-1]-yrs[0]);
-    const yv = v => 130 - 110*(v-40)/60;
+    const yv = v => 130 - 110*(v-lo)/(hi-lo);
     const line = rows => rows.map((r,i)=>`${i?"L":"M"}${x(Number(r.year)).toFixed(0)},${yv(Number(r.s)).toFixed(0)}`).join(" ");
     $("history").innerHTML = `
-      <p><b>Your satisfaction score since 2012</b> (dark) against the England average (grey).
-      The survey was redesigned in 2024 — levels either side are not directly comparable.</p>
+      <p><b>The share of your patients reporting a good overall experience, 2012–2023</b> (dark) against the
+      England average (grey). The survey was redesigned in 2024 — levels either side are not directly
+      comparable.</p>
       <svg viewBox="0 0 800 150" width="100%" role="img" aria-label="Line chart of practice satisfaction versus England average, 2012 to 2023">
         <path d="${line(he)}" fill="none" stroke="#bbb" stroke-width="2"/>
         <path d="${line(h)}" fill="none" stroke="#155fa0" stroke-width="2.5"/>
         <text x="30" y="145" font-size="11" fill="#667">${yrs[0]}</text>
         <text x="740" y="145" font-size="11" fill="#667">${yrs[yrs.length-1]}</text>
-        <text x="2" y="${yv(40)+4}" font-size="11" fill="#667">40</text>
-        <text x="2" y="${yv(100)+8}" font-size="11" fill="#667">100</text>
+        <text x="2" y="${yv(lo)+4}" font-size="11" fill="#667">${lo}</text>
+        <text x="2" y="${yv(hi)+8}" font-size="11" fill="#667">${hi}</text>
       </svg>
-      <p class="ev">A practice's long trajectory is one of the strongest predictors of its present position —
-      level tells you where a practice is; trajectory tells you where it's going.</p>`;
+      <p class="ev">GPPS 2012–2023, archived-methodology waves; the redesigned 2024–26 survey appears in the
+      table above and is not on the same scale.</p>`;
   } else { $("history").innerHTML = "<p>Not enough survey history for a trajectory (practice may be recently formed or merged).</p>"; }
 
-  // transition note if online intake rose a tertile between fieldworks
+  // ---- what shapes these scores: one plain-English factor block each ----
+  const GENERIC = ["lowest fifth","second-lowest fifth","middle fifth","second-highest fifth","highest fifth"];
+  const FACTORS = [
+    { col:"list_size", title:"Practice list size", fmt:f0, unit:" patients",
+      fifths:["smallest fifth","second-smallest fifth","middle fifth","second-largest fifth","largest fifth"] },
+    { col:"imd_score", title:"Deprivation (IMD score of your patients' areas)", fmt:f1, unit:"",
+      fifths:["least deprived fifth","second-least deprived fifth","middle fifth","second-most deprived fifth","most deprived fifth"] },
+    { col:"gp_per10k", title:"GPs per 10,000 patients (full-time equivalent)", fmt:f1, unit:"", fifths:GENERIC },
+    { col:"appts_percap", title:"Appointments per 1,000 patients per month", fmt:f0, unit:"", fifths:GENERIC },
+    { col:"sd_share", title:"Share of appointments booked same-day", fmt:v=>f1(v)+"%", unit:"", fifths:GENERIC },
+  ];
+  const mySat = Number(p.satisfaction_2026);
+  const rows = [];
+  let cuts = {};
+  for (const fac of FACTORS) {
+    const bins = await all(`WITH q AS (
+        SELECT NTILE(5) OVER (ORDER BY ${fac.col}) qt, satisfaction_2026 s, ${fac.col} v
+        FROM xsec WHERE ${fac.col} IS NOT NULL AND satisfaction_2026 IS NOT NULL AND gpps_n_2026>=30)
+      SELECT qt, AVG(s) m, QUANTILE_CONT(s, 0.1) p10, QUANTILE_CONT(s, 0.9) p90,
+        MIN(v) lo, MAX(v) hi, COUNT(*) n FROM q GROUP BY 1 ORDER BY 1`);
+    if (bins.length !== 5) continue;
+    cuts[fac.col] = bins;
+    const myVal = Number(p[fac.col]);
+    if (Number.isNaN(myVal)) { rows.push({ fac, missing:true }); continue; }
+    let bi = 4; for (let i=0;i<5;i++) if (myVal <= Number(bins[i].hi)) { bi = i; break; }
+    rows.push({ fac, bins, bi, myVal });
+  }
+  // one shared satisfaction axis across all five lines
+  const spans = rows.filter(r=>!r.missing);
+  let axLo = 100, axHi = 0;
+  for (const r of spans) { axLo = Math.min(axLo, Number(r.bins[r.bi].p10)); axHi = Math.max(axHi, Number(r.bins[r.bi].p90)); }
+  if (!Number.isNaN(mySat)) { axLo = Math.min(axLo, mySat); axHi = Math.max(axHi, mySat); }
+  axLo = Math.max(0, Math.floor(axLo/5)*5 - 5); axHi = Math.min(100, Math.ceil(axHi/5)*5 + 5);
+  const ax = v => 30 + 480*(Number(v)-axLo)/(axHi-axLo);
+  let chartsHtml = "";
+  for (const r of rows) {
+    if (r.missing) {
+      chartsHtml += `<div class="factor"><p><b>${r.fac.title}:</b> no value recorded for your practice.</p></div>`;
+      continue;
+    }
+    const q = r.bins[r.bi];
+    const youBit = Number.isNaN(mySat) ? "" :
+      `<circle cx="${ax(mySat)}" cy="24" r="6" fill="var(--acc)"/>
+       <text x="${Math.max(42, Math.min(498, ax(mySat)))}" y="10" font-size="10" text-anchor="middle"
+         fill="var(--acc)" font-weight="700">you: ${f1(mySat)}%</text>`;
+    chartsHtml += `<div class="factor">
+      <p><b>${r.fac.title}.</b> Yours is ${r.fac.fmt(r.myVal)}${r.fac.unit}, which puts you among the
+      ${f0(q.n)} practices in the ${r.fac.fifths[r.bi]} (${r.fac.fmt(q.lo)} to ${r.fac.fmt(q.hi)}).
+      The share of their patients reporting a good overall experience mostly sits between ${f1(q.p10)}% and
+      ${f1(q.p90)}% (the middle 80%, shown as the bar), averaging ${f1(q.m)}% (the notch).${Number.isNaN(mySat)?"":" The dot is your practice's figure."}</p>
+      <svg viewBox="0 0 540 48" width="100%" role="img"
+        aria-label="Range of satisfaction scores for practices in the same ${r.fac.fifths[r.bi]} by ${r.fac.title}, with your practice marked">
+        <line x1="30" y1="24" x2="510" y2="24" stroke="#eceef1" stroke-width="2"/>
+        <line x1="${ax(q.p10)}" y1="24" x2="${ax(q.p90)}" y2="24" stroke="#b9c0c8" stroke-width="8" stroke-linecap="round"/>
+        <line x1="${ax(q.m)}" y1="15" x2="${ax(q.m)}" y2="33" stroke="#556" stroke-width="2"/>
+        ${youBit}
+        <text x="30" y="44" font-size="9.5" fill="#667">${axLo}%</text>
+        <text x="510" y="44" font-size="9.5" fill="#667" text-anchor="end">${axHi}%</text>
+      </svg></div>`;
+  }
+  // practices of similar size and deprivation (same fifth on both) — cell computed at the top of run()
+  let similarHtml = "";
+  if (hasCell && p.satisfaction_2026 != null) {
+    const diff = Number(p.satisfaction_2026) - Number(cell.m);
+    similarHtml = `<p><b>Compared with practices like yours:</b> at the ${f0(cell.n)} practices about your
+      size, serving areas about as deprived as yours, an average of ${f1(cell.m)}% of patients report a good
+      overall experience. At yours it is ${f1(p.satisfaction_2026)}% — ${f1(Math.abs(diff))} points
+      ${diff>=0?"higher":"lower"}. This is the fairest single comparison on the page, because it sets you
+      only against practices working at the same scale with a similar population.</p>`;
+  }
+  // capacity position for the summary
+  const gpRow = rows.find(r=>r.fac && r.fac.col==="gp_per10k" && !r.missing);
+  const apRow = rows.find(r=>r.fac && r.fac.col==="appts_percap" && !r.missing);
+  diag.gpFifth = gpRow ? gpRow.bi : null;
+  diag.apFifth = apRow ? apRow.bi : null;
+  diag.gpLowAvg = gpRow ? Number(gpRow.bins[0].m) : null;
+  diag.gpHighAvg = gpRow ? Number(gpRow.bins[4].m) : null;
+  let gradHtml = "";
+  if (spans.length) {
+    gradHtml = `<table>
+      <tr><th>Share of patients reporting a good overall experience (average by fifth of practices)</th>
+        <th class="num">Lowest fifth</th><th class="num">Highest fifth</th></tr>
+      ${spans.map(r=>`<tr><td>${r.fac.title} (${r.fac.fifths[0]} → ${r.fac.fifths[4]})</td>
+        <td class="num">${f1(r.bins[0].m)}%</td><td class="num">${f1(r.bins[4].m)}%</td></tr>`).join("")}
+      </table>`;
+  }
+  $("context").innerHTML = `
+    <p>Each line below takes the fifth of England's practices your practice belongs to for one characteristic
+    — its size, its deprivation, and so on — and shows how many patients at those practices report a good
+    overall experience (2026 survey). The bar covers the middle 80% of those practices, the notch is their
+    average, and the dot is your practice's own figure. All five lines use the same scale, so you can see
+    which comparisons sit high or low for you.</p>
+    <p><b>Two of these you cannot change.</b> Patients at larger practices, and at practices serving more
+    deprived populations, report lower satisfaction on average (table below). These are features of the
+    population you serve and the scale you work at, not of how you run your practice; the national figures
+    used elsewhere on this page do not adjust for them, so a large practice in a deprived area is being
+    compared against an easier average than its circumstances would predict.</p>
+    ${chartsHtml}
+    ${gradHtml}
+    ${similarHtml}
+    ${(() => {
+      const g = spans.find(r=>r.fac.col==="gp_per10k"), s = spans.find(r=>r.fac.col==="sd_share");
+      if (!g || !s) return "";
+      return `<p><b>Staffing and appointment numbers matter; booking style barely does.</b> At the fifth of
+      practices with the most GPs per patient, ${f1(g.bins[4].m)}% of patients report a good overall
+      experience, against ${f1(g.bins[0].m)}% at the fifth with the fewest — a bigger difference than size or
+      deprivation makes. By contrast, whether a practice books most of its appointments same-day or ahead
+      makes almost no difference to what patients report (${f1(s.bins[0].m)}% against ${f1(s.bins[4].m)}%
+      between the extreme fifths), and how many admin staff a practice has makes none once phone answering is
+      taken into account.</p>`;
+    })()}
+    <p class="ev">These are cross-practice averages, unadjusted and overlapping — deprived areas also have
+    fewer GPs per head, so the gradients partly restate each other. They describe the terrain, not what any
+    one practice's score would do if a factor changed.</p>`;
+
+  // ---- transition note if online intake rose substantially between fieldworks ----
   const oc = await one(`SELECT
      AVG(CASE WHEN month IN ('2025-01','2025-02','2025-03') THEN oc_rate_1k END) o25,
-     AVG(CASE WHEN month IN ('2026-01','2026-02','2026-03') THEN oc_rate_1k END) o26
+     AVG(CASE WHEN month IN ('2026-01','2026-02','2026-03') THEN oc_rate_1k END) o26,
+     AVG(CASE WHEN month IN ('2026-02','2026-03','2026-04') THEN oc_rate_1k END) onow
      FROM panel WHERE gp_code='${code}'`);
+  diag.ocNow = oc && oc.onow != null ? Number(oc.onow) : null;
   if (oc && Number(oc.o26||0) - Number(oc.o25||0) >= 100) {
     $("transition").style.display = "block";
     $("transition").innerHTML = `<p><b>Your online intake rose substantially between the last two survey years
       (${f0(oc.o25)} to ${f0(oc.o26)} submissions per 1,000 patients per month).</b>
-      Nationally, practices making this move saw contact-experience scores dip in the first year and largely
-      recover after about a year; the average continuity fall did not recover — but it was not universal:
-      46% of moving practices improved continuity, on every software platform, which suggests routing patients
-      to their usual clinician is a configuration choice. Each 100 extra submissions per 1,000 patients is
-      associated with about 59 fewer phone calls, half of them from the 8–10am rush — and about 40 net
-      additional contacts.</p>`;
+      Nationally, at practices making this move the share of patients reporting a good contact experience
+      dipped in the first year and largely recovered after about a year; the fall in patients reporting they
+      see their preferred GP did not recover on average — but it was not universal: in 46% of moving
+      practices that share rose, on every software platform, which suggests routing patients to their usual
+      clinician is a configuration choice. Each 100 extra submissions per 1,000 patients is associated with
+      about 59 fewer phone calls, half of them from the 8–10am rush — and about 40 net additional contacts.</p>`;
   }
+
+  // ---- what stands out: ranked flags built from the evidence above ----
+  const flags = [], oks = [];
+  const link = (id, txt) => `<a href="#${id.slice(2)}" onclick="document.getElementById('${id}').open=true">${txt}</a>`;
+  const myDefl = Number(p.deflection_2026);
+  // 1. told to contact again (strongest survey link with poor access experience).
+  // Tempered when the practice's own patients report access as good as or better than peers,
+  // and caveated for small survey samples.
+  if (hasCell && !Number.isNaN(myDefl) && cell.d != null) {
+    const myAcc = Number(p.access_satisfaction_2026), mySat2 = Number(p.satisfaction_2026);
+    const accGood = !Number.isNaN(myAcc) && cell.a != null && myAcc >= Number(cell.a);
+    const satGood = !Number.isNaN(mySat2) && myAcc != null && mySat2 >= Number(cell.m);
+    const sampleNote = smallSurvey
+      ? ` With ${f0(p.gpps_n_2026)} survey responses, this percentage rests on a small number of patients and should be read as indicative.`
+      : "";
+    if (myDefl > Number(cell.d) + 3) {
+      if (accGood) flags.push({ pri:8, html:`
+        <p><b>${f1(myDefl)}% of your patients report being told to contact you again another day</b>
+        (practices like yours: ${f1(cell.d)}%). Nationally this measure carries the strongest link with
+        patients reporting a poor experience of access — but your patients' reported experience of access
+        (${f1(myAcc)}% against ${f1(cell.a)}% in practices like yours) suggests it is not doing damage in
+        your case.${sampleNote} Noted for completeness. ${link("d-survey","See the survey evidence")}.</p>`});
+      else flags.push({ pri:1, html:`
+        <p><b>${f1(myDefl)}% of your patients report being told to contact you again another day, against
+        ${f1(cell.d)}% in practices like yours.</b> Across England this is the survey measure most strongly
+        tied to patients reporting a poor experience of access.${satGood ? ` Overall, your patients rate you
+        highly — ${f1(mySat2)}% report a good experience, against ${f1(cell.m)}% at similar practices. But
+        fewer report a good experience of contacting you: ${f1(myAcc)}%, against ${f1(cell.a)}%.` : ""}
+        The survey does not record what patients are offered at that point. A review of what your team offers
+        when no slot is available — a callback, an online submission, signposting to another service, or
+        advice to call again — would establish what lies behind the figure.${sampleNote}
+        ${link("d-survey","See the survey evidence")}.</p>`});
+    }
+    else if (myDefl < Number(cell.d) - 3) oks.push(`Few patients report being told to contact you again
+      another day (${f1(myDefl)}% against ${f1(cell.d)}% in practices like yours) — the measure most strongly
+      tied to patients reporting a good experience of access.`);
+  }
+  // 2. queue answering vs practices of the same size
+  if (diag.ans != null && diag.sizeAns != null) {
+    if (diag.ans < diag.sizeAns - 5) flags.push({ pri:2, html:`
+      <p><b>Calls answered from the queue: ${f1(diag.ans)}%, where practices your size typically answer
+      ${f1(diag.sizeAns)}%.</b> This is the phone measure most strongly tied to patients reporting you easy
+      to reach.${diag.gap != null && diag.gap > 10 ? ` Your Monday gap is also wide: ${f1(diag.aqMon)}%
+      answered against ${f1(diag.aqWed)}% on Wednesdays (typical gap: 3.7 points)${diag.monPattern
+        ? `, and your Monday ${diag.monPattern} — the hour-by-hour figures are in the day-of-week table`
+        : ""}.` : ""} A review of reception staffing against call volumes — particularly
+      on Monday mornings — would establish whether cover is the constraint.
+      ${link("d-phones","See the phone evidence")}.</p>`});
+    else if (diag.ans > diag.sizeAns + 5) oks.push(`You answer more of your queue than is typical for
+      practices of your size (${f1(diag.ans)}% against ${f1(diag.sizeAns)}%).`);
+  }
+  // 3. contacts per appointment
+  if (diag.ratio != null) {
+    if (diag.ratio > 1.81) flags.push({ pri:3, html:`
+      <p><b>Contacts per appointment: ${diag.ratio.toFixed(2)} — three-quarters of practices are below
+      1.81.</b> More attempts to reach you than appointments delivered.${diag.ans != null && diag.sizeAns != null && diag.ans < diag.sizeAns - 5
+        ? " Some of this will be the phones themselves: unanswered calls come back as repeat calls, so this finding and the answering finding above are linked."
+        : " The published data does not separate new demand from repeat attempts; your telephone system's own reports can distinguish first calls from repeat callers."}
+      ${link("d-demand","See the demand evidence")}.</p>`});
+    else if (diag.ratio < 1.47) oks.push(`Demand and delivery are comparatively well matched
+      (${diag.ratio.toFixed(2)} contacts per appointment, below the national 1.47).`);
+  }
+  // 4. calls ended within the IVR
+  if (diag.ivr != null && diag.i75 != null && diag.ivr > diag.i75) {
+    flags.push({ pri:4, html:`
+      <p><b>Calls ended within the IVR: ${f1(diag.ivr)}% — three-quarters of practices are below
+      ${f1(diag.i75)}%.</b> The data cannot say whether these are automated self-service, redirection, or
+      callers giving up in your menus.${diag.mx != null && diag.mx > 5 ? ` In your case they cluster in the
+      8–10am rush, which is the pattern a capacity-triggered message would produce. Reviewing the recorded
+      messages your menu plays during the Monday-morning peak would establish which explanation applies.` : ""}
+      ${link("d-phones","See the phone evidence")}.</p>`});
+  }
+  // 5. Monday answering gap (only when overall answering is not already flagged)
+  if (diag.gap != null && diag.gap > 10 && !(diag.ans != null && diag.sizeAns != null && diag.ans < diag.sizeAns - 5)) {
+    flags.push({ pri:5, html:`
+      <p><b>Your Mondays fall behind: ${f1(diag.aqMon)}% of queueing calls answered against ${f1(diag.aqWed)}%
+      on Wednesdays.</b> Nearly every practice answers fewer calls on Mondays — the typical gap is 3.7 points
+      — and yours ${diag.monPattern || "is set out hour by hour in the day-of-week table"}${diag.monPattern
+        ? " (hour-by-hour figures in the day-of-week table)" : ""}. A review of Monday reception staffing
+      against Monday call volumes would establish whether cover is the constraint.
+      ${link("d-phones","See the day-of-week evidence")}.</p>`});
+  }
+  // 6. capacity context (lowest fifth for GPs per patient)
+  if (diag.gpFifth === 0) {
+    flags.push({ pri:6, html:`
+      <p><b>You are in the fifth of practices with the fewest GPs per patient.</b> In that fifth,
+      ${f1(diag.gpLowAvg)}% of patients report a good overall experience, against ${f1(diag.gpHighAvg)}% at
+      the best-staffed — the steepest gradient on this page, and the slowest to change. The operational
+      findings above should be read in that context. ${link("d-context","See what shapes these scores")}.</p>`});
+  }
+  // 7. channel option (only when deflection is flagged and online intake is in the lowest third)
+  if (flags.some(f=>f.pri===1) && diag.ocNow != null && diag.ocNow < 32) {
+    flags.push({ pri:7, html:`
+      <p><b>Your online intake is in the lowest third of practices (${f0(diag.ocNow)} submissions per 1,000
+      patients per month).</b> In the national data, moving intake online was the most common route out of
+      high told-to-contact-again figures, and it cut morning phone traffic — but it also brought net
+      additional contacts, and the share of patients reporting a good contact experience typically dipped
+      before recovering. The trade-offs are material and are set out in the evidence below.
+      ${link("d-demand","See demand and delivery")}.</p>`});
+  }
+  flags.sort((a,b)=>a.pri-b.pri);
+  const top = flags.slice(0,3), rest = flags.slice(3);
+  $("standout").innerHTML = `
+    <p class="big" style="font-size:1.15rem">What stands out for your practice</p>
+    ${top.length ? top.map(f=>`<div class="flagbox">${f.html}</div>`).join("")
+      : `<p>Nothing stands out as a priority. On the measures most strongly tied to what patients report —
+         being told to contact again, phone answering, demand against appointments — you are at or better
+         than practices like yours.</p>`}
+    ${(() => {
+      // when operational findings fire but patients' reports are at or above similar practices, say so
+      if (!top.length || !hasCell || p.satisfaction_2026 == null
+          || Number(p.satisfaction_2026) < Number(cell.m)) return "";
+      const pe26 = Number(p.phone_easy_2026);
+      const peClause = !Number.isNaN(pe26) && cell.pe != null && pe26 >= Number(cell.pe) - 2
+        ? `, and reported phone ease is at the level of similar practices (${f1(pe26)}% against ${f1(cell.pe)}%)`
+        : "";
+      return `<p><b>Set against this, your patients' feedback is good:</b> ${f1(p.satisfaction_2026)}%
+      report a good overall experience, against ${f1(cell.m)}% at similar practices${peClause}. The findings
+      above are operational; whether they matter here is a judgement the numbers alone cannot make.</p>`;
+    })()}
+    ${rest.length ? `<p class="ev">Also noted: ${rest.map((f,i)=>f.html.replace(/<\/?p>|<\/?b>/g,"")).join(" ")}</p>` : ""}
+    ${oks.length ? `<p class="okline"><b>What you are doing well:</b> ${oks.join(" ")}</p>` : ""}
+    <p class="ev">Ranked by how strongly each measure relates to patient experience across ~5,000 practices.
+    "Similar practices" means the same twenty-fifth of England's practices as yours: the same fifth for list
+    size and the same fifth for deprivation${hasCell ? ` (${f0(cell.n)} practices in your case — the cells
+    vary in size because size and deprivation are related)` : ""}. These are associations, not guarantees — the evidence for every
+    claim is in the sections below.</p>`;
 }
 </script>
 </body>
