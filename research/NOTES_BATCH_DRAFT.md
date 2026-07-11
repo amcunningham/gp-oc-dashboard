@@ -2,8 +2,8 @@
 
 Nothing here is banked. On approval: sections 4.15–4.24 append to PANEL_NOTES.md, the
 KEY_FINDINGS block goes into explore.html, the capacity amendment into the RCGP briefing,
-and this file is deleted. Three numbers from the 10 July analyses are marked [CHECK] where
-the draft was reconstructed from the session record rather than the original table.
+and this file is deleted. Three numbers from the 10 July analyses were re-derived from the raw cloud-telephony
+files on 11 July and confirmed (max IVR share corrected 91%→94%); tags removed.
 
 ---
 
@@ -11,7 +11,7 @@ the draft was reconstructed from the session record rather than the original tab
 
 > 14. About a quarter of calls to practices end in the automated phone system (IVR) before
 > reaching the hold queue — stable nationally (26–29%, Oct 2024–May 2026) but hugely variable
-> between practices (median 24%, top decile above 36%, maximum 91%). Higher IVR-ended share is
+> between practices (median 24%, top decile above 36%, maximum ~94%). Higher IVR-ended share is
 > associated with worse patient experience on every measure (phone ease −3.3pp/SD, contact
 > experience −1.8, told-to-contact-again +0.8) after adjusting for queue answering, capacity,
 > staffing, online intake, deprivation, size and region. What predicts a heavy IVR: list size
@@ -83,7 +83,7 @@ filters — ≥200 inbound, IVR<95% of inbound):
 
 | p10 | median | p90 | max |
 |---|---|---|---|
-| 14.8% | 24.0% | 35.8% | 91% [CHECK max — from 10 Jul table] |
+| 14.8% | 24.0% | 35.8% | ~94% (single practice-month outlier; p99 51%) |
 
 PREDICTORS of IVR share (one model, ~4,800): list size +2.8pp/SD; calls per patient +2.7/SD
 (reverse-causality warning: heavy IVR may suppress or inflate measured calls); non-white %
@@ -100,10 +100,10 @@ ends more calls in the IVR outside the 8–10am rush (median tilt −4.1pp) — 
 signature. About one practice in five shows the opposite, morning-heavy pattern (>5pp excess
 at 8–10). In that group the morning excess tracks demand: Monday-morning IVR share exceeds
 Wednesday-morning by 2.9pp median (under 1pp elsewhere); in the original March analysis the
-Monday premium was ~+4.9pp vs Wednesday in the 819 morning-excess practices [CHECK exact
-March values]. Mid-morning message-switching was tested and refuted: IVR rates fall after the
+Monday premium was +4.9pp (mean; median +3.4pp) vs Wednesday in the morning-excess practices
+(re-derived 11 Jul from cbt_daytime_mar26). Mid-morning message-switching was tested and refuted: IVR rates fall after the
 rush rather than rising, deflection operates at 8am itself; secondary observations: a lunch
-bump (12–14h) and an 18:00–18:30 spike of 33–36% [CHECK] within core hours. A fixed
+bump (12–14h) and an 18:00–18:30 spike of 33–36% (national pooled 34.6%) within core hours. A fixed
 prescription-line IVR has no reason to know what day it is; a message that changes when the
 day's capacity is gone does. Capacity-responsive messaging is the parsimonious mechanism —
 deflection performed by a recording, counted nationally as dealt with. Limits: outcomes
