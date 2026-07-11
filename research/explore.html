@@ -61,6 +61,7 @@
           <li><a href="https://digital.nhs.uk/data-and-information/publications/statistical/submissions-via-online-consultation-systems-in-general-practice">Online Consultation Submissions</a> — OC use, suppliers, and time-of-day of submissions</li>
           <li><a href="https://digital.nhs.uk/data-and-information/publications/statistical/cloud-based-telephony">Cloud Based Telephony</a> — call volumes and the 8–10am phone rush</li>
           <li><a href="https://gp-patient.co.uk/">GP Patient Survey 2025</a> — satisfaction, continuity, experienced access, respondent demographics</li>
+          <li><a href="https://www.england.nhs.uk/fft/friends-and-family-test-data/">Friends &amp; Family Test (GP)</a> — monthly % would-recommend per practice, Jul 2022 onward (timeliness signal between annual surveys)</li>
           <li><a href="https://digital.nhs.uk/data-and-information/publications/statistical/general-and-personal-medical-services">General Practice Workforce</a> — GP/nurse/other FTEs, registered population age</li>
           <li><a href="https://digital.nhs.uk/data-and-information/publications/statistical/nhs-payments-to-general-practice">NHS Payments to General Practice</a> — rurality, dispensing status</li>
           <li><a href="https://fingertips.phe.org.uk/">OHID Fingertips</a> — IMD deprivation, QOF points and diabetes prevalence, cancer detection/referral measures (NDRS)</li>
@@ -187,11 +188,12 @@ const TABLES = {
   rush:  "rush_both_sameday.csv",
   history: "gpps_long.parquet",
   lists: "practice_list_history.parquet",
+  fft:   "fft_gp_panel.parquet",
 };
 
 const SCHEMA_DOC = `
 You translate questions about English general practice access into DuckDB SQL.
-Four views exist (practice identifier: gp_code):
+Seven views exist (practice identifier: gp_code):
 
 xsec — one row per practice (n=6007), exposure year Apr 2024–Mar 2025 unless noted:
   gp_name, pcn_name, sub_icb_name, icb_name (e.g. 'NHS SUSSEX ICB'), postcode (e.g. 'BN14 7JL'),
@@ -273,8 +275,21 @@ lists — practice x year, April 2013–2026 (98,277 rows): gp_code, year, list_
   (registered patients, NHS Digital April snapshots). Includes since-closed practices —
   use for growth, merger and closure questions.
 
-Rules: DuckDB syntax. SELECT statements only. The six views are named exactly xsec, panel,
-waits, rush, history, lists — use these bare names in FROM; never invent file paths like
+fft — practice x month, Jul 2022-May 2026 (296k rows): gp_code, date (month-end), period
+  ('YYYYMM'), stype (supply-typology peer cluster 0-4), fft_responses, fft_pct_positive
+  (% of Friends & Family Test respondents rating the practice good/very good that month),
+  fft_pos_roll3 (that practice's 3-month rolling mean - PREFER for trends; single months are
+  noisy), peer_pos / peer_pos_roll3 (mean for the practice's stype peer group that month),
+  eng_pos / eng_pos_roll3 (England). All response-weighted.
+  TIMELINESS LAYER, NOT AN ANALYTICAL MEASURE: FFT is monthly (GPPS is annual) - use it to show a
+  practice's recent trajectory and where it sits vs 'practices like it' (same stype) and England,
+  NOT as a satisfaction predictor or in models. Self-selected, ceiling-bound (~92%), gameable;
+  ~39% of practice-months have no submission (fft_pct_positive IS NULL - show gaps, never
+  interpolate); correlates only ~0.4 with GPPS satisfaction. Starts Jul 2022 (GP FFT recommenced
+  then). JOIN xsec USING (gp_code) for place/name filters.
+
+Rules: DuckDB syntax. SELECT statements only. The seven views are named exactly xsec, panel,
+waits, rush, history, lists, fft — use these bare names in FROM; never invent file paths like
 'xsec.parquet'. Joining history or lists to xsec: JOIN ON gp_code; xsec only contains
 practices open in 2026, so closed practices appear in history/lists but not xsec.
 Always aggregate or LIMIT (max 500 rows).
@@ -340,6 +355,7 @@ const EXAMPLES = [
   "What does this data tell us about how practices choose their appointment systems?",
   "Did access satisfaction improve more in deprived areas between 2025 and 2026?",
   "Were there warning signs before practices closed over the last decade?",
+  "Show [your practice's name]'s Friends & Family Test trend since 2022 versus similar practices and England",
   "What happens to satisfaction when a practice grows rapidly by merger?",
 ];
 
