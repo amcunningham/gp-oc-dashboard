@@ -119,6 +119,7 @@ const TABLES = {
   daytime: "cbt_daytime_may.parquet",
   history: "gpps_long.parquet",
   wf: "practice_workforce_2019_latest.csv",
+  xsup: "xsec_supplement.csv",
 };
 let conn, ready = false;
 (async () => {
@@ -228,7 +229,10 @@ async function run() {
   } else {
     const matches = await all(`SELECT gp_code, gp_name, postcode, list_size FROM xsec
       WHERE gp_name ILIKE '%${raw}%' OR gp_code ILIKE '${raw.replace(/\s/g,"").toUpperCase()}%'
-      ORDER BY list_size DESC LIMIT 10`);
+      UNION ALL
+      SELECT gp_code, gp_name, '' AS postcode, list_size FROM xsup
+      WHERE gp_name ILIKE '%${raw}%' OR gp_code ILIKE '${raw.replace(/\s/g,"").toUpperCase()}%'
+      ORDER BY list_size DESC NULLS LAST LIMIT 10`);
     if (matches.length === 0) {
       $("error").textContent = "No practice matched. Try more of the name, or the six-character ODS code.";
       return;
@@ -242,16 +246,14 @@ async function run() {
     }
     lookupCode = matches[0].gp_code;
   }
-  const p = await one(`SELECT * FROM xsec WHERE gp_code = '${lookupCode}'`);
+  let p = await one(`SELECT * FROM xsec WHERE gp_code = '${lookupCode}'`);
+  let reduced = false;
   if (!p) {
-    const elsewhere = await one(`SELECT
-      (SELECT COUNT(*) FROM panel WHERE gp_code='${lookupCode}') np,
-      (SELECT COUNT(*) FROM cbt WHERE gp_code='${lookupCode}') nc`);
-    $("error").textContent = (elsewhere && (Number(elsewhere.np) > 0 || Number(elsewhere.nc) > 0))
-      ? `${lookupCode} exists in the appointment and phone data but is missing from the survey cross-section
-         this page is built on (usually a practice without a 2025 survey record, or a recent code change).
-         We cannot show its page yet — this is a known gap, not a judgement on the practice.`
-      : "No practice matched that code. Check the six-character ODS code.";
+    p = await one(`SELECT * FROM xsup WHERE gp_code = '${lookupCode}'`);
+    if (p) reduced = true;
+  }
+  if (!p) {
+    $("error").textContent = "No practice matched that code. Check the six-character ODS code.";
     return;
   }
   $("results").style.display = "block";
@@ -278,9 +280,13 @@ async function run() {
   diag.ocNow = oc && oc.onow != null ? Number(oc.onow) : null;
   const ocRamp = oc && Number(oc.o26||0) - Number(oc.o25||0) >= 100;
 
-  $("ident").innerHTML = `<span class="big">${p.gp_name}</span> (${code}, ${p.postcode})<br>
+  $("ident").innerHTML = `<span class="big">${p.gp_name}</span> (${code}${p.postcode ? ", " + p.postcode : ""})<br>
     ${f0(p.list_size)} patients · ${p.pcn_name||""} · ${p.region||""} · IMD ${f1(p.imd_score)}
-    ${smallSurvey ? ' · <span class="note">small survey sample — treat survey figures cautiously</span>' : ""}`;
+    ${smallSurvey ? ' · <span class="note">small survey sample — treat survey figures cautiously</span>' : ""}
+    ${reduced ? `<br><span class="note">This practice is missing from our main cross-section — a gap in our
+    build, not in the practice's data — so comparisons with "practices like yours" and some staffing detail
+    are unavailable below. The practice's own data and national comparisons are shown. Fix scheduled for the
+    next data refresh.</span>` : ""}`;
 
   // ---- continuity: the strongest survey correlate of overall experience ----
   const cd = await one(`SELECT MEDIAN(continuity_2026) med, QUANTILE_CONT(continuity_2026, 0.1) p10,
