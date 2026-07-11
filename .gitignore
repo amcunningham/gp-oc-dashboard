@@ -1,6 +1,7 @@
-# Raw source downloads (GPPS practice CSVs etc.) live here locally but must not be
-# committed - they are ~1.3GB and available from the publishers. Processed outputs
-# belong in research/data.
-data/
+# Raw source downloads (GPPS practice CSVs etc.) live in the TOP-LEVEL data/ folder
+# locally but must not be committed - they are ~1.3GB and available from the publishers.
+# Processed outputs belong in research/data, which is tracked.
+# (Leading slash matters: without it, git also ignores research/data.)
+/data/
 ~$*
 *.crdownload
