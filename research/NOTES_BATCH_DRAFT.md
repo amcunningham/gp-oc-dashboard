@@ -374,6 +374,31 @@ with every join a left join and every comparison degrading gracefully. Practices
 survey at all still get their operational page — which requires a practice-name source
 independent of the survey files (ODS epraccur) in the rebuild.
 
+### 4.26 Medicus joins Visiba: the invisible-supplier watch (11 Jul 2026; AMC local knowledge via N81086)
+
+N81086/Wilmslow ran Accurx at 280–320 submissions/1,000/month (among the heaviest in England)
+until May 2025, then shows "No Data" in the OC collection for twelve consecutive months —
+coinciding, per AMC, with a move to Medicus. Over the same period their weekday calls per day
+roughly halved (430→260 Mondays) and Monday queue answering rose 66.7%→81.7%: the substitution
+signature of §4.14 operating at full strength while the national collection records zero.
+The mechanism differs from Visiba's (AMC correction). Visiba is a dedicated OC platform that
+never joined the OC collection. Medicus is a core clinical system — a named, participating
+GPAD supplier alongside EMIS and TPP (GPAD May 2026: "EMIS, TPP, …, Medicus, Evergreen Life
+and Archvale") — that includes OC functionality within the core system. Wilmslow's move was a
+clinical-system migration, not an OC-platform switch, and their appointment data flowed
+uninterrupted through it. The blind spot this exposes: as core systems absorb OC functionality, that
+activity can leave the collection — the undercount growing with exactly the practices making
+the deepest digital moves. It is not structural: TPP's built-in OC (SystmConnect) reports to
+the collection and appears throughout our event studies (AMC's observation) — so core-system
+OC is onboardable, and Medicus's absence is an onboarding gap, not an impossibility. Enumerating the Medicus estate needs a supplier-per-practice source;
+check whether the GPAD practice files expose one at the 30 July release. NATIONAL SCAN:
+practices with recorded OC in Jan–Apr 2025 and ≥7 of 8 dead months Sep 2025–Apr 2026 — 18
+total, 6 of them previously ≥100/1,000 (5 ex-Accurx, 1 ex-Klinik at 323/1,000). Small so far,
+but each such practice enters every model as zero online intake while actually running a heavy
+online front door — a misclassification that attenuates OC coefficients and, at scale, would
+corrupt the national series. WATCH: recount at each OC release; the tool's transition card and
+OC covariates treat "No Data after recorded intake" as missing, not zero, from the rebuild.
+
 ---
 
 ## C. RCGP briefing capacity amendment (replaces the current bullet's final sentences)
