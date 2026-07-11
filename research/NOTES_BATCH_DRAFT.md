@@ -399,6 +399,67 @@ online front door — a misclassification that attenuates OC coefficients and, a
 corrupt the national series. WATCH: recount at each OC release; the tool's transition card and
 OC covariates treat "No Data after recorded intake" as missing, not zero, from the rebuild.
 
+### 4.27 Closure warning signs (10 Jul 2026; COMPANION SESSION — its figures, its transcript holds the tables)
+
+Event study on gpps_long 2012–2023: practices that subsequently exited show a monotone,
+widening satisfaction deficit over their final three years — −0.8pp → −2.1pp against the
+same-year national figure (p<1e-16). Their phone-ease and continuity sit ABOVE national
+(small-practice composition) but erode toward exit. This corrects an earlier "no warning
+signs" result traced to a windowing bug. (Companion session proposed this as §4.15; renumbered
+here to avoid collision with the IVR section.)
+
+### 4.28 Practices raising f2f against the national tide gained satisfaction (10 Jul 2026; COMPANION SESSION)
+
+Cohort n=884 (f2f_increaser_cohort.csv); windows Jan–Feb 2024 vs Jan–Feb 2026,
+fieldwork-aligned. Satisfaction gains robust to Δappointments/patient AND ΔGP-FTE/10k
+(corr(Δf2f, ΔGP-FTE) = −0.01 — not a staffing artefact); GP capacity retains its own separate
+positive effect. Horse race: GP-delivered f2f +0.42/SD against other-staff f2f +0.28/SD, both
+independently significant. Two-wave check (2025 vs 2026): driver set essentially unchanged
+(GP FTE +, deprivation −, size −, phone-ease dominant; same-day share a non-predictor both
+years); continuity +1.5pp nationally while has-preferred fell −0.9pp — the pool wanting
+continuity is shrinking.
+
+### 4.29 Anima/Continuum adoption DiD: selection on trajectory, not demonstrated harm (10 Jul 2026; COMPANION SESSION)
+
+Three estimators (unadjusted / adjusted / propensity-matched; did_anima_results.csv). Matched
+DiD suggested worse satisfaction/access/continuity, BUT parallel trends fail: adopters were
+already declining pre-adoption (satisfaction PRE −1.6 vs POST −0.9; continuity PRE −1.9 vs
+POST −2.8). Honest read: selection on trajectory; no demonstrated satisfaction harm;
+continuity may take an incremental hit on an already-falling path. Adopter flag
+(latest-month Continuum) likely misclassifies mixed-supplier practices — supplier-field
+opacity again (cf. §4.26).
+
+### 4.30 Workforce panel data note (10 Jul 2026; COMPANION SESSION)
+
+workforce_panel.{csv,parquet}: per-practice GP/nurse/DPC/admin FTE + patients, 32 quarters
+2018–2026, 7,352 practices. CAVEAT: its gp_fte is TOTAL GP FTE (including registrars and
+locums); fully-qualified (EXRL) is captured only for 2018 (NHS renamed the column). National
+total GP FTE/10k rose 4.8→6.0 over the panel — registrar-driven, consistent with §4.21. This
+file is DISTINCT from practice_workforce_2019_latest.csv (used for §4.21's fully-qualified/
+trainee split); do not mix their GP definitions.
+
+---
+
+## D. The 30 July 2026 rebuild list (consolidated, both sessions)
+
+1. Rebuild xsec_master survey-first with left joins, reading the PARQUET panel (never the
+   CSV); recovers the 96/159 orphaned practices (§4.25); add an ODS-derived practice-name
+   source so no-survey practices still render on mypractice.html.
+2. Rerun the predictors-page models on the rebuilt cross-section; refresh all page tables.
+3. OC covariates and the tool's transition card: treat "No Data after recorded intake" as
+   missing, never zero (§4.26); check whether GPAD practice files expose supplier-per-practice
+   to enumerate the Medicus estate; recount the vanished-practice scan.
+4. CBT June edition: practice-level call-waiting times → phones card, summary, and the test
+   the phone-ease size gap is waiting for (§4.23); first contract-quarter read.
+5. GPAD June edition: contract metrics at practice level (clinically-urgent same-day,
+   non-urgent within 7/14 days) → candidate tool measures.
+6. Ingest hygiene (companion session): fold website_easy/app_easy/deflection_2025/
+   couldnt_contact_2025 into ingest_gpps2026.py's QSET and dedupe the two ingest versions
+   before any re-run; optional EXRL (fully-qualified) column mapping post-2018 in
+   workforce_panel; optional exact *_basew weighting for explorer benchmarks.
+7. README: one-line description for adoption_risk_2027.csv (now deliberately public).
+8. Re-run the §4.14 substitution analysis with waiting-time outcomes (standing diary item).
+
 ---
 
 ## C. RCGP briefing capacity amendment (replaces the current bullet's final sentences)
