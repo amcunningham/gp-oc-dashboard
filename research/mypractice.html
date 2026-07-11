@@ -54,7 +54,7 @@
   </div>
   <p class="sub">Type your practice's ODS code (e.g. A81001) or part of its name. Everything shown comes from
   published NHS England and GP Patient Survey data — nothing is uploaded, and queries run entirely in your
-  browser. Where the data allows, each measure is compared with the same month one year earlier. Companion to
+  browser. Where the data allows, each measure is compared with the year before. Companion to
   <a href="explore.html">the plain-English data explorer</a>; analysis notes in
   <a href="PANEL_NOTES.md">PANEL_NOTES.md</a>. All comparisons are associations across ~5,000 practices,
   not predictions for yours.</p>
@@ -96,12 +96,15 @@
       is under 50 responses). "Calls ended within the IVR" blends automated self-service, redirection to other
       channels, and callers giving up in the menus — published data cannot distinguish them. Phone measures
       cover only practices whose telephony supplier submits to the national collection (85.4% of open
-      practices in May 2026; coverage a year earlier was smaller, so some practices have no May 2025
+      practices in May 2026; coverage a year earlier was smaller, so some practices have no 2025
       comparison). Appointment counts reflect what is recorded in appointment books, not total workload.
       NHS England flagged May 2026 online-consultation submissions as incomplete for five suppliers (Blinx,
       Evergreen Life, iPlato, Silicon Practice, PATCHS), so online contact counts may be undercounted for
-      some practices. Sources: Cloud Based Telephony (May 2025, May 2026), Online Consultation Submissions,
-      Appointments in General Practice, GP Patient Survey 2012–2026. Evidence for each claim:
+      some practices. Sources: Cloud Based Telephony (phone measures average March–May of each year;
+      April 2025 is not in the published collection), Online Consultation Submissions,
+      Appointments in General Practice, GP Patient Survey 2012–2026, GP Workforce census (March 2025),
+      Patients Registered at a GP Practice (1 July 2026 snapshot — the registered-population figure used
+      throughout this page). Evidence for each claim:
       <a href="predictors.html">the models behind this page</a> and PANEL_NOTES.md.
     </div>
   </div>
@@ -122,6 +125,7 @@ const TABLES = {
   wf: "gp_composition_mar25.csv",
   xsup: "xsec_supplement.csv",
   waits: "waits_panel.parquet",
+  lst: "list_jul26.csv",   // registered patients, 1 July 2026 snapshot (NHS England)
 };
 let conn, ready = false;
 (async () => {
@@ -145,27 +149,36 @@ let conn, ready = false;
     if (failed.length) {
       $("error").textContent = "Some data files failed to load — related sections will be blank.\n" + failed.join("\n");
     }
-    // shared national phone benchmark: May 2026 with May 2025 comparison where available.
-    // Filters: at least 200 inbound calls, and IVR endings below 95% of inbound (excludes
-    // implausible submissions); answer rate capped at 100.
+    // shared national phone benchmark: March–May 2026 average, with a year-before average
+    // where available (March + May 2025 — April 2025 is not in the published collection).
+    // Averaging a quarter, per user feedback, smooths single-month fluctuation from leave,
+    // rota gaps and demand spikes. Counts are summed across months, so ratios are naturally
+    // volume-weighted; mo/mo0 = months present, for converting sums to monthly averages.
+    // Filters: at least 200 inbound calls per month on average, and IVR endings below 95% of
+    // inbound (excludes implausible submissions); answer rate capped at 100.
+    // inb_may/inb_may0 keep the single-May counts for the demand card, which stays May-vs-May.
     try {
     await conn.query(`CREATE TABLE bench AS
       WITH p AS (
         SELECT gp_code,
-          MAX(CASE WHEN month='2026-05' THEN inbound END) AS inb,
-          MAX(CASE WHEN month='2026-05' THEN ivr_ended END) AS ivr,
-          MAX(CASE WHEN month='2026-05' THEN answered END) AS ans,
-          MAX(CASE WHEN month='2025-05' THEN inbound END) AS inb0,
-          MAX(CASE WHEN month='2025-05' THEN ivr_ended END) AS ivr0,
-          MAX(CASE WHEN month='2025-05' THEN answered END) AS ans0
-        FROM cbt WHERE month IN ('2025-05','2026-05') GROUP BY 1)
-      SELECT gp_code, inb, inb0,
+          SUM(CASE WHEN month LIKE '2026-%' THEN inbound END) AS inb,
+          SUM(CASE WHEN month LIKE '2026-%' THEN ivr_ended END) AS ivr,
+          SUM(CASE WHEN month LIKE '2026-%' THEN answered END) AS ans,
+          COUNT(CASE WHEN month LIKE '2026-%' THEN 1 END) AS mo,
+          SUM(CASE WHEN month LIKE '2025-%' THEN inbound END) AS inb0,
+          SUM(CASE WHEN month LIKE '2025-%' THEN ivr_ended END) AS ivr0,
+          SUM(CASE WHEN month LIKE '2025-%' THEN answered END) AS ans0,
+          COUNT(CASE WHEN month LIKE '2025-%' THEN 1 END) AS mo0,
+          MAX(CASE WHEN month='2026-05' THEN inbound END) AS inb_may,
+          MAX(CASE WHEN month='2025-05' THEN inbound END) AS inb_may0
+        FROM cbt WHERE month IN ('2026-03','2026-04','2026-05','2025-03','2025-05') GROUP BY 1)
+      SELECT gp_code, inb, inb0, mo, mo0, inb_may, inb_may0,
         100.0*ivr/inb AS ivr_share, LEAST(100.0*ans/(inb-ivr),100) AS ans_queue,
-        CASE WHEN inb0>=200 AND ivr0<0.95*inb0 THEN 100.0*ivr0/inb0 END AS ivr_share0,
-        CASE WHEN inb0>=200 AND ivr0<0.95*inb0 THEN LEAST(100.0*ans0/(inb0-ivr0),100) END AS ans_queue0,
+        CASE WHEN mo0>0 AND inb0>=200*mo0 AND ivr0<0.95*inb0 THEN 100.0*ivr0/inb0 END AS ivr_share0,
+        CASE WHEN mo0>0 AND inb0>=200*mo0 AND ivr0<0.95*inb0 THEN LEAST(100.0*ans0/(inb0-ivr0),100) END AS ans_queue0,
         PERCENT_RANK() OVER (ORDER BY LEAST(100.0*ans/(inb-ivr),100)) AS ans_pct,
         PERCENT_RANK() OVER (ORDER BY 100.0*ivr/inb) AS ivr_pct
-      FROM p WHERE inb>=200 AND ivr<0.95*inb`);
+      FROM p WHERE inb>=200*mo AND ivr<0.95*inb`);
     } catch (err) {
       failed.push("phone benchmark: " + (err && err.message || err));
       $("error").textContent = "Some data failed to load — related sections will be blank.\n" + failed.join("\n");
@@ -244,11 +257,13 @@ async function run() {
   if (isCode) {
     lookupCode = raw.replace(/\s/g,"").toUpperCase();
   } else {
-    const matches = await all(`SELECT gp_code, gp_name, postcode, list_size FROM xsec
-      WHERE gp_name ILIKE '%${raw}%' OR gp_code ILIKE '${raw.replace(/\s/g,"").toUpperCase()}%'
+    const matches = await all(`SELECT x.gp_code, x.gp_name, x.postcode, COALESCE(l.list_jul26, x.list_size) AS list_size
+      FROM xsec x LEFT JOIN lst l USING(gp_code)
+      WHERE x.gp_name ILIKE '%${raw}%' OR x.gp_code ILIKE '${raw.replace(/\s/g,"").toUpperCase()}%'
       UNION ALL
-      SELECT gp_code, gp_name, '' AS postcode, list_size FROM xsup
-      WHERE gp_name ILIKE '%${raw}%' OR gp_code ILIKE '${raw.replace(/\s/g,"").toUpperCase()}%'
+      SELECT s.gp_code, s.gp_name, '' AS postcode, COALESCE(l.list_jul26, s.list_size) AS list_size
+      FROM xsup s LEFT JOIN lst l USING(gp_code)
+      WHERE s.gp_name ILIKE '%${raw}%' OR s.gp_code ILIKE '${raw.replace(/\s/g,"").toUpperCase()}%'
       ORDER BY list_size DESC NULLS LAST LIMIT 10`);
     if (matches.length === 0) {
       $("error").textContent = "No practice matched. Try more of the name, or the six-character ODS code.";
@@ -273,6 +288,15 @@ async function run() {
     $("error").textContent = "No practice matched that code. Check the six-character ODS code.";
     return;
   }
+  // Registered population: prefer the current NHS snapshot (1 July 2026) over the
+  // 2024/25 average that the analysis dataset carries. All rates and size-fifth
+  // placements on this page then use the current list.
+  p.list_2425 = p.list_size;
+  let listIsCurrent = false;
+  try {
+    const lj = await one(`SELECT list_jul26 FROM lst WHERE gp_code='${lookupCode}'`);
+    if (lj && lj.list_jul26 != null) { p.list_size = Number(lj.list_jul26); listIsCurrent = true; }
+  } catch { /* list file missing: fall back to the 2024/25 average */ }
   $("results").style.display = "block";
   const code = p.gp_code;
   const smallSurvey = Number(p.gpps_n_2026) < 50;
@@ -283,10 +307,12 @@ async function run() {
   if (p.list_size != null && p.imd_score != null) {
     cell = await one(`WITH s AS (
         SELECT satisfaction_2026 sat, access_satisfaction_2026 acc, phone_easy_2026 pe,
-          deflection_2026 d, continuity_2026 cont, has_pref_hcp_2026 hp, list_size, imd_score,
-          NTILE(5) OVER (ORDER BY list_size) sq, NTILE(5) OVER (ORDER BY imd_score) iq
-        FROM xsec WHERE satisfaction_2026 IS NOT NULL AND gpps_n_2026>=30
-          AND list_size IS NOT NULL AND imd_score IS NOT NULL),
+          deflection_2026 d, continuity_2026 cont, has_pref_hcp_2026 hp,
+          COALESCE(l.list_jul26, x.list_size) AS list_size, imd_score,
+          NTILE(5) OVER (ORDER BY COALESCE(l.list_jul26, x.list_size)) sq, NTILE(5) OVER (ORDER BY imd_score) iq
+        FROM xsec x LEFT JOIN lst l USING(gp_code)
+        WHERE satisfaction_2026 IS NOT NULL AND gpps_n_2026>=30
+          AND COALESCE(l.list_jul26, x.list_size) IS NOT NULL AND imd_score IS NOT NULL),
       ms AS (SELECT COALESCE(MIN(sq),5) v FROM (SELECT sq, MAX(list_size) hi FROM s GROUP BY sq) WHERE hi >= ${Number(p.list_size)}),
       mi AS (SELECT COALESCE(MIN(iq),5) v FROM (SELECT iq, MAX(imd_score) hi FROM s GROUP BY iq) WHERE hi >= ${Number(p.imd_score)})
       SELECT AVG(sat) m, AVG(acc) a, AVG(pe) pe, AVG(d) d, AVG(cont) c, AVG(hp) hp, COUNT(*) n
@@ -303,7 +329,10 @@ async function run() {
   const ocRamp = oc && Number(oc.o26||0) - Number(oc.o25||0) >= 100;
 
   $("ident").innerHTML = `<span class="big">${p.gp_name}</span> (${code}${p.postcode ? ", " + p.postcode : ""})<br>
-    ${f0(p.list_size)} patients · ${p.pcn_name||""} · ${p.region||""} · IMD ${f1(p.imd_score)}
+    ${f0(p.list_size)} patients ${listIsCurrent
+      ? '<span class="note">(NHS registration snapshot, 1 July 2026)</span>'
+      : '<span class="note">(2024/25 average — no entry for this practice in the July 2026 NHS registration snapshot)</span>'}
+    · ${p.pcn_name||""} · ${p.region||""} · IMD ${f1(p.imd_score)}
     ${smallSurvey ? ' · <span class="note">small survey sample — treat survey figures cautiously</span>' : ""}
     ${reduced ? `<br><span class="note">This practice is missing from our main cross-section (a gap in our
     build, not in the practice's data), so a few details are unavailable: the told-to-contact-again measure,
@@ -354,7 +383,7 @@ async function run() {
     $("continuity").innerHTML = "<p>No 2026 continuity figures for this practice.</p>";
   }
 
-  // ---- phones: May 2026 vs May 2025 vs national, with distribution lines ----
+  // ---- phones: Mar–May 2026 average vs year before vs national, with distribution lines ----
   const b = await one(`SELECT * FROM bench WHERE gp_code='${code}'`);
   const nat = await one(`SELECT MEDIAN(ans_queue) mq, MEDIAN(ivr_share) mi,
     MEDIAN(ans_queue0) mq0, MEDIAN(ivr_share0) mi0,
@@ -363,11 +392,15 @@ async function run() {
     QUANTILE_CONT(ivr_share, 0.75) i75 FROM bench`);
   if (b) {
     const noPrior = b.ans_queue0 == null;
-    const cv = await one(`SELECT MEDIAN(1000.0*b.inb/x.list_size) m26, MEDIAN(1000.0*b.inb0/x.list_size) m25
-      FROM bench b JOIN xsec x USING(gp_code) WHERE x.list_size > 0`);
+    const cv = await one(`SELECT MEDIAN(1000.0*b.inb/b.mo/COALESCE(l.list_jul26, x.list_size)) m26,
+        MEDIAN(1000.0*b.inb0/b.mo0/COALESCE(l.list_jul26, x.list_size)) m25
+      FROM bench b JOIN xsec x USING(gp_code) LEFT JOIN lst l USING(gp_code)
+      WHERE COALESCE(l.list_jul26, x.list_size) > 0`);
     // typical practice of the same size (same fifth of England by list size, placed by value)
     const sz = p.list_size == null ? null : await one(`WITH s AS (
-        SELECT gp_code, list_size, NTILE(5) OVER (ORDER BY list_size) qt FROM xsec WHERE list_size IS NOT NULL),
+        SELECT x.gp_code, COALESCE(l.list_jul26, x.list_size) AS list_size,
+          NTILE(5) OVER (ORDER BY COALESCE(l.list_jul26, x.list_size)) qt
+        FROM xsec x LEFT JOIN lst l USING(gp_code) WHERE COALESCE(l.list_jul26, x.list_size) IS NOT NULL),
       me AS (SELECT COALESCE(MIN(qt),5) v FROM (SELECT qt, MAX(list_size) hi FROM s GROUP BY qt) WHERE hi >= ${Number(p.list_size)})
       SELECT MEDIAN(bb.ans_queue) sa, MEDIAN(bb.ivr_share) si, ANY_VALUE(s.qt) qt, COUNT(*) n
       FROM bench bb JOIN s ON s.gp_code=bb.gp_code WHERE s.qt = (SELECT v FROM me)`);
@@ -384,20 +417,23 @@ async function run() {
       automated menu stage (the IVR — answered by a recorded message, redirected to another service, or
       abandoned by the caller), or it joins the queue to speak to a person. Of the calls that join the queue,
       some are answered and some are given up on or end while waiting.</p>
+      <p>Figures are averaged over March–May of each year, so that one month of staff leave, a rota gap or
+      a demand spike does not colour the whole picture. (The 2025 column averages March and May only —
+      April 2025 is not in the published collection.)</p>
       <table>
-      <tr><th></th><th class="num">Your practice<br>May 2025</th><th class="num">Your practice<br>May 2026</th>
-        <th class="num">Typical practice<br>May 2025</th><th class="num">Typical practice<br>May 2026</th></tr>
+      <tr><th></th><th class="num">Your practice<br>Mar–May 2025</th><th class="num">Your practice<br>Mar–May 2026</th>
+        <th class="num">Typical practice<br>Mar–May 2025</th><th class="num">Typical practice<br>Mar–May 2026</th></tr>
       <tr><td>Calls reaching the queue that were answered</td><td class="num">${f1(b.ans_queue0)}%</td>
         <td class="num big">${f1(b.ans_queue)}%</td><td class="num">${f1(nat.mq0)}%</td><td class="num">${f1(nat.mq)}%</td></tr>
       <tr><td>Calls ended within the IVR (before the queue)</td><td class="num">${f1(b.ivr_share0)}%</td>
         <td class="num big">${f1(b.ivr_share)}%</td><td class="num">${f1(nat.mi0)}%</td><td class="num">${f1(nat.mi)}%</td></tr>
-      <tr><td>Calls received per 1,000 patients</td>
-        <td class="num">${b.inb0 != null && p.list_size > 0 ? f0(1000*Number(b.inb0)/Number(p.list_size)) : "–"}</td>
-        <td class="num">${p.list_size > 0 ? f0(1000*Number(b.inb)/Number(p.list_size)) : "–"}</td>
+      <tr><td>Calls received per 1,000 patients per month</td>
+        <td class="num">${b.inb0 != null && b.mo0 > 0 && p.list_size > 0 ? f0(1000*Number(b.inb0)/Number(b.mo0)/Number(p.list_size)) : "–"}</td>
+        <td class="num">${p.list_size > 0 ? f0(1000*Number(b.inb)/Number(b.mo)/Number(p.list_size)) : "–"}</td>
         <td class="num">${f0(cv ? cv.m25 : null)}</td><td class="num">${f0(cv ? cv.m26 : null)}</td></tr>
       </table>
-      ${noPrior ? '<p class="ev">No May 2025 figures for your practice — your supplier joined the national collection later.</p>' : ""}
-      <p>The lines below show where you sit among all ~4,900 practices in May 2026. The bar covers the middle
+      ${noPrior ? '<p class="ev">No 2025 figures for your practice — your supplier joined the national collection later.</p>' : ""}
+      <p>The lines below show where you sit among all ~4,900 practices over March–May 2026. The bar covers the middle
       80% of practices, the vertical line marks the typical practice${hasSz ? `, and the
       <span class="note">◆</span> is the typical practice of your size (the ${szName})` : ""}.</p>
       <p><b>Calls answered from the queue.</b> You answered ${f1(b.ans_queue)}%${hasSz ? `; the typical
@@ -541,8 +577,8 @@ async function run() {
 
   // ---- demand vs delivery: May 2026 with May 2025 comparison ----
   const dd = await one(`
-    SELECT b.inb*1.0 AS calls, COALESCE(pn.oc_rate_1k,0)*${Number(p.list_size)||0}/1000 AS oc_subs, pn.total AS appts,
-           b.inb0*1.0 AS calls0, COALESCE(pn0.oc_rate_1k,0)*COALESCE(pn0.list_size,${Number(p.list_size)||0})/1000 AS oc_subs0,
+    SELECT b.inb_may*1.0 AS calls, COALESCE(pn.oc_rate_1k,0)*${Number(p.list_size)||0}/1000 AS oc_subs, pn.total AS appts,
+           b.inb_may0*1.0 AS calls0, COALESCE(pn0.oc_rate_1k,0)*COALESCE(pn0.list_size,${Number(p.list_size)||0})/1000 AS oc_subs0,
            pn0.total AS appts0
     FROM panel pn
     LEFT JOIN bench b ON b.gp_code=pn.gp_code
@@ -597,21 +633,26 @@ async function run() {
       10000.0*admin_fte/${Number(p.list_size)||1} AS a10k,
       registrar_fte AS rg_fte
     FROM wf WHERE gp_code='${code}'`);
-  const capNat = await one(`WITH j AS (
-      SELECT 10000.0*(w.partner_fte + w.salaried_fte + w.locum_fte + w.registrar_fte + w.foundation_other_fte)/x.list_size gp10k,
-             10000.0*w.partner_fte/x.list_size pt10k, 10000.0*w.salaried_fte/x.list_size sa10k,
-             10000.0*w.locum_fte/x.list_size lo10k, 10000.0*w.registrar_fte/x.list_size rg10k,
-             10000.0*w.foundation_other_fte/x.list_size fo10k,
-             10000.0*w.nurse_fte/x.list_size n10k, 10000.0*w.dpc_fte/x.list_size d10k,
-             10000.0*w.admin_fte/x.list_size a10k, x.appts_percap ap1k
-      FROM wf w JOIN xsec x USING(gp_code) WHERE x.list_size > 0)
+  const capNat = await one(`WITH j0 AS (
+      SELECT w.*, COALESCE(l.list_jul26, x.list_size) AS ls, x.appts_percap
+      FROM wf w JOIN xsec x USING(gp_code) LEFT JOIN lst l USING(gp_code)
+      WHERE COALESCE(l.list_jul26, x.list_size) > 0),
+    j AS (
+      SELECT 10000.0*(partner_fte + salaried_fte + locum_fte + registrar_fte + foundation_other_fte)/ls gp10k,
+             10000.0*partner_fte/ls pt10k, 10000.0*salaried_fte/ls sa10k,
+             10000.0*locum_fte/ls lo10k, 10000.0*registrar_fte/ls rg10k,
+             10000.0*foundation_other_fte/ls fo10k,
+             10000.0*nurse_fte/ls n10k, 10000.0*dpc_fte/ls d10k,
+             10000.0*admin_fte/ls a10k, appts_percap ap1k
+      FROM j0)
     SELECT MEDIAN(gp10k) mgp, MEDIAN(pt10k) mpt, MEDIAN(sa10k) msa, MEDIAN(lo10k) mlo, MEDIAN(rg10k) mrg,
            MEDIAN(fo10k) mfo, MEDIAN(n10k) mn, MEDIAN(d10k) md, MEDIAN(a10k) ma, MEDIAN(ap1k) mapp FROM j`);
   // staffing medians among practices like yours (same size and deprivation fifths, value-placed)
   const capCell = (p.list_size == null || p.imd_score == null) ? null : await one(`WITH s AS (
-      SELECT gp_code, list_size, imd_score, appts_percap,
-        NTILE(5) OVER (ORDER BY list_size) sq, NTILE(5) OVER (ORDER BY imd_score) iq
-      FROM xsec WHERE list_size IS NOT NULL AND imd_score IS NOT NULL),
+      SELECT x.gp_code, COALESCE(l.list_jul26, x.list_size) AS list_size, imd_score, appts_percap,
+        NTILE(5) OVER (ORDER BY COALESCE(l.list_jul26, x.list_size)) sq, NTILE(5) OVER (ORDER BY imd_score) iq
+      FROM xsec x LEFT JOIN lst l USING(gp_code)
+      WHERE COALESCE(l.list_jul26, x.list_size) IS NOT NULL AND imd_score IS NOT NULL),
     ms AS (SELECT COALESCE(MIN(sq),5) v FROM (SELECT sq, MAX(list_size) hi FROM s GROUP BY sq) WHERE hi >= ${Number(p.list_size)}),
     mi AS (SELECT COALESCE(MIN(iq),5) v FROM (SELECT iq, MAX(imd_score) hi FROM s GROUP BY iq) WHERE hi >= ${Number(p.imd_score)})
     SELECT MEDIAN(10000.0*(w.partner_fte + w.salaried_fte + w.locum_fte + w.registrar_fte + w.foundation_other_fte)/s.list_size) cgp,
@@ -627,7 +668,7 @@ async function run() {
     const isTraining = Number(capMe.rg_fte) > 0.25;
     $("capacity").innerHTML = `
       <p><b>The capacity that demand meets.</b> Staffing from the March 2025 workforce census, per 10,000
-      registered patients; appointments from May 2026. GPs are shown by contract type, because who the GPs
+      registered patients (using the 1 July 2026 registered list); appointments from May 2026. GPs are shown by contract type, because who the GPs
       are matters as well as how many: partners carry the strongest link with patients seeing their
       preferred clinician (<a href="predictors.html">the models behind this page</a>).</p>
       <table>
@@ -658,7 +699,9 @@ async function run() {
       </table>
       <p class="ev">Staffing figures are rates, not headcounts: at your list size of ${f0(p.list_size)},
       1.0 FTE per 10,000 equals ${f1(Number(p.list_size)/10000)} whole-time staff. Small practices
-      naturally show higher rates — one partner across a small list is a large number per 10,000.</p>
+      naturally show higher rates — one partner across a small list is a large number per 10,000.
+      The staffing count is 15 months older than the list it is divided by, so a practice that has
+      recruited or lost staff since March 2025 will look different from these figures.</p>
       <p class="ev">In the combined models: partners' association with experience runs largely through
       continuity; salaried GPs carry a direct association of similar size; regular locums show no
       relationship either way (note: ad-hoc locums are not published at practice level, so sessional cover

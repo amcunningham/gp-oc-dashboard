@@ -516,6 +516,11 @@ capacity card now shows each practice its GP mix vs the typical practice.
    practice level; re-derive the model training flag as ST-registrar-only (67 practices
    reclassify; effect on coefficients expected negligible but must be verified).
    (Similar-practices staffing column: done same day.)
+10. Refresh research/data/list_jul26.csv from the monthly Patients Registered publication at
+    each rebuild (it is a 1st-of-month snapshot; the filename should probably become
+    list_current.csv with a date column so the page label can be generated, not hard-coded).
+11. Consider the March–May averaging window for the CBT terms in the predictors models too
+    (the page benchmark now averages the quarter; the models still use single-May inputs).
 
 ## E. First user feedback (11 Jul 2026, via AMC) — and actions
 
@@ -529,6 +534,23 @@ with the honest note that per-clinician waits are unpublished so the continuity-
 trade-off is invisible in national data. Deferred to the rebuild (D.9): census vintage,
 similar-practices staffing comparators, FFT evaluation, waits × continuity. The feedback
 channel works.
+
+Second round (11 Jul 2026, same practice + A82071), actioned same day: **registered
+population was stale and unlabelled** — the page showed the 2024/25 exposure-year *average*
+list (A82071: 4,216 shown vs 4,099 registered on 1 July 2026 — "about 100 less", exactly as
+the practice said). Fix: research/data/list_jul26.csv (6,139 practices, NHS Patients
+Registered snapshot, 1 July 2026) is now the registered-population figure everywhere on the
+page — identity line (with source and date shown), staffing rates, calls per 1,000, and all
+size-fifth placements including peers' (COALESCE to the 24/25 average for the 21 practices
+absent from the snapshot). The 15-month gap between the March 2025 staffing numerator and the
+July 2026 list denominator is stated on the capacity card. **Phone measures were single-month
+(May)** — one clinician's leave or a rota gap coloured the whole card. Fix: the phone
+benchmark now averages March–May of each year (counts summed, so ratios are volume-weighted;
+eligibility ≥200 inbound/month on average; n=4,930, of which 3,088 have a year-before
+average). April 2025 is not in the published collection, so the 2025 column is a
+March+May average — stated on the card. The day-of-week card stays May-only (it is about
+within-week pattern); the demand card stays May-vs-May (its appointment and OC comparators
+are May); the predictors models still use single-May CBT inputs (D.11).
 
 ---
 
