@@ -1021,3 +1021,47 @@ month.
 DIARY: 30 Jul 2026 - CBT June edition adds the two contract call-waiting metrics with
 practice-level time series; next OC release same week. Re-run substitution with waiting-time
 outcomes; first contract-quarter read.
+
+## 4.15 Warning signs before practice exit: a pre-closure satisfaction slide (11 Jul 2026)
+
+Event study on gpps_long (2012-2023 per-practice satisfaction/phone/continuity). 1,987 practices
+exited (last year present < 2023; closure OR merger OR sub-threshold). Gap vs same-year national
+approaching exit: satisfaction -0.8 (t-3) -> -0.6 -> -1.4 -> -2.1 (final year, p<1e-16) — a monotone,
+widening deficit. Phone (+3.3->+1.6) and continuity (+2.8->+0.9) sit ABOVE national throughout
+(exiters are small; small = easier phones / better continuity) but erode toward exit. The satisfaction
+slide runs AGAINST the small-practice advantage, so it is robust. Corrects an LLM "no warning signs"
+result that was a windowing bug: the national mean was computed AFTER the group filter, so each group's
+gap was a deviation from its own mean -> 0.0 by construction (survivors ~= national ~= 0). Complements
+closure_exposed (neighbour-shock, sec 4-ish / line ~266): this is the exiting practice's OWN trajectory.
+Consistent with the 2025->2026 spot check (gone-by-2026 practices -4.1pp satisfaction, p=0.02).
+Caveats: exit pools closure/merger/list-recode; population-level signal, not an individual predictor;
+gpps_long has no list size (size inferred).
+
+## 4.16 Friends & Family Test monthly layer (11 Jul 2026)
+
+Built fft_gp_panel (296k practice-months, 6,502 practices, Jul 2022-May 2026) from the monthly GP FFT
+xlsm files (england.nhs.uk; scripts/fetch_fft.py pulls 47 months, layout-robust parser). Per practice:
+fft_pct_positive (% would-recommend), fft_responses, fft_pos_roll3 (3-mo rolling); peer line =
+same size-fifth x IMD-fifth over xsec UNION xsec_supplement (so supplement practices get a peer);
+eng line; all response-weighted. DELIBERATELY OUT of the analytical model: self-selected, ceiling-bound
+(England ~92%), gameable, ~39% of practice-months non-submission (nulls kept as gaps, never interpolated),
+correlates only ~0.4 with GPPS satisfaction (0.45 at >=50 responses). Use = timeliness/monitoring between
+annual GPPS waves. England %positive 87.2 (Jul22) -> 92.3 (May26), mirroring the GPPS access recovery.
+Surfaced in explore.html (fft view + schema paragraph) and mypractice.html (SVG trend: you/similar/England).
+
+## 4.17 Data-quality findings from the reproducible cross-section rebuild (11 Jul 2026)
+
+Rebuilt the cross-section from CURRENT corrected sources (scripts/build_xsec_full.py -> data/xsec_master_rebuilt.csv;
+see XSEC_REBUILD_PROPOSAL.md). Three findings:
+1. WORKFORCE FTE DOUBLED in the live xsec_master: gp_fte / dpc_fte / admin_fte are EXACTLY 2x the corrected
+   workforce_panel (Mar 2025 — A81001: 7.41 vs true 3.71). Original build summed the workforce file's total
+   AND its component rows. So gp_per10k/nurse_per10k/etc. and any displayed staffing figure are ~2x too high;
+   standardised model coefficients are unaffected (uniform scaling) but absolute staffing is wrong.
+   FIX: use the corrected workforce_panel values (or halve).
+2. contact_fail provenance PINNED: contact_fail = deflection_2025 + couldnt_contact_2025 (Q12_3 "told to
+   contact again another day" + Q12_4 "couldn't contact at all"); corr 1.0, mean 9.9, zero diff.
+3. CROSS-SECTION BUILD GAP: ~159 practices sit in xsec_supplement rather than the main master. 126 are
+   spurious drops (incl A82071 Burnett Edgar) recoverable by rebuilding against the corrected panel_merged
+   (the original build used a stale GPAD extract); 33 legitimately fail inclusion (21 absent from the current
+   panel, 4 <=1000 appts, 8 no IMD). The rebuild reproduces 72/98 columns EXACTLY (corr 1.0); 26 columns
+   need external re-linkage (NHS Payments, Fingertips, NHSBSA EPD, ODS epraccur) — in progress; not switched over.
