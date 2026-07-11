@@ -352,15 +352,27 @@ public data, and the concrete case for Tier 2 of the practice tool.
 
 ---
 
-### 4.25 Data-quality note: 96 practices missing from the cross-section (11 Jul 2026; found via AMC's N81086 report)
+### 4.25 Data-quality incident: the corrupt panel CSV and the 96 missing practices (11 Jul 2026; found via AMC's N81086 report)
 
-xsec_master_2026 silently excludes 96 practices that have usable 2026 survey records (base
-≥30), N81086 among them (overall experience 88.8% → 81.2%, full CBT and GPAD histories) — an
-inner-join casualty in the build pipeline. All practice-level model n's are correspondingly
-~2% short, direction of any bias unknown but plausibly against newer/recoded practices. FIX
-SCHEDULED: rebuild the cross-section survey-first with left joins at the 30 July refresh and
-rerun the predictors page in the same pass. Until then mypractice.html tells affected
-practices plainly that the gap is ours, not theirs.
+xsec_master_2026 silently excludes 96 practices with usable 2026 survey records (base ≥30) —
+N81086/Wilmslow among them (overall experience 88.8% → 81.2%, full CBT and GPAD histories).
+ROOT CAUSE: build_xsec.py reads panel_merged.CSV, not the parquet. The CSV was doubly broken:
+~4,100 rows had unquoted commas in supplier names (splitting columns), and the file was stale
+and truncated — at discovery it parsed to 83,870 rows / 2,208 practices against the parquet's
+242,345 / 6,386. Practices whose exposure-window rows fell on broken lines dropped below the
+build's 1,000-appointment threshold and out of the universe. All analyses in these notes used
+the parquet directly and are unaffected; the damage is confined to cross-section membership
+(all model n's ~2% short). ACTIONS: (a) CSV regenerated from the parquet with proper quoting,
+11 Jul; (b) mypractice.html given a supplement file (xsec_supplement.csv, 159 practices from
+the raw GPPS + panel) so affected practices get a reduced page with an honest banner instead
+of an error; (c) at the 30 July rebuild, build_xsec.py switches to the parquet, the
+cross-section is rebuilt survey-first with left joins, and the predictors page reruns.
+LESSON: never maintain a CSV twin by separate writes; derive it from the parquet or not at all.
+DESIGN PRINCIPLE (AMC): absence of a survey year is never a failure condition. The rebuilt
+cross-section's universe is the union of sources (GPPS any year, GPAD, CBT, workforce, ODS),
+with every join a left join and every comparison degrading gracefully. Practices with no
+survey at all still get their operational page — which requires a practice-name source
+independent of the survey files (ODS epraccur) in the rebuild.
 
 ---
 
