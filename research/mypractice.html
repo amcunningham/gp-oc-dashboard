@@ -102,7 +102,7 @@
       Evergreen Life, iPlato, Silicon Practice, PATCHS), so online contact counts may be undercounted for
       some practices. Sources: Cloud Based Telephony (phone measures average March–May of each year;
       April 2025 is not in the published collection), Online Consultation Submissions,
-      Appointments in General Practice, GP Patient Survey 2012–2026, GP Workforce census (March 2025),
+      Appointments in General Practice, GP Patient Survey 2012–2026, GP Workforce census (31 May 2026),
       Patients Registered at a GP Practice (1 July 2026 snapshot — the registered-population figure used
       throughout this page). Evidence for each claim:
       <a href="predictors.html">the models behind this page</a> and PANEL_NOTES.md.
@@ -122,7 +122,7 @@ const TABLES = {
   cbt: "cbt_ivr_panel.csv",
   daytime: "cbt_daytime_may.parquet",
   history: "gpps_long.parquet",
-  wf: "gp_composition_mar25.csv",
+  wf: "gp_composition_may26.csv",   // 31 May 2026 workforce census; training flag = registrar in Mar 25 or May 26
   xsup: "xsec_supplement.csv",
   waits: "waits_panel.parquet",
   lst: "list_jul26.csv",   // registered patients, 1 July 2026 snapshot (NHS England)
@@ -631,7 +631,7 @@ async function run() {
       10000.0*nurse_fte/${Number(p.list_size)||1} AS n10k,
       10000.0*dpc_fte/${Number(p.list_size)||1} AS d10k,
       10000.0*admin_fte/${Number(p.list_size)||1} AS a10k,
-      registrar_fte AS rg_fte
+      training AS trn
     FROM wf WHERE gp_code='${code}'`);
   const capNat = await one(`WITH j0 AS (
       SELECT w.*, COALESCE(l.list_jul26, x.list_size) AS ls, x.appts_percap
@@ -665,10 +665,10 @@ async function run() {
     WHERE s.sq=(SELECT v FROM ms) AND s.iq=(SELECT v FROM mi)`);
   const hasCapCell = capCell && Number(capCell.n) >= 30;
   if (capMe && capNat) {
-    const isTraining = Number(capMe.rg_fte) > 0.25;
+    const isTraining = Number(capMe.trn) === 1;
     $("capacity").innerHTML = `
-      <p><b>The capacity that demand meets.</b> Staffing from the March 2025 workforce census, per 10,000
-      registered patients (using the 1 July 2026 registered list); appointments from May 2026. GPs are shown by contract type, because who the GPs
+      <p><b>The capacity that demand meets.</b> Staffing from the 31 May 2026 workforce census, per 10,000
+      registered patients (1 July 2026 registered list); appointments from May 2026. GPs are shown by contract type, because who the GPs
       are matters as well as how many: partners carry the strongest link with patients seeing their
       preferred clinician (<a href="predictors.html">the models behind this page</a>).</p>
       <table>
@@ -686,7 +686,7 @@ async function run() {
         ${hasCapCell ? `<td class="num">${f1(capCell.crg)}</td>` : ""}</tr>
       <tr><td>Foundation doctors and other training grades (FTE per 10,000)</td><td class="num">${f1(capMe.fo10k)}</td><td class="num">${f1(capNat.mfo)}</td>
         ${hasCapCell ? `<td class="num">${f1(capCell.cfo)}</td>` : ""}</tr>
-      <tr><td>Designated here as a training practice (GP registrar in post, Mar 2025)</td><td class="num">${isTraining ? "yes" : "no"}</td><td class="num">56% do</td>
+      <tr><td>Designated here as a training practice (GP registrar in post in the March 2025 or May 2026 census)</td><td class="num">${isTraining ? "yes" : "no"}</td><td class="num">61% do</td>
         ${hasCapCell ? `<td class="num"></td>` : ""}</tr>
       <tr><td>Nurses (FTE per 10,000)</td><td class="num">${f1(capMe.n10k)}</td><td class="num">${f1(capNat.mn)}</td>
         ${hasCapCell ? `<td class="num">${f1(capCell.cn)}</td>` : ""}</tr>
@@ -699,16 +699,15 @@ async function run() {
       </table>
       <p class="ev">Staffing figures are rates, not headcounts: at your list size of ${f0(p.list_size)},
       1.0 FTE per 10,000 equals ${f1(Number(p.list_size)/10000)} whole-time staff. Small practices
-      naturally show higher rates — one partner across a small list is a large number per 10,000.
-      The staffing count is 15 months older than the list it is divided by, so a practice that has
-      recruited or lost staff since March 2025 will look different from these figures.</p>
+      naturally show higher rates — one partner across a small list is a large number per 10,000.</p>
       <p class="ev">In the combined models: partners' association with experience runs largely through
       continuity; salaried GPs carry a direct association of similar size; regular locums show no
       relationship either way (note: ad-hoc locums are not published at practice level, so sessional cover
       is invisible here); and training practices score about two points higher than their staffing and
       circumstances would predict. Admin staffing does not predict better answering or better scores. We
-      infer training status from a registrar being in post in the March 2025 census, so it can be wrong in
-      either direction — if it is wrong for your practice, the feedback box at the end of your summary is
+      infer training status from a registrar being in post in either the March 2025 or the May 2026 census
+      (registrars rotate, so a single month can miss a genuine training practice), and it can still be wrong
+      in either direction — if it is wrong for your practice, the feedback box at the end of your summary is
       the place to tell us.</p>`;
   } else { $("capacity").innerHTML = "<p>No workforce data for this practice.</p>"; }
 

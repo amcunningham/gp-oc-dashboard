@@ -509,8 +509,9 @@ capacity card now shows each practice its GP mix vs the typical practice.
    workforce_panel; optional exact *_basew weighting for explorer benchmarks.
 7. README: one-line description for adoption_risk_2027.csv (now deliberately public).
 8. Re-run the §4.14 substitution analysis with waiting-time outcomes (standing diary item).
-9. From first user feedback (see E): use the LATEST monthly workforce census at each refresh
-   (it updates monthly; March 2025 is already stale for some practices); evaluate FFT monthly
+9. From first user feedback (see E): latest-census — DONE for the tool same day (31 May 2026
+   census now drives the capacity card; the *models* still use March 2025 workforce inputs and
+   should move to the latest census at the model rerun); evaluate FFT monthly
    practice data as a year-aggregated satisfaction comparator alongside GPPS; test
    waiting-time bands × continuity (the "our favourite GPs have longer waits" trade-off) at
    practice level; re-derive the model training flag as ST-registrar-only (67 practices
@@ -551,6 +552,20 @@ average). April 2025 is not in the published collection, so the 2025 column is a
 March+May average — stated on the card. The day-of-week card stays May-only (it is about
 within-week pattern); the demand card stays May-vs-May (its appointment and OC comparators
 are May); the predictors models still use single-May CBT inputs (D.11).
+
+Same day, AMC: "why are we using March 2025 staffing?" — no reason; the census is monthly.
+The capacity card now uses the **31 May 2026 census** (gp_composition_may26.csv; raw
+publication files kept locally in data/gpw_may26/, gitignored), so staffing, appointments and
+phone data share a vintage and the July 2026 list denominator is five weeks away rather than
+15 months. Training designation is now **registrar in post in either March 2025 or May 2026**
+(>0.25 FTE ST1–ST4): rotations mean a single month can miss a genuine training practice, and
+the either-rule catches 243 practices the May census alone would misclassify. National share
+under the either-rule: 61% (card updated from "56% do"). Reconciliation: practice-file FTE
+totals come in slightly under the bulletin (37,975 vs 38,821 GP FTE) because the
+practice-level CSV excludes fully-estimated records — expected, per the publication notes.
+A82071 under the new census: 0.93 partner + 0.57 salaried + 1.07 foundation FTE, no
+registrar, not training — matching the practice's own description (F1/F2 and students, no
+registrars).
 
 ---
 
