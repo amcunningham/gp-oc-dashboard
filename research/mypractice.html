@@ -206,6 +206,7 @@ const distLine = (lo, hi, b10, b90, med, sizeVal, you, label) => {
 };
 
 $("go").onclick = run;
+window.runLookup = run;
 $("q").addEventListener("keydown", e => { if (e.key==="Enter") run(); });
 // if any section throws, say so on the page instead of failing silently
 window.addEventListener("unhandledrejection", e => {
@@ -221,10 +222,38 @@ async function run() {
   const raw = esc($("q").value);
   if (!raw) return;
   const isCode = /^[A-Za-z][0-9A-Za-z]{5}$/.test(raw.replace(/\s/g,""));
-  const cond = isCode ? `gp_code = '${raw.replace(/\s/g,"").toUpperCase()}'`
-                      : `gp_name ILIKE '%${raw}%'`;
-  const p = await one(`SELECT * FROM xsec WHERE ${cond} ORDER BY list_size DESC LIMIT 1`);
-  if (!p) { $("error").textContent = "No practice matched. Try the six-character ODS code."; return; }
+  let lookupCode;
+  if (isCode) {
+    lookupCode = raw.replace(/\s/g,"").toUpperCase();
+  } else {
+    const matches = await all(`SELECT gp_code, gp_name, postcode, list_size FROM xsec
+      WHERE gp_name ILIKE '%${raw}%' OR gp_code ILIKE '${raw.replace(/\s/g,"").toUpperCase()}%'
+      ORDER BY list_size DESC LIMIT 10`);
+    if (matches.length === 0) {
+      $("error").textContent = "No practice matched. Try more of the name, or the six-character ODS code.";
+      return;
+    }
+    if (matches.length > 1) {
+      $("error").innerHTML = `<span style="color:var(--ink)">Several practices match — choose one:<br>`
+        + matches.map(m => `<a href="#" onclick="document.getElementById('q').value='${m.gp_code}';window.runLookup();return false">
+          ${m.gp_name}</a> (${m.gp_code}, ${m.postcode}, ${f0(m.list_size)} patients)`).join("<br>")
+        + `</span>`;
+      return;
+    }
+    lookupCode = matches[0].gp_code;
+  }
+  const p = await one(`SELECT * FROM xsec WHERE gp_code = '${lookupCode}'`);
+  if (!p) {
+    const elsewhere = await one(`SELECT
+      (SELECT COUNT(*) FROM panel WHERE gp_code='${lookupCode}') np,
+      (SELECT COUNT(*) FROM cbt WHERE gp_code='${lookupCode}') nc`);
+    $("error").textContent = (elsewhere && (Number(elsewhere.np) > 0 || Number(elsewhere.nc) > 0))
+      ? `${lookupCode} exists in the appointment and phone data but is missing from the survey cross-section
+         this page is built on (usually a practice without a 2025 survey record, or a recent code change).
+         We cannot show its page yet — this is a known gap, not a judgement on the practice.`
+      : "No practice matched that code. Check the six-character ODS code.";
+    return;
+  }
   $("results").style.display = "block";
   const code = p.gp_code;
   const smallSurvey = Number(p.gpps_n_2026) < 50;
