@@ -579,3 +579,140 @@ registrars).
 > three to four times larger over the same period; and seven-year staffing change predicts
 > experience durably. The 2026 improvement is operational in character; the workforce turn,
 > if sustained, is what the longer-run evidence says will consolidate it.
+
+---
+## COMPANION-SESSION ADDITIONS — pending merge into section B (from PANEL_NOTES, 11 Jul 2026)
+
+These were appended directly to PANEL_NOTES by the companion session before this draft's staging
+workflow was known; moved here for the single review. On review, RENUMBER into section B and DEDUPE:
+- '4.15 Warning signs before practice exit' overlaps the stubbed draft 4.27 (closure) -- merge, keep the table below.
+- '4.16 FFT monthly layer' is NET-NEW (no FFT section in the draft yet).
+- '4.17 data-quality / rebuild' overlaps draft 4.25/4.30 and section D -- the WORKFORCE-DOUBLING (2x) finding,
+  the contact_fail = deflection+couldnt composite, and ae_pop = ae_after_fail x contact_fail/100 are NET-NEW.
+- '4.18 / 4.18.1' (deprivation gradient; deflection-by-condition; deflection vs diversion) is NET-NEW and
+  complements draft 4.22 (which is the regression-model version) -- the individual-level equity crosstabs.
+
+## 4.15 Warning signs before practice exit: a pre-closure satisfaction slide (11 Jul 2026)
+
+Event study on gpps_long (2012-2023 per-practice satisfaction/phone/continuity). 1,987 practices
+exited (last year present < 2023; closure OR merger OR sub-threshold). Gap vs same-year national
+approaching exit: satisfaction -0.8 (t-3) -> -0.6 -> -1.4 -> -2.1 (final year, p<1e-16) — a monotone,
+widening deficit. Phone (+3.3->+1.6) and continuity (+2.8->+0.9) sit ABOVE national throughout
+(exiters are small; small = easier phones / better continuity) but erode toward exit. The satisfaction
+slide runs AGAINST the small-practice advantage, so it is robust. Corrects an LLM "no warning signs"
+result that was a windowing bug: the national mean was computed AFTER the group filter, so each group's
+gap was a deviation from its own mean -> 0.0 by construction (survivors ~= national ~= 0). Complements
+closure_exposed (neighbour-shock, sec 4-ish / line ~266): this is the exiting practice's OWN trajectory.
+Consistent with the 2025->2026 spot check (gone-by-2026 practices -4.1pp satisfaction, p=0.02).
+Caveats: exit pools closure/merger/list-recode; population-level signal, not an individual predictor;
+gpps_long has no list size (size inferred).
+
+## 4.16 Friends & Family Test monthly layer (11 Jul 2026)
+
+Built fft_gp_panel (296k practice-months, 6,502 practices, Jul 2022-May 2026) from the monthly GP FFT
+xlsm files (england.nhs.uk; scripts/fetch_fft.py pulls 47 months, layout-robust parser). Per practice:
+fft_pct_positive (% would-recommend), fft_responses, fft_pos_roll3 (3-mo rolling); peer line =
+same size-fifth x IMD-fifth over xsec UNION xsec_supplement (so supplement practices get a peer);
+eng line; all response-weighted. DELIBERATELY OUT of the analytical model: self-selected, ceiling-bound
+(England ~92%), gameable, ~39% of practice-months non-submission (nulls kept as gaps, never interpolated),
+correlates only ~0.4 with GPPS satisfaction (0.45 at >=50 responses). Use = timeliness/monitoring between
+annual GPPS waves. England %positive 87.2 (Jul22) -> 92.3 (May26), mirroring the GPPS access recovery.
+Surfaced in explore.html (fft view + schema paragraph) and mypractice.html (SVG trend: you/similar/England).
+
+## 4.17 Data-quality findings from the reproducible cross-section rebuild (11 Jul 2026)
+
+Rebuilt the cross-section from CURRENT corrected sources (scripts/build_xsec_full.py -> data/xsec_master_rebuilt.csv;
+see XSEC_REBUILD_PROPOSAL.md). Three findings:
+1. WORKFORCE FTE DOUBLED in the live xsec_master: gp_fte / dpc_fte / admin_fte are EXACTLY 2x the corrected
+   workforce_panel (Mar 2025 — A81001: 7.41 vs true 3.71). Original build summed the workforce file's total
+   AND its component rows. So gp_per10k/nurse_per10k/etc. and any displayed staffing figure are ~2x too high;
+   standardised model coefficients are unaffected (uniform scaling) but absolute staffing is wrong.
+   FIX: use the corrected workforce_panel values (or halve).
+2. contact_fail provenance PINNED: contact_fail = deflection_2025 + couldnt_contact_2025 (Q12_3 "told to
+   contact again another day" + Q12_4 "couldn't contact at all"); corr 1.0, mean 9.9, zero diff.
+3. CROSS-SECTION BUILD GAP: ~159 practices sit in xsec_supplement rather than the main master. 126 are
+   spurious drops (incl A82071 Burnett Edgar) recoverable by rebuilding against the corrected panel_merged
+   (the original build used a stale GPAD extract); 33 legitimately fail inclusion (21 absent from the current
+   panel, 4 <=1000 appts, 8 no IMD). The rebuild reproduces 72/98 columns EXACTLY (corr 1.0); 26 columns
+   need external re-linkage (NHS Payments, Fingertips, NHSBSA EPD, ODS epraccur) — in progress; not switched over.
+
+## 4.18 The deprivation gradient: deflection + diversion, and a need-vs-capacity decomposition (11 Jul 2026)
+
+Individual-level national crosstabs (GPPS analysis tool, by IMD quintile) + practice-level decomposition.
+Purpose: decide which experience items are worth showing (see 4.16/decision) AND probe the access-model equity story.
+
+DEPRIVATION-GRADIENT MAP (individual-level, most vs least deprived, GPPS 2026, all 27 questions screened):
+- Service-experience measures uniformly but MODESTLY worse in deprived (~3-7pp): website +7, contact exp +6,
+  continuity +6, reception +5, listening +5, overall exp +5, involved +5, phone/app +3, trust/info +3.
+- The BIG gaps are patient need/capability, NOT service: confidence to self-manage +13 (71 v 84),
+  enough support to manage conditions +11 (64 v 75), conditions-limit-daily-life -18 (71 v 53; more in
+  deprived = the morbidity gradient itself).
+- Mental wellbeing (Q26) FLAT (75 v 75) -- cross-validates the practice-level r=-0.03; the one experience
+  item not deprivation-confounded (see 4.16: the fair item to feature).
+- Reversed: appointment-was-remote HIGHER in deprived (29 v 23) -- deprived get more remote, less f2f.
+- Dental strongly inverse-care (got appt +9, experience +8) -- pattern spans services the GP does not run,
+  supporting the pharmacy/dental-as-respondent-disposition control idea.
+
+DEFLECTION + DIVERSION (practice-level, by IMD quintile): "booked an appointment" is FLAT (72->73, r+0.05)
+despite ~1.5x morbidity. The shortfall is rationed two ways, BOTH ~doubling with deprivation:
+  DIVERSION (told pharmacy/111/urgent care) 6.5 -> 13.5% (r +0.37);
+  DEFLECTION (told to contact the practice again another day) 5.0 -> 9.8% (r +0.31).
+Combined deflect+divert 11.5 -> 23.3% (least -> most deprived). Self-care advice 12.6->16.2, prescribing
+19.5->24.1 also rise. Least-deprived diversion is likely OFF-survey (private care), so the true gradient is
+if anything understated.
+
+NEED-vs-CAPACITY DECOMPOSITION of deflection (practice-level, n=5,558): corr(deflection, deprivation)=+0.30,
+corr(deflection, diabetes prevalence)=+0.25 (deprivation~morbidity 0.49). BOTH survive partialling:
+morbidity|deprivation +0.13, deprivation|morbidity +0.21. Joint standardised model: deprivation +1.11,
+morbidity +1.06, GP-FTE/10k -0.61, appts-per-capita -0.83. => deflection is the pressure valve that opens
+when NEED (morbidity + deprivation, each independent) outruns CAPACITY (GPs, appointments). ECOLOGICAL
+caveat: cannot show whether LTC patients THEMSELVES are deflected vs the practice deflecting everyone when
+swamped -- needs the individual crosstab Q12 x deprivation x LTC status (Q38/Q41). PENDING.
+
+NEED vs SUPPLY context (practice-level, by IMD quintile): diabetes 6.7->10.0% (1.5x) but appts/capita 1.01x
+and GP-FTE/10k 0.89x (corrected) -- supply flat/lower where need highest. Deprived populations are YOUNGER
+(65+ 22->13%) yet SICKER. Equal provision for unequal need = the inverse care law. And deprived PRACTICES do
+MORE care planning (Q44/Q45 reversed at practice level, QOF-driven) yet deprived PATIENTS report LESS
+confidence/support (Q42/Q43): more activity, still less met need.
+
+NOVELTY: the general inverse-care-law-in-general-practice literature is deep (Tudor Hart 1971; Mercer/Watt
+Deep End; Health Foundation "Tackling the inverse care law"; consultation-length BJGP 2021). Under-explored
+and likely novel here: the DEFLECTION metric (GPPS Q12, added only in the 2024 questionnaire redesign)
+quantified by deprivation; the paired deflection+diversion mechanism; and pharmacy/dental ratings as a
+respondent-disposition control for GP satisfaction (practice GP-sat correlates +0.27/+0.37 net of deprivation
+with pharmacy/OOH -- a ~halo component the practice does not control). VERIFY with a proper scoping search
+before claiming novelty in the briefing/a paper.
+
+## 4.18.1 Deflection is need-targeted; diversion is not (individual-level, 11 Jul 2026) — RESOLVES the 4.18 pending item
+
+GPPS analysis-tool crosstabs, national, exact rates computed from count/base (the tool rounds display to
+1dp; bases are tens of thousands per cell -> reliable). "Deflection" = Q12 "told to contact the practice
+again another day". "Diversion" = Q14 told pharmacy + 111/other NHS + urgent care.
+
+DEFLECTION x deprivation x NEED — the sickest, in the poorest areas, are deflected most, and the need-penalty
+CONCENTRATES in deprived areas:
+- has-any-LTC (Q38): most-deprived 9.82% (LTC) vs 7.62% (no LTC), gap +2.19; least-deprived 5.15 vs 4.71,
+  gap +0.44. So the LTC penalty is ~5x larger in the most-deprived fifth than the least.
+- limiting condition (Q41): gap +2 to +4pp, bigger than any-LTC -> SEVERITY drives it.
+- vulnerabilities (Q37), most-deprived: two-or-more-falls 15%, feeling isolated 14%, mobility 11%, none 8%.
+
+DEFLECTION x CONDITION (Q39) — the pattern is the headline. Ranked deflection %:
+  learning disability 11.0 (most-dep 13.1), autism 9.4, mental health 8.7, kidney/liver 8.5, neurological 8.3,
+  lung 7.9 ... vs no-LTC 6.5, high BP 6.4, heart 6.7, dementia 6.0 (small base), CANCER 5.5 (lowest).
+  => the COGNITIVE / COMMUNICATION / MENTAL-HEALTH conditions (learning disability, autism, mental health) are
+  deflected MOST; clear-cut acute physical (cancer) LEAST. The patients least able to navigate phone triage /
+  "call back tomorrow", and who most need relational continuity, are the ones most often turned away. Worst
+  cell in the whole analysis: learning disability x most-deprived = 13.1%, vs cancer x least-deprived 4.4% (~3x).
+  Deprivation stacks within every condition. Caveat: Q39 multi-response (conditions co-occur, not isolated);
+  per-contact rate; "come back" is occasionally an appropriate "book a proper appointment", but that can't
+  explain why it is worst for learning disability/autism specifically.
+
+DIVERSION x deprivation x need (Q41): diversion RISES with deprivation (least ~4.3 -> most ~8.5, ~doubles) BUT
+is NOT need-targeted -- limiting vs non-limiting gap is ~0-1pp and ESSENTIALLY ZERO in the most-deprived
+(8.52 vs 8.40). So diversion tracks area/capacity (and request type) but is blind to patient morbidity --
+consistent with appropriate signposting (pharmacy suits the presenting minor ailment, not the person's LTCs).
+
+CONCLUSION for the briefing: do NOT lump deflection and diversion. DEFLECTION is the discriminatory mechanism
+-- it lands specifically on the highest-need patients (learning disability, autism, mental health, limiting
+conditions), hardest in deprived areas. DIVERSION is need-neutral and largely appropriate triage. The access
+model's inequity is concentrated in "come back another day", not in "go to the pharmacy".
