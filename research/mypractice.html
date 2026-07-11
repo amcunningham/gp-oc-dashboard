@@ -585,7 +585,9 @@ async function run() {
   } else { $("demand").innerHTML = "<p>Insufficient data to compute demand against delivery.</p>"; }
 
   // ---- capacity: the staffing the demand meets, by GP contract type ----
-  const capMe = await one(`SELECT 10000.0*partner_fte/${Number(p.list_size)||1} AS pt10k,
+  const capMe = await one(`SELECT
+      10000.0*(partner_fte + salaried_fte + locum_fte + registrar_fte + foundation_other_fte)/${Number(p.list_size)||1} AS gp10k,
+      10000.0*partner_fte/${Number(p.list_size)||1} AS pt10k,
       10000.0*salaried_fte/${Number(p.list_size)||1} AS sa10k,
       10000.0*locum_fte/${Number(p.list_size)||1} AS lo10k,
       10000.0*registrar_fte/${Number(p.list_size)||1} AS rg10k,
@@ -596,13 +598,14 @@ async function run() {
       registrar_fte AS rg_fte
     FROM wf WHERE gp_code='${code}'`);
   const capNat = await one(`WITH j AS (
-      SELECT 10000.0*w.partner_fte/x.list_size pt10k, 10000.0*w.salaried_fte/x.list_size sa10k,
+      SELECT 10000.0*(w.partner_fte + w.salaried_fte + w.locum_fte + w.registrar_fte + w.foundation_other_fte)/x.list_size gp10k,
+             10000.0*w.partner_fte/x.list_size pt10k, 10000.0*w.salaried_fte/x.list_size sa10k,
              10000.0*w.locum_fte/x.list_size lo10k, 10000.0*w.registrar_fte/x.list_size rg10k,
              10000.0*w.foundation_other_fte/x.list_size fo10k,
              10000.0*w.nurse_fte/x.list_size n10k, 10000.0*w.dpc_fte/x.list_size d10k,
              10000.0*w.admin_fte/x.list_size a10k, x.appts_percap ap1k
       FROM wf w JOIN xsec x USING(gp_code) WHERE x.list_size > 0)
-    SELECT MEDIAN(pt10k) mpt, MEDIAN(sa10k) msa, MEDIAN(lo10k) mlo, MEDIAN(rg10k) mrg,
+    SELECT MEDIAN(gp10k) mgp, MEDIAN(pt10k) mpt, MEDIAN(sa10k) msa, MEDIAN(lo10k) mlo, MEDIAN(rg10k) mrg,
            MEDIAN(fo10k) mfo, MEDIAN(n10k) mn, MEDIAN(d10k) md, MEDIAN(a10k) ma, MEDIAN(ap1k) mapp FROM j`);
   // staffing medians among practices like yours (same size and deprivation fifths, value-placed)
   const capCell = (p.list_size == null || p.imd_score == null) ? null : await one(`WITH s AS (
@@ -611,7 +614,8 @@ async function run() {
       FROM xsec WHERE list_size IS NOT NULL AND imd_score IS NOT NULL),
     ms AS (SELECT COALESCE(MIN(sq),5) v FROM (SELECT sq, MAX(list_size) hi FROM s GROUP BY sq) WHERE hi >= ${Number(p.list_size)}),
     mi AS (SELECT COALESCE(MIN(iq),5) v FROM (SELECT iq, MAX(imd_score) hi FROM s GROUP BY iq) WHERE hi >= ${Number(p.imd_score)})
-    SELECT MEDIAN(10000.0*w.partner_fte/s.list_size) cpt, MEDIAN(10000.0*w.salaried_fte/s.list_size) csa,
+    SELECT MEDIAN(10000.0*(w.partner_fte + w.salaried_fte + w.locum_fte + w.registrar_fte + w.foundation_other_fte)/s.list_size) cgp,
+           MEDIAN(10000.0*w.partner_fte/s.list_size) cpt, MEDIAN(10000.0*w.salaried_fte/s.list_size) csa,
            MEDIAN(10000.0*w.locum_fte/s.list_size) clo, MEDIAN(10000.0*w.registrar_fte/s.list_size) crg,
            MEDIAN(10000.0*w.foundation_other_fte/s.list_size) cfo,
            MEDIAN(10000.0*w.nurse_fte/s.list_size) cn, MEDIAN(10000.0*w.dpc_fte/s.list_size) cd,
@@ -629,7 +633,9 @@ async function run() {
       <table>
       <tr><th></th><th class="num">Your practice</th><th class="num">Typical practice</th>
         ${hasCapCell ? `<th class="num">Practices like yours<br>(n=${f0(capCell.n)})</th>` : ""}</tr>
-      <tr><td>GP partners (FTE per 10,000)</td><td class="num big">${f1(capMe.pt10k)}</td><td class="num">${f1(capNat.mpt)}</td>
+      <tr><td>All GPs, every contract type (FTE per 10,000)</td><td class="num big">${f1(capMe.gp10k)}</td><td class="num">${f1(capNat.mgp)}</td>
+        ${hasCapCell ? `<td class="num">${f1(capCell.cgp)}</td>` : ""}</tr>
+      <tr><td>GP partners (FTE per 10,000)</td><td class="num">${f1(capMe.pt10k)}</td><td class="num">${f1(capNat.mpt)}</td>
         ${hasCapCell ? `<td class="num">${f1(capCell.cpt)}</td>` : ""}</tr>
       <tr><td>Salaried GPs, incl. retainers (FTE per 10,000)</td><td class="num">${f1(capMe.sa10k)}</td><td class="num">${f1(capNat.msa)}</td>
         ${hasCapCell ? `<td class="num">${f1(capCell.csa)}</td>` : ""}</tr>
@@ -650,6 +656,9 @@ async function run() {
       <tr><td>Appointments per 1,000 patients per month</td><td class="num">${f0(p.appts_percap)}</td><td class="num">${f0(capNat.mapp)}</td>
         ${hasCapCell ? `<td class="num">${f0(capCell.cap1k)}</td>` : ""}</tr>
       </table>
+      <p class="ev">Staffing figures are rates, not headcounts: at your list size of ${f0(p.list_size)},
+      1.0 FTE per 10,000 equals ${f1(Number(p.list_size)/10000)} whole-time staff. Small practices
+      naturally show higher rates — one partner across a small list is a large number per 10,000.</p>
       <p class="ev">In the combined models: partners' association with experience runs largely through
       continuity; salaried GPs carry a direct association of similar size; regular locums show no
       relationship either way (note: ad-hoc locums are not published at practice level, so sessional cover
