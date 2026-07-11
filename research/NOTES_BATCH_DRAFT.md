@@ -436,7 +436,57 @@ workforce_panel.{csv,parquet}: per-practice GP/nurse/DPC/admin FTE + patients, 3
 locums); fully-qualified (EXRL) is captured only for 2018 (NHS renamed the column). National
 total GP FTE/10k rose 4.8→6.0 over the panel — registrar-driven, consistent with §4.21. This
 file is DISTINCT from practice_workforce_2019_latest.csv (used for §4.21's fully-qualified/
-trainee split); do not mix their GP definitions.
+trainee split); do not mix their GP definitions. LOCUM BOUNDARY (11 Jul, AMC query): the
+census's fully-qualified GP FTE — and therefore our models — INCLUDES regular locums (vacancy/
+absence/other cover; ~580 FTE nationally, <2% of fully-qualified) and EXCLUDES ad-hoc locums
+entirely, which NHS England reports only in national annexes. Ad-hoc locum reliance is
+invisible at practice level in all published data. Optional test (detailed practice file has
+TOTAL_GP_LOCUM_*_FTE): whether locum-heavy FTE predicts lower continuity per GP — 30 July list.
+
+### 4.31 GP composition: partners, salaried, locums, trainees (11 Jul 2026; AMC — locum query led here)
+
+DATA: March 2025 census detailed practice file. Partners = senior partners + partner/providers;
+salaried incl. salaried-by-other-orgs + retainers; regular locums = vacancy/absence/other cover
+(ad-hoc locums NOT published at practice level — invisible everywhere, §4.30); trainees = all
+training grades. Medians per 10,000: partners 2.55, salaried 1.56, locums 0.00, trainees 0.90.
+Only 10% of practices carry >0.25 FTE regular locum (median 0.73/10k where present).
+
+ALONE (bivariate, CBT sample n=4,736):
+
+| per SD FTE/10k | Q32 | Q16 | Q1 phone ease | Q7 continuity* |
+|---|---|---|---|---|
+| Partners | +2.55 | +2.60 | +3.79 | +3.68 |
+| Salaried | +0.93 | +0.79 | −0.17 ns | −0.98 |
+| Regular locums | −0.30 ns | −0.21 ns | +0.47 ns | +0.10 ns |
+| Trainees | +1.44 | +1.29 | +0.73 | — |
+(*continuity alones from the first-pass sample n=5,919)
+
+FULL MODELS (page specification; Together = external only; +Report adds Q6/Q7/Q12):
+
+| | Q32 Tog / +Rep | Q16 Tog / +Rep | Q1 Tog / +Rep |
+|---|---|---|---|
+| Partners | +1.68 / +0.55 | +1.53 / +0.31 | +1.71 / +0.32 ns |
+| Salaried | +1.42 / +0.96 | +1.29 / +0.71 | +1.19 / +0.52 |
+| Regular locums | +0.28 ns / +0.15 ns | +0.21 ns / +0.05 ns | +0.19 ns / +0.01 ns |
+| Trainees | +0.12 ns / +0.65 | +0.09 ns / +0.63 | −0.00 ns / +0.70 |
+| Training flag | +2.79 / +1.89 | +3.05 / +1.90 | +3.41 / +2.06 |
+All-practices replication (n=5,913): same pattern throughout.
+
+CONTINUITY (Q7) AS OUTCOME, full external spec (n=4,790, R²=0.233): partners +2.45, salaried
++1.03, locums +0.33 ns, trainees −2.07, training flag +2.16.
+
+READINGS: (1) Regular locums null on every outcome in every specification — but a thin variable
+with the ad-hoc invisibility caveat; absence of evidence. (2) Partners and salaried GPs
+near-equal on experience gross but travel by different roads: partners' association collapses
+when continuity is controlled (+1.68→+0.55) — partners deliver experience through being
+seeable-again — while salaried persists (+1.42→+0.96). (3) Trainee FTE adds nothing beyond the
+training flag externally; the flag was carrying the §4.21 trainee story. (4) The continuity
+model's paradox: training practices are continuity-POSITIVE (+2.16) while trainee FTE drags it
+(−2.07) — organisational quality showing twice. (5) Composition sentence for the wider
+argument: as the workforce shifts from partners toward salaried and sessional models, the thing
+specifically at risk is continuity — the strongest single correlate of overall experience.
+PAGES: predictors.html rebuilt on the composition split (n=4,736/5,913); mypractice.html
+capacity card now shows each practice its GP mix vs the typical practice.
 
 ---
 
@@ -459,6 +509,26 @@ trainee split); do not mix their GP definitions.
    workforce_panel; optional exact *_basew weighting for explorer benchmarks.
 7. README: one-line description for adoption_risk_2027.csv (now deliberately public).
 8. Re-run the §4.14 substitution analysis with waiting-time outcomes (standing diary item).
+9. From first user feedback (see E): use the LATEST monthly workforce census at each refresh
+   (it updates monthly; March 2025 is already stale for some practices); evaluate FFT monthly
+   practice data as a year-aggregated satisfaction comparator alongside GPPS; test
+   waiting-time bands × continuity (the "our favourite GPs have longer waits" trade-off) at
+   practice level; re-derive the model training flag as ST-registrar-only (67 practices
+   reclassify; effect on coefficients expected negligible but must be verified).
+   (Similar-practices staffing column: done same day.)
+
+## E. First user feedback (11 Jul 2026, via AMC) — and actions
+
+A practice manager reviewing their page raised six points. Actioned same day:
+training-practice designation wrongly counted foundation doctors (their practice hosts F1/F2
+and students, no registrar) — flag re-derived as ST1–ST4 only, 67 practices reclassified,
+foundation/other grades now a separate card row; nurse/other-clinical/admin rows failed for
+cross-section orphans — all staffing now sourced from the census composition file; a
+waiting-times card added (same-day / 1–7 / 8–14 / 15+ day bands vs the typical practice),
+with the honest note that per-clinician waits are unpublished so the continuity-versus-speed
+trade-off is invisible in national data. Deferred to the rebuild (D.9): census vintage,
+similar-practices staffing comparators, FFT evaluation, waits × continuity. The feedback
+channel works.
 
 ---
 

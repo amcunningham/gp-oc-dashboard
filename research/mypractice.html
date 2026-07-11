@@ -80,6 +80,7 @@
     <details id="d-demand"><summary>Demand and capacity — the evidence</summary>
       <div class="card" id="demand"></div>
       <div class="card" id="capacity"></div>
+      <div class="card" id="waits"></div>
     </details>
     <details id="d-survey"><summary>What your patients reported — the evidence</summary>
       <div class="card" id="survey"></div>
@@ -118,8 +119,9 @@ const TABLES = {
   cbt: "cbt_ivr_panel.csv",
   daytime: "cbt_daytime_may.parquet",
   history: "gpps_long.parquet",
-  wf: "practice_workforce_2019_latest.csv",
+  wf: "gp_composition_mar25.csv",
   xsup: "xsec_supplement.csv",
+  waits: "waits_panel.parquet",
 };
 let conn, ready = false;
 (async () => {
@@ -374,7 +376,7 @@ async function run() {
     const ansLo = Math.max(0, Math.floor(Math.min(Number(nat.a10), Number(b.ans_queue))/10)*10 - 5);
     const ivrHi = Math.min(100, Math.ceil(Math.max(Number(nat.i90), Number(b.ivr_share))/10)*10 + 5);
     $("phones").innerHTML = `
-      <p><b>Your patients' verdict first:</b> ${f1(p.phone_easy_2026)}% report finding it easy to get
+      <p><b>What your patients report, first:</b> ${f1(p.phone_easy_2026)}% report finding it easy to get
       through to you on the phone${hasCell ? ` — similar practices: ${f1(cell.pe)}%` : ""}. Everything below
       shows what sits behind that number, and the phone data predicts it well
       (<a href="predictors.html">the models behind this page</a>).</p>
@@ -574,7 +576,7 @@ async function run() {
       ${hasCalls ? "" : `<p class="ev">Your phone supplier does not report to the national collection, so
       calls — and therefore the contacts-per-appointment ratio — cannot be shown; appointments and online
       submissions are complete.</p>`}
-      <p class="ev">Read this as a demand diagnostic, not a verdict: we built it as a proxy for capacity
+      <p class="ev">Read this as a description of demand, not a judgement: we built it as a proxy for capacity
       under pressure, but once phone answering and call volume are accounted for it shows no independent
       relationship with what patients report (<a href="predictors.html">the models behind this page</a>).
       Unanswered calls generate repeat calls, so the ratio partly reflects phone answering itself — and
@@ -582,40 +584,113 @@ async function run() {
     if (ratio != null) diag.ratio = ratio;
   } else { $("demand").innerHTML = "<p>Insufficient data to compute demand against delivery.</p>"; }
 
-  // ---- capacity: the staffing the demand meets ----
-  const capMe = await one(`SELECT 10000.0*gp_fq_fte_latest/${Number(p.list_size)||1} AS fq10k,
-      10000.0*GREATEST(gp_fte_latest - gp_fq_fte_latest, 0)/${Number(p.list_size)||1} AS tr10k,
-      GREATEST(gp_fte_latest - gp_fq_fte_latest, 0) AS tr_fte
+  // ---- capacity: the staffing the demand meets, by GP contract type ----
+  const capMe = await one(`SELECT 10000.0*partner_fte/${Number(p.list_size)||1} AS pt10k,
+      10000.0*salaried_fte/${Number(p.list_size)||1} AS sa10k,
+      10000.0*locum_fte/${Number(p.list_size)||1} AS lo10k,
+      10000.0*registrar_fte/${Number(p.list_size)||1} AS rg10k,
+      10000.0*foundation_other_fte/${Number(p.list_size)||1} AS fo10k,
+      10000.0*nurse_fte/${Number(p.list_size)||1} AS n10k,
+      10000.0*dpc_fte/${Number(p.list_size)||1} AS d10k,
+      10000.0*admin_fte/${Number(p.list_size)||1} AS a10k,
+      registrar_fte AS rg_fte
     FROM wf WHERE gp_code='${code}'`);
   const capNat = await one(`WITH j AS (
-      SELECT 10000.0*w.gp_fq_fte_latest/x.list_size fq10k,
-             10000.0*GREATEST(w.gp_fte_latest - w.gp_fq_fte_latest, 0)/x.list_size tr10k,
-             x.nurse_per10k n10k, x.dpc_per10k d10k, x.admin_per10k a10k, x.appts_percap ap1k
+      SELECT 10000.0*w.partner_fte/x.list_size pt10k, 10000.0*w.salaried_fte/x.list_size sa10k,
+             10000.0*w.locum_fte/x.list_size lo10k, 10000.0*w.registrar_fte/x.list_size rg10k,
+             10000.0*w.foundation_other_fte/x.list_size fo10k,
+             10000.0*w.nurse_fte/x.list_size n10k, 10000.0*w.dpc_fte/x.list_size d10k,
+             10000.0*w.admin_fte/x.list_size a10k, x.appts_percap ap1k
       FROM wf w JOIN xsec x USING(gp_code) WHERE x.list_size > 0)
-    SELECT MEDIAN(fq10k) mfq, MEDIAN(tr10k) mtr, MEDIAN(n10k) mn, MEDIAN(d10k) md,
-           MEDIAN(a10k) ma, MEDIAN(ap1k) mapp FROM j`);
+    SELECT MEDIAN(pt10k) mpt, MEDIAN(sa10k) msa, MEDIAN(lo10k) mlo, MEDIAN(rg10k) mrg,
+           MEDIAN(fo10k) mfo, MEDIAN(n10k) mn, MEDIAN(d10k) md, MEDIAN(a10k) ma, MEDIAN(ap1k) mapp FROM j`);
+  // staffing medians among practices like yours (same size and deprivation fifths, value-placed)
+  const capCell = (p.list_size == null || p.imd_score == null) ? null : await one(`WITH s AS (
+      SELECT gp_code, list_size, imd_score, appts_percap,
+        NTILE(5) OVER (ORDER BY list_size) sq, NTILE(5) OVER (ORDER BY imd_score) iq
+      FROM xsec WHERE list_size IS NOT NULL AND imd_score IS NOT NULL),
+    ms AS (SELECT COALESCE(MIN(sq),5) v FROM (SELECT sq, MAX(list_size) hi FROM s GROUP BY sq) WHERE hi >= ${Number(p.list_size)}),
+    mi AS (SELECT COALESCE(MIN(iq),5) v FROM (SELECT iq, MAX(imd_score) hi FROM s GROUP BY iq) WHERE hi >= ${Number(p.imd_score)})
+    SELECT MEDIAN(10000.0*w.partner_fte/s.list_size) cpt, MEDIAN(10000.0*w.salaried_fte/s.list_size) csa,
+           MEDIAN(10000.0*w.locum_fte/s.list_size) clo, MEDIAN(10000.0*w.registrar_fte/s.list_size) crg,
+           MEDIAN(10000.0*w.foundation_other_fte/s.list_size) cfo,
+           MEDIAN(10000.0*w.nurse_fte/s.list_size) cn, MEDIAN(10000.0*w.dpc_fte/s.list_size) cd,
+           MEDIAN(10000.0*w.admin_fte/s.list_size) ca, MEDIAN(s.appts_percap) cap1k, COUNT(*) n
+    FROM s JOIN wf w USING(gp_code)
+    WHERE s.sq=(SELECT v FROM ms) AND s.iq=(SELECT v FROM mi)`);
+  const hasCapCell = capCell && Number(capCell.n) >= 30;
   if (capMe && capNat) {
-    const isTraining = Number(capMe.tr_fte) > 0.25;
+    const isTraining = Number(capMe.rg_fte) > 0.25;
     $("capacity").innerHTML = `
       <p><b>The capacity that demand meets.</b> Staffing from the March 2025 workforce census, per 10,000
-      registered patients; appointments from May 2026.</p>
+      registered patients; appointments from May 2026. GPs are shown by contract type, because who the GPs
+      are matters as well as how many: partners carry the strongest link with patients seeing their
+      preferred clinician (<a href="predictors.html">the models behind this page</a>).</p>
       <table>
-      <tr><th></th><th class="num">Your practice</th><th class="num">Typical practice</th></tr>
-      <tr><td>Fully-qualified GPs (FTE per 10,000)</td><td class="num big">${f1(capMe.fq10k)}</td><td class="num">${f1(capNat.mfq)}</td></tr>
-      <tr><td>GP registrars in training (FTE per 10,000)</td><td class="num">${f1(capMe.tr10k)}</td><td class="num">${f1(capNat.mtr)}</td></tr>
-      <tr><td>Designated here as a training practice (registrar in post, Mar 2025)</td><td class="num">${isTraining ? "yes" : "no"}</td><td class="num">59% do</td></tr>
-      <tr><td>Nurses (FTE per 10,000)</td><td class="num">${f1(p.nurse_per10k)}</td><td class="num">${f1(capNat.mn)}</td></tr>
-      <tr><td>Other clinical staff (FTE per 10,000)</td><td class="num">${f1(p.dpc_per10k)}</td><td class="num">${f1(capNat.md)}</td></tr>
-      <tr><td>Admin staff (FTE per 10,000)</td><td class="num">${f1(p.admin_per10k)}</td><td class="num">${f1(capNat.ma)}</td></tr>
-      <tr><td>Appointments per 1,000 patients per month</td><td class="num">${f0(p.appts_percap)}</td><td class="num">${f0(capNat.mapp)}</td></tr>
+      <tr><th></th><th class="num">Your practice</th><th class="num">Typical practice</th>
+        ${hasCapCell ? `<th class="num">Practices like yours<br>(n=${f0(capCell.n)})</th>` : ""}</tr>
+      <tr><td>GP partners (FTE per 10,000)</td><td class="num big">${f1(capMe.pt10k)}</td><td class="num">${f1(capNat.mpt)}</td>
+        ${hasCapCell ? `<td class="num">${f1(capCell.cpt)}</td>` : ""}</tr>
+      <tr><td>Salaried GPs, incl. retainers (FTE per 10,000)</td><td class="num">${f1(capMe.sa10k)}</td><td class="num">${f1(capNat.msa)}</td>
+        ${hasCapCell ? `<td class="num">${f1(capCell.csa)}</td>` : ""}</tr>
+      <tr><td>Regular locum GPs (FTE per 10,000)</td><td class="num">${f1(capMe.lo10k)}</td><td class="num">${f1(capNat.mlo)}</td>
+        ${hasCapCell ? `<td class="num">${f1(capCell.clo)}</td>` : ""}</tr>
+      <tr><td>GP registrars, ST1–ST4 (FTE per 10,000)</td><td class="num">${f1(capMe.rg10k)}</td><td class="num">${f1(capNat.mrg)}</td>
+        ${hasCapCell ? `<td class="num">${f1(capCell.crg)}</td>` : ""}</tr>
+      <tr><td>Foundation doctors and other training grades (FTE per 10,000)</td><td class="num">${f1(capMe.fo10k)}</td><td class="num">${f1(capNat.mfo)}</td>
+        ${hasCapCell ? `<td class="num">${f1(capCell.cfo)}</td>` : ""}</tr>
+      <tr><td>Designated here as a training practice (GP registrar in post, Mar 2025)</td><td class="num">${isTraining ? "yes" : "no"}</td><td class="num">56% do</td>
+        ${hasCapCell ? `<td class="num"></td>` : ""}</tr>
+      <tr><td>Nurses (FTE per 10,000)</td><td class="num">${f1(capMe.n10k)}</td><td class="num">${f1(capNat.mn)}</td>
+        ${hasCapCell ? `<td class="num">${f1(capCell.cn)}</td>` : ""}</tr>
+      <tr><td>Other clinical staff (FTE per 10,000)</td><td class="num">${f1(capMe.d10k)}</td><td class="num">${f1(capNat.md)}</td>
+        ${hasCapCell ? `<td class="num">${f1(capCell.cd)}</td>` : ""}</tr>
+      <tr><td>Admin staff (FTE per 10,000)</td><td class="num">${f1(capMe.a10k)}</td><td class="num">${f1(capNat.ma)}</td>
+        ${hasCapCell ? `<td class="num">${f1(capCell.ca)}</td>` : ""}</tr>
+      <tr><td>Appointments per 1,000 patients per month</td><td class="num">${f0(p.appts_percap)}</td><td class="num">${f0(capNat.mapp)}</td>
+        ${hasCapCell ? `<td class="num">${f0(capCell.cap1k)}</td>` : ""}</tr>
       </table>
-      <p class="ev">In the combined models, fully-qualified GPs per patient is the strongest staffing term on
-      every outcome, and training practices score about two points higher than their staffing and
-      circumstances would predict. Admin staffing does not predict better answering or better scores
-      (<a href="predictors.html">the models behind this page</a>). We infer training status from a registrar
-      being in post in the March 2025 census, so it can be wrong in either direction — if it is wrong for
-      your practice, the feedback box at the end of your summary is the place to tell us.</p>`;
+      <p class="ev">In the combined models: partners' association with experience runs largely through
+      continuity; salaried GPs carry a direct association of similar size; regular locums show no
+      relationship either way (note: ad-hoc locums are not published at practice level, so sessional cover
+      is invisible here); and training practices score about two points higher than their staffing and
+      circumstances would predict. Admin staffing does not predict better answering or better scores. We
+      infer training status from a registrar being in post in the March 2025 census, so it can be wrong in
+      either direction — if it is wrong for your practice, the feedback box at the end of your summary is
+      the place to tell us.</p>`;
   } else { $("capacity").innerHTML = "<p>No workforce data for this practice.</p>"; }
+
+  // ---- waiting times: how long booked appointments waited (May 2026) ----
+  const wMe = await one(`SELECT same_day, d1 + d2_7 AS d1_7, d8_14, d15_21 + d22_28 + d28plus AS d15p
+    FROM waits WHERE gp_code='${code}' AND month='2026-05'`);
+  const wNat = await one(`WITH s AS (
+      SELECT same_day + d1 + d2_7 + d8_14 + d15_21 + d22_28 + d28plus AS known,
+             same_day, d1 + d2_7 AS d1_7, d8_14, d15_21 + d22_28 + d28plus AS d15p
+      FROM waits WHERE month='2026-05')
+    SELECT MEDIAN(100.0*same_day/known) msd, MEDIAN(100.0*d1_7/known) m17,
+           MEDIAN(100.0*d8_14/known) m814, MEDIAN(100.0*d15p/known) m15
+    FROM s WHERE known > 100`);
+  if (wMe && wNat) {
+    const known = Number(wMe.same_day)+Number(wMe.d1_7)+Number(wMe.d8_14)+Number(wMe.d15p);
+    if (known > 100) {
+      const sh = v => f1(100*Number(v)/known);
+      $("waits").innerHTML = `
+      <p><b>How long booked appointments waited</b> — time from booking to the appointment, May 2026,
+      as a share of appointments with a recorded wait.</p>
+      <table>
+      <tr><th></th><th class="num">Same day</th><th class="num">1–7 days</th><th class="num">8–14 days</th><th class="num">15+ days</th></tr>
+      <tr><td>Your practice</td><td class="num big">${sh(wMe.same_day)}%</td><td class="num">${sh(wMe.d1_7)}%</td>
+        <td class="num">${sh(wMe.d8_14)}%</td><td class="num">${sh(wMe.d15p)}%</td></tr>
+      <tr><td>Typical practice (median)</td><td class="num">${f1(wNat.msd)}%</td><td class="num">${f1(wNat.m17)}%</td>
+        <td class="num">${f1(wNat.m814)}%</td><td class="num">${f1(wNat.m15)}%</td></tr>
+      </table>
+      <p class="ev">Booking-to-appointment time partly reflects how a practice's system is set up — total-triage
+      practices book almost everything same-day — so read alongside the same-day share in the section above.
+      Waits for a particular clinician are not published: if patients wait longer to see the GP they prefer,
+      that trade-off between continuity and speed is invisible here, though your own appointment book can
+      show it.</p>`;
+    } else { $("waits").innerHTML = "<p>Too few recorded waits in May 2026 to show a breakdown.</p>"; }
+  } else { $("waits").innerHTML = "<p>No waiting-time data for this practice in May 2026.</p>"; }
 
   // ---- survey ----
   const eng = await one(`SELECT
@@ -778,12 +853,12 @@ async function run() {
     unfair.</p>
     <p><b>Two of these you cannot change — though one of them works through things you can.</b> Patients at
     larger practices, and at practices serving more deprived populations, report lower satisfaction on
-    average (table below). Deprivation remains a headwind in every model we have run. Size behaves
+    average (table below). Deprivation stays a disadvantage in every model we have run. Size behaves
     differently: in the combined models (<a href="predictors.html">the models behind this page</a>), the
     disadvantage of being large is largely accounted for by two things large practices tend to lose —
     patients getting to see their preferred clinician, and calls being answered — and both of those are
     addressable. A practice cannot change its size, but it can work on both of those. The national
-    figures used elsewhere on this page do not adjust for either headwind, so a large practice in a deprived
+    figures used elsewhere on this page do not adjust for either factor, so a large practice in a deprived
     area is still being compared against an easier average than its circumstances would predict.</p>
     ${chartsHtml}
     ${gradHtml}
@@ -801,8 +876,8 @@ async function run() {
       answering, which is flat across admin staffing levels (see the phones section).</p>`;
     })()}
     <p class="ev">These are cross-practice averages, unadjusted and overlapping — deprived areas also have
-    fewer GPs per head, so the gradients partly restate each other. They describe the terrain, not what any
-    one practice's score would do if a factor changed.</p>`;
+    fewer GPs per head, so the gradients partly restate each other. They describe differences across
+    practices, not what any one practice's score would do if a factor changed.</p>`;
 
   // ---- transition note if online intake rose substantially between fieldworks ----
   if (ocRamp) {
@@ -859,8 +934,8 @@ async function run() {
         experience, against ${f1(cell.m)}% at similar practices. But fewer report a good experience of
         contacting you: ${f1(myAcc)}%, against ${f1(cell.a)}%.` : ""} The choice inside it is what patients
         are offered when no slot is left — an appointment on another day, an online submission, signposting,
-        or "try again tomorrow": that is, whether the practice or the patient carries the demand
-        forward.${sampleNote} ${link("d-survey","See the survey evidence")}.</p>`});
+        or "try again tomorrow": that is, whether the practice books the follow-up or the patient has to
+        start again.${sampleNote} ${link("d-survey","See the survey evidence")}.</p>`});
     }
     else if (myDefl < Number(cell.d) - 3) oks.push(`Few patients report being told to contact you again
       another day (${f1(myDefl)}% against ${f1(cell.d)}% in practices like yours) — the measure most strongly
@@ -890,7 +965,7 @@ async function run() {
   if (cellPe != null && !Number.isNaN(myPe)) {
     if (myPe < cellPe - 5) flags.push({ pri:2, grp:"rep", html:`
       <p><b>${f1(myPe)}% of your patients report finding it easy to get through on the phone, against
-      ${f1(cellPe)}% at similar practices.</b> This is the survey's verdict on your phones${diag.ans != null
+      ${f1(cellPe)}% at similar practices.</b> This is what patients report about your phones${diag.ans != null
         ? `; the phone data shows what sits behind it — ${f1(diag.ans)}% of queueing calls answered
       (typical for your size: ${f1(diag.sizeAns)}%), ${f1(diag.ivr)}% of calls ending within the IVR`
         : `; your phone supplier does not report to the national collection, so what sits behind it
@@ -934,8 +1009,7 @@ async function run() {
       messages your menu plays during the Monday-morning peak would establish which explanation applies —
       and if the message is telling callers you are full, the finding is really about capacity at that time,
       not about the message. Even then, one thing remains yours to choose: whether the caller leaves with an
-      appointment on another day, or is told to try again — that is, who carries the demand forward, the
-      practice or the patient.` : ""}${!ansFlagged ? peAgrees : ""}
+      appointment on another day, or is told to try again another day.` : ""}${!ansFlagged ? peAgrees : ""}
       ${link("d-phones","See the phone evidence")}.</p>`});
   }
   // (No standalone Monday flag: once the overall answer rate is accounted for, the
@@ -968,7 +1042,7 @@ async function run() {
   $("standout").innerHTML = `
     <p class="big" style="font-size:1.15rem">What stands out for your practice</p>
     ${repTop.length ? `<p><b>What your patients report</b>, ordered by how much of each is within a
-      practice's gift:</p>`
+      practice's control:</p>`
       + repTop.map(f=>`<div class="flagbox">${f.html}</div>`).join("") : ""}
     ${opTop.length ? `<p><b>What the operational data shows</b> — objective measures, recorded by systems
       rather than reported by patients:</p>`
@@ -991,7 +1065,7 @@ async function run() {
     })()}
     ${rest.length ? `<p class="ev">Also noted: ${rest.map((f,i)=>f.html.replace(/<\/?p>|<\/?b>/g,"")).join(" ")}</p>` : ""}
     ${oks.length ? `<p class="okline"><b>What you are doing well:</b> ${oks.join(" ")}</p>` : ""}
-    <p class="ev">The patient-reported findings are ordered by how much of each is within a practice's gift;
+    <p class="ev">The patient-reported findings are ordered by how much of each is within a practice's control;
     the operational findings by strength of evidence across ~5,000 practices
     (<a href="predictors.html">the models behind this page</a>).
     "Similar practices" means the same twenty-fifth of England's practices as yours: the same fifth for list
