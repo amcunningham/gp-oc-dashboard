@@ -445,6 +445,10 @@ the other; phone_failed = % whose call went unanswered or who gave up in the que
 nextstep_immediate = % told the next step there and then (GPPS Q13);
 ae_after_fail = % who went to A&E, AMONG those whose contact failed (GPPS Q15) — conditional,
 not a population rate (use ae_pop for the approximate population-level share).
+CAUTION — ae_after_fail and ae_pop come from GPPS Q15, reached only by the minority who failed to
+contact (median base ~15 responses/practice; ~1,150 practices suppressed), so they are the NOISIEST
+fields here. Use them ONLY for England/region-level patterns, never for a single practice, and whenever
+an answer uses either column, state the small-base caveat explicitly.
 EFFECT SIZES need context, in plain words: for practice-level correlations, |r| < 0.1 is
 negligible (<1% of variance), 0.1-0.3 weak, 0.3-0.5 moderate, > 0.5 strong; where helpful
 translate to variance explained or to the difference between top and bottom groups. Never use

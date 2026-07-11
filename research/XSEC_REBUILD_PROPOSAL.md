@@ -144,3 +144,17 @@ python3 research/scripts/build_xsec_full.py
 ```
 Inputs (all in-repo): `research/data/panel_merged.parquet`, `waits_panel.parquet`,
 `workforce_panel.parquet`, `adoption_risk_2027.csv`; `data/GPPS_2024/2025/2026_...PUBLIC.csv`.
+
+---
+## COMPLETION UPDATE (11 Jul 2026, later)
+
+xsec_master_rebuilt.csv now has 6,133 practices and 97 of 98 columns populated. Status by column group:
+
+- **72 base columns** (GPAD, wait-bands, GPPS 2024/25/26, derived): reproduced EXACTLY from current sources (corr 1.0).
+- **Workforce FTE**: uses the CORRECTED workforce_panel (ratio 1.00 vs live's 2.0 doubling) — the rebuild is better than the live master here.
+- **External, properly pulled from source**: rurality/dispensing/sub_icb_name (NHS Payments); qof/dm_prev/cdr/conv/ref_rate/ca_em_rate (Fingertips); pct65plus (registered-65+); pcn_name (GPAD Feb-26 crosstab).
+- **GPPS composites, derived + calibrated to corr 1.0**: contact_fail = deflection_2025 + couldnt_contact_2025; phone_failed = gpcontactoutcome_4 + _5 (Q11 didn't-wait + not-answered); ae_after_fail = gpcontactunsuccessful_8 (Q15 A&E).
+- **Backfilled from the live master (overlap only) — NOT yet source-reproducible**: abx_per1k, statins_per1k, items_per_pt (need NHSBSA EPD), closure_exposed, merger_recipient (need ODS epraccur close-date derivation). The 126 newly-included practices are NULL for these five.
+- RESOLVED: ae_pop = ae_after_fail * contact_fail / 100 (population-level A&E-after-failed-contact rate; corr 1.0).
+
+REMAINING FOR FULL REPRODUCIBILITY: (1) pull NHSBSA EPD to derive the 3 prescribing columns from source; (2) pull ODS epraccur to derive the 2 closure flags; (3) resolve ae_pop's definition; (4) fold all merge steps (ext extracts, PCN, GPPS composites) into build_xsec_full.py so the whole cross-section regenerates in one command. Then diff against xsec_master_2026 and switch the pages/explorer over (remembering they must then use the corrected, un-doubled workforce).
