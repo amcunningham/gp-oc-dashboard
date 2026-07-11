@@ -275,16 +275,21 @@ async function run() {
   const code = p.gp_code;
   const smallSurvey = Number(p.gpps_n_2026) < 50;
   const diag = {};   // values collected across sections for the "what stands out" summary
-  // practices like yours: same fifth of England for both list size and deprivation
-  const cell = await one(`WITH s AS (
-      SELECT gp_code, satisfaction_2026 sat, access_satisfaction_2026 acc, phone_easy_2026 pe,
-        deflection_2026 d, continuity_2026 cont, has_pref_hcp_2026 hp,
-        NTILE(5) OVER (ORDER BY list_size) sq, NTILE(5) OVER (ORDER BY imd_score) iq
-      FROM xsec WHERE satisfaction_2026 IS NOT NULL AND gpps_n_2026>=30
-        AND list_size IS NOT NULL AND imd_score IS NOT NULL)
-    SELECT AVG(sat) m, AVG(acc) a, AVG(pe) pe, AVG(d) d, AVG(cont) c, AVG(hp) hp, COUNT(*) n
-    FROM s WHERE sq=(SELECT sq FROM s WHERE gp_code='${code}')
-      AND iq=(SELECT iq FROM s WHERE gp_code='${code}')`);
+  // practices like yours: same fifth of England for both list size and deprivation.
+  // Placed by VALUE (not by membership), so supplement practices get peer comparisons too.
+  let cell = null;
+  if (p.list_size != null && p.imd_score != null) {
+    cell = await one(`WITH s AS (
+        SELECT satisfaction_2026 sat, access_satisfaction_2026 acc, phone_easy_2026 pe,
+          deflection_2026 d, continuity_2026 cont, has_pref_hcp_2026 hp, list_size, imd_score,
+          NTILE(5) OVER (ORDER BY list_size) sq, NTILE(5) OVER (ORDER BY imd_score) iq
+        FROM xsec WHERE satisfaction_2026 IS NOT NULL AND gpps_n_2026>=30
+          AND list_size IS NOT NULL AND imd_score IS NOT NULL),
+      ms AS (SELECT COALESCE(MIN(sq),5) v FROM (SELECT sq, MAX(list_size) hi FROM s GROUP BY sq) WHERE hi >= ${Number(p.list_size)}),
+      mi AS (SELECT COALESCE(MIN(iq),5) v FROM (SELECT iq, MAX(imd_score) hi FROM s GROUP BY iq) WHERE hi >= ${Number(p.imd_score)})
+      SELECT AVG(sat) m, AVG(acc) a, AVG(pe) pe, AVG(d) d, AVG(cont) c, AVG(hp) hp, COUNT(*) n
+      FROM s WHERE sq=(SELECT v FROM ms) AND iq=(SELECT v FROM mi)`);
+  }
   const hasCell = cell && Number(cell.n) >= 30;
   // online-consultation intake, used by the continuity card and the transition note
   const oc = await one(`SELECT
@@ -298,10 +303,10 @@ async function run() {
   $("ident").innerHTML = `<span class="big">${p.gp_name}</span> (${code}${p.postcode ? ", " + p.postcode : ""})<br>
     ${f0(p.list_size)} patients · ${p.pcn_name||""} · ${p.region||""} · IMD ${f1(p.imd_score)}
     ${smallSurvey ? ' · <span class="note">small survey sample — treat survey figures cautiously</span>' : ""}
-    ${reduced ? `<br><span class="note">This practice is missing from our main cross-section — a gap in our
-    build, not in the practice's data — so comparisons with "practices like yours" and some staffing detail
-    are unavailable below. The practice's own data and national comparisons are shown. Fix scheduled for the
-    next data refresh.</span>` : ""}`;
+    ${reduced ? `<br><span class="note">This practice is missing from our main cross-section (a gap in our
+    build, not in the practice's data), so a few details are unavailable: the told-to-contact-again measure,
+    part of the staffing breakdown, and the postcode. Everything else, including comparisons with practices
+    like yours, is shown. Full fix at the next data refresh.</span>` : ""}`;
 
   // ---- continuity: the strongest survey correlate of overall experience ----
   const cd = await one(`SELECT MEDIAN(continuity_2026) med, QUANTILE_CONT(continuity_2026, 0.1) p10,
@@ -358,12 +363,12 @@ async function run() {
     const noPrior = b.ans_queue0 == null;
     const cv = await one(`SELECT MEDIAN(1000.0*b.inb/x.list_size) m26, MEDIAN(1000.0*b.inb0/x.list_size) m25
       FROM bench b JOIN xsec x USING(gp_code) WHERE x.list_size > 0`);
-    // typical practice of the same size (same fifth of England by list size)
-    const sz = await one(`WITH s AS (
-        SELECT gp_code, NTILE(5) OVER (ORDER BY list_size) qt FROM xsec WHERE list_size IS NOT NULL)
-      SELECT MEDIAN(bb.ans_queue) sa, MEDIAN(bb.ivr_share) si, ANY_VALUE(me.qt) qt, COUNT(*) n
-      FROM bench bb JOIN s ON s.gp_code=bb.gp_code
-      JOIN (SELECT qt FROM s WHERE gp_code='${code}') me ON me.qt=s.qt`);
+    // typical practice of the same size (same fifth of England by list size, placed by value)
+    const sz = p.list_size == null ? null : await one(`WITH s AS (
+        SELECT gp_code, list_size, NTILE(5) OVER (ORDER BY list_size) qt FROM xsec WHERE list_size IS NOT NULL),
+      me AS (SELECT COALESCE(MIN(qt),5) v FROM (SELECT qt, MAX(list_size) hi FROM s GROUP BY qt) WHERE hi >= ${Number(p.list_size)})
+      SELECT MEDIAN(bb.ans_queue) sa, MEDIAN(bb.ivr_share) si, ANY_VALUE(s.qt) qt, COUNT(*) n
+      FROM bench bb JOIN s ON s.gp_code=bb.gp_code WHERE s.qt = (SELECT v FROM me)`);
     const hasSz = sz && sz.qt != null;
     const szName = hasSz ? SIZE_FIFTHS[Number(sz.qt)-1] : "";
     const ansLo = Math.max(0, Math.floor(Math.min(Number(nat.a10), Number(b.ans_queue))/10)*10 - 5);
