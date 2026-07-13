@@ -24,6 +24,13 @@ Single source of truth for every project. If a project grows its own copy of the
 - `scripts/` ingest + build; provenance in `PANEL_NOTES.md`, `XSEC_REBUILD_PROPOSAL.md`.
 - Gaps: telephony starts Oct 2024; POMI (direct booking) ended Aug 2024; OC undercount where suppliers
   don't report (Medicus/Visiba, §4.26).
+- **Registration / list-size denominator (all NHSE, not Fingertips) — DO NOT MIX:** four flavours differ by
+  up to ~3% by date/method. `xsec.list_size` = 12-month AVG of the monthly GPAD-panel count; `practice_age_sex.total_list`
+  = NHSE "Patients Registered at a GP Practice" (latest snapshot, Jul 2026); `practice_list_history` = annual;
+  `practice_weighted_list.registered_patients` = NHS Payments 2024/25 (oldest, keep only for the Carr-Hill ratio).
+  **Rule:** canonical source = NHSE "Patients Registered at a GP Practice"; for monthly rates use the matching
+  month's list, for a cross-sectional denominator the latest snapshot; never take a count from one source and
+  divide by a denominator from another. Fingertips list size is a lagged re-publication — don't use it.
 
 ### Data sources (from the Arjus landscape review, 13 Jul) — pulled 13 Jul
 
