@@ -37,9 +37,12 @@
   <h1>Ask the GP Access Research Data</h1>
   <p class="sub">Natural-language querying of practice-level open data on GP appointment access in England
   (6,007 practices; monthly panel Mar 2023–May 2026; GP Patient Survey 2025 and 2026 waves). Your question is turned into SQL by a language model,
-  the SQL is <strong>always shown</strong>, and the query runs entirely in your browser with
-  <a href="https://duckdb.org/docs/api/wasm/overview.html">DuckDB-WASM</a> — no data leaves this page.
-  See the <a href="README.md">data dictionary</a> and <a href="PANEL_NOTES.md">analysis notes</a>.</p>
+  the SQL is <strong>always shown</strong>, and the query itself runs entirely in your browser with
+  <a href="https://duckdb.org/docs/api/wasm/overview.html">DuckDB-WASM</a>. Your question — and, for the
+  written answer, the SQL and a small sample of the (public) results — is sent to the language model chosen
+  in settings; nothing else leaves the page. Details: <a href="about.html">about, privacy and terms</a>.
+  Methods, data dictionary and build code:
+  <a href="https://github.com/amcunningham/gp-oc-dashboard/tree/main/research">GitHub</a>.</p>
 
   <div class="card">
     <details>
@@ -68,7 +71,7 @@
           <li><a href="https://opendata.nhsbsa.net/dataset/english-prescribing-data-epd">NHSBSA English Prescribing Data</a> — prescription items, antibiotics</li>
           <li><a href="https://digital.nhs.uk/services/organisation-data-service/data-search-and-export/csv-downloads/gp-and-gp-practice-related-data">NHS ODS</a> — practice postcodes, closures</li>
         </ul>
-        <p style="margin:.5rem 0 .2rem"><strong>What the survey measures actually ask</strong> (GP Patient Survey 2025, exact questions in the <a href="GPPS_2025_questions.md">question reference</a>):</p>
+        <p style="margin:.5rem 0 .2rem"><strong>What the survey measures actually ask</strong> (GP Patient Survey 2025; full questionnaires at <a href="https://gp-patient.co.uk/">gp-patient.co.uk</a>):</p>
         <ul style="margin:.2rem 0 .4rem 1.2rem; padding:0">
           <li><em>Satisfaction</em> — "Overall, how would you describe your experience of your GP practice?" (% very/fairly good)</li>
           <li><em>Continuity</em> — "How often do you get to see or speak to your preferred healthcare professional when you ask to?" (% always/almost always or a lot of the time; asked only of patients with a preferred professional)</li>
@@ -77,7 +80,7 @@
           <li><em>Failed contact</em> — a composite: "told to contact my practice again another day, as they couldn't help that day" + "I couldn't contact my practice" (from "did you know what the next step would be?")</li>
           <li><em>A&amp;E after failed contact</em> — "What did you do when you couldn't contact your GP practice…?" (% "I went to A&amp;E", among those whose contact failed)</li>
         </ul>
-        <p style="margin:.4rem 0">Full build pipeline and derived files: <a href="README.md">data dictionary</a> · <a href="https://github.com/amcunningham/gp-oc-dashboard/tree/main/research">GitHub</a>.</p>
+        <p style="margin:.4rem 0">Full build pipeline, data dictionary and derived files: <a href="https://github.com/amcunningham/gp-oc-dashboard/tree/main/research">GitHub</a>.</p>
         <p style="margin:.4rem 0"><strong>Good questions look like:</strong> a place ("access in Brighton", "compare Cardiff Road Surgery
         with its PCN" — practices are named), a comparison ("deprived vs affluent", "rural vs urban", "big vs small"),
         a trend ("how have long waits changed since 2023?"), a relationship ("does phone consulting relate to antibiotic
@@ -166,8 +169,11 @@ FROM waits GROUP BY 1 ORDER BY 1;</textarea>
     weighted samples of roughly 100 responses per practice, so small differences between practices are
     within noise. The appointment data (GPAD) is official statistics in development, and practices record
     their appointments differently. Nothing here is a rating, ranking or endorsement of any practice.
-    Fuller caveats — and the research findings themselves — are in the <a href="PANEL_NOTES.md">notes</a>.
+    Fuller caveats and methods are on the project's
+    <a href="https://github.com/amcunningham/gp-oc-dashboard/tree/main/research">GitHub page</a>.
   </div>
+  <p class="sub" style="margin-top:1.2rem">Published NHS data about GP practices — descriptive, not a rating
+  or a league table. <a href="about.html">About this tool, privacy and terms</a>.</p>
 </div>
 
 <script type="module">
@@ -197,7 +203,9 @@ Seven views exist (practice identifier: gp_code):
 
 xsec — one row per practice (n=6007), exposure year Apr 2024–Mar 2025 unless noted:
   gp_name, pcn_name, sub_icb_name, icb_name (e.g. 'NHS SUSSEX ICB'), postcode (e.g. 'BN14 7JL'),
-  region (e.g. 'LONDON','MIDLANDS'), list_size, rural (1=rural), imd_score (higher=more deprived),
+  region (e.g. 'LONDON','MIDLANDS'), list_size (12-month average of the monthly panel count,
+  Apr 2024-Mar 2025; NOT the latest registration snapshot, which can differ by up to ~3% -
+  do not mix with lists-table counts in one ratio), rural (1=rural), imd_score (higher=more deprived),
   imd_quintile, pct65plus, nonwhite_pct, dispensing_f, gp_per10k, nurse_per10k, dpc_per10k,
   same_day_pct_12m (% appts booked+delivered same day), sd_share (same), sd_percap (same-day appts
   /1k patients/month), appts_percap (all appts /1k/month), phone_pct_12m, f2f_pct_12m, dna_pct_12m,
@@ -764,11 +772,36 @@ async function interpret(question, sql, rows) {
 }
 
 // ---------- answer + follow-ups ----------
+// short provenance labels for each view, shown under data answers so readers can check the source
+const VIEW_SOURCES = {
+  xsec: "practice profile snapshot (Appointments in General Practice 2024/25, GP Patient Survey 2025–26, GP Workforce, Fingertips, NHSBSA prescribing, ODS)",
+  panel: "monthly panel, Mar 2023–May 2026 (Appointments in General Practice + Online Consultation Submissions)",
+  waits: "Appointments in General Practice — booking-to-appointment waits, monthly",
+  rush: "Cloud-Based Telephony — 8–10am call rush",
+  history: "GP Patient Survey, 2012 onward",
+  lists: "registered list sizes, 2013 onward (NHS England)",
+  fft: "Friends and Family Test for GP practices, monthly",
+};
+function sqlSources(sql) {
+  const seen = [];
+  for (const m of String(sql).matchAll(/\b(?:from|join)\s+([a-z_]+)/gi)) {
+    const lbl = VIEW_SOURCES[m[1].toLowerCase()];
+    if (lbl && !seen.includes(lbl)) seen.push(lbl);
+  }
+  return seen.join(" · ");
+}
 function showAnswer(text, kind) {
   const lines = String(text).split(/\r?\n/);
   const nexts = lines.filter(l => /^NEXT:\s*/i.test(l)).map(l => l.replace(/^NEXT:\s*/i, "").trim()).filter(Boolean);
   const main = lines.filter(l => !/^NEXT:\s*/i.test(l)).join("\n").trim();
   $("answer").textContent = (kind === "notes" ? "From the analysis notes (not a live query): " : "") + main;
+  const src = kind === "data" ? sqlSources($("sql").value) : "";
+  if (src) {
+    const d = document.createElement("div");
+    d.style.cssText = "margin-top:.5rem; padding-top:.35rem; border-top:1px dotted #cfd6cc; font-size:.78rem; color:var(--mut)";
+    d.textContent = "Data: " + src;
+    $("answer").appendChild(d);
+  }
   $("answer").style.display = "";
   const nx = $("next"); nx.innerHTML = "";
   if (nexts.length) {
@@ -855,7 +888,7 @@ async function ask() {
         if (r.ok) notes = await r.text();
       } catch (e) {}
       if (!notes || notes.length < 500) {
-        $("answer").textContent = "This looks like a question about findings rather than a data query, but the analysis notes (PANEL_NOTES.md) couldn't be loaded from this page — that works when the page is served (locally via http.server, or from the live site) rather than opened as a file. Try rephrasing as a data question instead.";
+        $("answer").textContent = "This looks like a question about findings rather than a data query, but the analysis notes couldn't be loaded from this page — that works when the page is served (locally, or from the live site) rather than opened as a file. Try rephrasing as a data question instead.";
         $("answer").style.display = "";
         $("llmstatus").textContent = ""; $("ask").disabled = false;
         return;

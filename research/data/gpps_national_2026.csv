@@ -1,0 +1,299 @@
+question,response,national_pct,national_n
+Q1,Easy,57.0,277548
+Q1,Difficult,30.0,145438
+Q2,Easy,59.0,194819
+Q2,Difficult,27.0,90776
+Q3,Easy,55.0,148185
+Q3,Difficult,30.0,79620
+Q4,Helpful,85.0,429166
+Q4,Not helpful,15.0,75452
+Q5,Booking appointments,52.0,276156
+Q5,"Filling in an online form to give information about a health issue (for example, to ask for an appointment or advice)",32.0,170109
+Q5,Ordering repeat prescriptions,48.0,253781
+Q5,Accessing medical records,30.0,158106
+Q5,Registering with a practice,5.0,25012
+Q5,Finding out test results,36.0,189615
+Q5,"Making an administrative request (for example, asking for a fit note or updating contact details)",11.0,59060
+Q5,None of these,19.0,100779
+Q6,Yes,32.0,167555
+Q6,No,68.0,363897
+Q7,Always or almost always / A lot of the time,42.0,65887
+Q7,Sometimes / Never or almost never,58.0,90003
+Q8,In the last 6 months,79.0,421080
+Q8,More than 6 months ago,18.0,93861
+Q9,Get advice or treatment from a healthcare professional for a new health issue,38.0,195452
+Q9,Get advice or treatment from a healthcare professional for an existing health issue,26.0,134054
+Q9,Get a prescription,12.0,63844
+Q9,Get test results,6.0,28445
+Q9,"Make an administrative request (for example, updating contact details or personal information)",1.0,7696
+Q9,"Get help with a fit note or any other medical evidence (for example, for benefit claims or background medical checks)",2.0,11020
+Q9,Discuss a referral for specialist care,4.0,21230
+Q9,Register with the practice as a new patient,1.0,2899
+Q9,Do something else,10.0,49950
+Q10,I phoned the practice,53.0,272336
+Q10,I visited in person,14.0,70716
+Q10,"Online, using the practice website",20.0,102643
+Q10,"Online, using the NHS App",9.0,48304
+Q10,"Online, using a different website or app",3.0,12995
+Q10,Another way,2.0,7839
+Q11,My call was answered straight away,13.0,35861
+Q11,My call was held in a queue and I waited until someone answered,71.0,193984
+Q11,My call was held in a queue and I asked for a call-back through an automated system,12.0,33751
+Q11,My call was held in a queue but I didn’t wait for anybody to answer,1.0,2784
+Q11,My call wasn’t answered at all,2.0,5820
+Q12,Yes,85.0,423667
+Q12,No,8.0,42423
+Q12,"I was told to contact my practice again another day, as they couldn’t help that day",7.0,34068
+Q13,There and then,58.0,227797
+Q13,Later on the same day,29.0,114936
+Q13,The next day,6.0,24612
+Q13,After two or more days,7.0,28415
+Q14,Booked in for an appointment,72.0,302726
+Q14,Given information about how to manage the health issue,15.0,62060
+Q14,Prescribed medication,22.0,91618
+Q14,Told to go to a pharmacy,5.0,22773
+Q14,Told to contact NHS 111 or a different NHS service,2.0,9151
+Q14,Told to get urgent care,2.0,6808
+Q14,Given help or information in another way,10.0,42926
+Q14,I don’t know or I can’t remember,3.0,13386
+Q15,I tried to contact them again,50.0,45093
+Q15,I tried to treat myself or the person I was contacting the practice for,12.0,10555
+Q15,I asked a friend or family member for advice,7.0,6588
+Q15,I went to a pharmacy,11.0,9736
+Q15,I phoned NHS 111,9.0,8303
+Q15,I used NHS 111 online,3.0,2699
+Q15,I looked online for information,13.0,12127
+Q15,I went to A&E,7.0,5891
+Q15,I went to an urgent treatment centre,4.0,3753
+Q15,I tried a different NHS service,3.0,2712
+Q15,I tried to get information or advice from somewhere else,12.0,10996
+Q15,I didn’t do anything,19.0,17232
+Q16,Good,73.0,377704
+Q16,Poor,14.0,71910
+Q17,In the last 6 months,70.0,373089
+Q17,More than 6 months ago,26.0,138256
+Q18,I tried to treat myself,35.0,180831
+Q18,I asked a friend or family member for advice,15.0,78809
+Q18,I went to a pharmacy,15.0,75369
+Q18,I phoned NHS 111,4.0,21638
+Q18,I used NHS 111 online,3.0,16107
+Q18,I looked online for information,31.0,157080
+Q18,I tried a different NHS service,3.0,13056
+Q18,I tried to get information or advice from somewhere else,10.0,53218
+Q18,I didn’t do anything before trying to get an appointment with my GP practice,37.0,190663
+Q19,A choice of time or day,57.0,210625
+Q19,A choice of location (to see a healthcare professional in person),16.0,59219
+Q19,I was not offered these choices,37.0,134806
+Q20,On the same day,27.0,136858
+Q20,On the next day,8.0,40682
+Q20,A few days later,23.0,115135
+Q20,Between a week and two weeks later,20.0,104267
+Q20,More than two weeks later,12.0,62587
+Q20,I can’t remember,10.0,50950
+Q21,It was about right,70.0,321120
+Q21,It took too long,30.0,138295
+Q22,Remote appointment,26.0,131850
+Q22,Face-to-face appointment,74.0,378266
+Q23,A GP,63.0,321935
+Q23,A nurse,22.0,112424
+Q23,A pharmacist working in my GP practice,2.0,9373
+Q23,A mental health professional,1.0,3530
+Q23,Another healthcare professional,7.0,36226
+Q23,I don’t know,5.0,27164
+Q24,Good,87.0,438258
+Q24,Poor,6.0,28656
+Q25,Good,86.0,432424
+Q25,Poor,6.0,29591
+Q26,Good,75.0,304959
+Q26,Poor,8.0,31891
+Q27,Yes,92.0,451755
+Q27,No,8.0,37074
+Q28,Yes,93.0,461426
+Q28,No,7.0,35986
+Q29,Yes,92.0,436587
+Q29,No,8.0,39469
+Q30,I was given a prescription,39.0,199330
+Q30,I was referred for specialist care,23.0,115464
+Q30,I was given a future appointment at my GP practice,9.0,47082
+Q30,I was given information or advice about how to manage my condition at home,22.0,110354
+Q30,I was asked for more information,3.0,16323
+Q30,I was advised to contact my practice again if the health issue got worse or didn’t improve,18.0,89718
+Q30,Something else,13.0,64110
+Q30,No further action was needed,10.0,53535
+Q30,I can’t remember,4.0,21829
+Q31,Yes,90.0,450746
+Q31,No,10.0,48328
+Q32,Good,77.0,410372
+Q32,Poor,10.0,54454
+Q33,Yes,31.0,164999
+Q33,No,69.0,366545
+Q34,I phoned NHS 111,41.0,67165
+Q34,I used NHS 111 online,12.0,19503
+Q34,I used a different NHS website (including NHS.uk),7.0,11599
+Q34,I used my GP practice website to look for information about other services or ways to manage the condition,11.0,17935
+Q34,I went to A&E,22.0,36422
+Q34,I went to an urgent treatment centre,12.0,20482
+Q34,I went to a pharmacy,17.0,28639
+Q34,I used a different NHS service,5.0,8004
+Q34,I can’t remember,16.0,25804
+Q35,It was about right,56.0,82875
+Q35,It took too long,44.0,64171
+Q36,Good,60.0,98105
+Q36,Poor,18.0,30201
+Q37,Living with frailty,4.0,23617
+Q37,Not living with frailty,96.0,508153
+Q38,Yes,67.0,339804
+Q38,No,33.0,170435
+Q38,I would prefer not to say,0.0,0
+Q39,Arthritis or problem with your back or joints,22.0,119365
+Q39,Autism or autism spectrum condition,3.0,16275
+Q39,Blindness or partial sight,1.0,7183
+Q39,Cancer in the last five years,4.0,19194
+Q39,Deafness or hearing loss,6.0,32890
+Q39,Dementia or Alzheimer’s disease,1.0,2971
+Q39,Diabetes,8.0,42490
+Q39,Heart or cardiovascular condition,7.0,38764
+Q39,High blood pressure,18.0,96940
+Q39,Kidney or liver disease,3.0,15318
+Q39,Learning disability,2.0,9628
+Q39,Lung or breathing condition,8.0,43957
+Q39,Mental health condition,14.0,72503
+Q39,Neurological condition,4.0,22151
+Q39,Stroke or TIA (Transient Ischemic Attack),1.0,7655
+Q39,Another long-term condition or illness,18.0,93304
+Q39,I don’t have any long-term conditions,37.0,198986
+Q40,Yes,4.0,19028
+Q40,No,87.0,461287
+Q40,I don’t know,9.0,47956
+Q40,I would prefer not to say,1.0,3437
+Q41,Yes,61.0,205901
+Q41,No,39.0,130558
+Q42,Confident,79.0,255579
+Q42,Not Confident,21.0,68669
+Q43,Yes,70.0,181258
+Q43,No,30.0,76536
+Q44,Yes,44.0,147651
+Q44,No,49.0,165150
+Q44,I don’t know,7.0,23549
+Q45,Yes,44.0,65161
+Q45,No,46.0,67674
+Q45,I don’t know,10.0,14768
+Q46,Helpful,94.0,59913
+Q46,Not Helpful,6.0,3754
+Q47,"To address an issue which my GP practice, NHS 111 or A&E referred me to a pharmacy for",8.0,44301
+Q47,To pick up a prescription,75.0,398087
+Q47,To buy medication (such as paracetamol or eye drops),43.0,226367
+Q47,"To get advice (for example, about prescription medicines, a health issue or other health services)",22.0,119315
+Q47,To have my blood pressure checked,7.0,39794
+Q47,"To get a vaccine (for example, flu or COVID)",19.0,99821
+Q47,To get contraception without a GP prescription,2.0,10321
+Q47,To monitor my medication or get other support for a long-term health condition,3.0,15702
+Q47,None of these,13.0,69471
+Q48,Good,89.0,412532
+Q48,Poor,3.0,14529
+Q49,In the last 2 years,50.0,264995
+Q49,More than 2 years ago,20.0,104140
+Q50,Yes,84.0,212017
+Q50,No,16.0,40542
+Q51,Yes,81.0,207862
+Q51,No,19.0,47698
+Q52,Good,74.0,194644
+Q52,Poor,15.0,40206
+Q53,I haven’t needed to visit a dentist,18.0,48587
+Q53,I don’t like going to the dentist,5.0,13498
+Q53,I didn’t think I could get an NHS dental appointment,27.0,70683
+Q53,I’m on a waiting list for an NHS dentist,4.0,9636
+Q53,I prefer to go to a private dentist,28.0,73262
+Q53,NHS dental care is too expensive,5.0,14105
+Q53,Another reason,14.0,36497
+Q54,16 to 24,10.0,51371
+Q54,25 to 34,16.0,86439
+Q54,35 to 44,18.0,95019
+Q54,45 to 54,16.0,86619
+Q54,55 to 64,16.0,86463
+Q54,65 to 74,12.0,63854
+Q54,75 to 84,8.0,44805
+Q54,85 or over,3.0,14491
+Q54,I would prefer not to say,1.0,2710
+Q55,Female,51.0,269251
+Q55,Male,48.0,255274
+Q55,Non-binary,0.0,1806
+Q55,Prefer to self-describe,0.0,1053
+Q55,I would prefer not to say,1.0,4386
+Q56,Yes,98.0,520467
+Q56,No,1.0,4748
+Q56,I would prefer not to say,1.0,5836
+Q57,Heterosexual or straight,88.0,468396
+Q57,Gay or lesbian,3.0,14095
+Q57,Bisexual,3.0,13432
+Q57,Other,1.0,7048
+Q57,I would prefer not to say,5.0,28799
+Q58,"English, Welsh, Scottish, Northern Irish or British",68.0,360015
+Q58,Irish,1.0,5148
+Q58,Gypsy or Irish Traveller,0.0,221
+Q58,Roma,0.0,695
+Q58,Any other White background,7.0,39032
+Q58,White and Black Caribbean,0.0,2551
+Q58,White and Black African,0.0,1323
+Q58,White and Asian,1.0,3366
+Q58,Any other Mixed or Multiple ethnic background,1.0,4242
+Q58,Indian,4.0,23107
+Q58,Pakistani,3.0,14292
+Q58,Bangladeshi,1.0,5521
+Q58,Chinese,1.0,6902
+Q58,Any other Asian background,3.0,13652
+Q58,Caribbean,1.0,5264
+Q58,African,5.0,27311
+Q58,"Any other Black, Black British, Caribbean or African background",1.0,3454
+Q58,Arab,1.0,3557
+Q58,Any other ethnic group,1.0,6136
+Q58,I would prefer not to say,1.0,5980
+Q59,No religion,38.0,202728
+Q59,Buddhist,1.0,3992
+Q59,"Christian (including Church of England, Catholic, Protestant, and other Christian denominations)",45.0,239502
+Q59,Hindu,2.0,12975
+Q59,Jewish,0.0,2395
+Q59,Muslim,7.0,37819
+Q59,Sikh,1.0,4226
+Q59,Any other religion,1.0,6497
+Q59,I would prefer not to say,4.0,21635
+Q60,In full-time paid work (30 hours or more each week) including self-employment,45.0,240912
+Q60,In part-time paid work (under 30 hours each week) including self-employment,13.0,69463
+Q60,"In full-time education at school, college or university",6.0,31253
+Q60,Unemployed,5.0,27750
+Q60,Unable to work due to long-term sickness or disability,6.0,33004
+Q60,Fully retired from work,22.0,116524
+Q60,Looking after the family or home,5.0,27590
+Q60,Other,4.0,19633
+Q61,Yes,16.0,85636
+Q61,No,84.0,446134
+Q62,Yes,24.0,128295
+Q62,No,76.0,403475
+Q63,Never smoked,61.0,325997
+Q63,Former smoker,27.0,145359
+Q63,Occasional smoker,6.0,32610
+Q63,Regular smoker,5.0,27804
+Q64,Never vaped,84.0,446359
+Q64,Former vaper,5.0,26031
+Q64,Occasional vaper,5.0,28249
+Q64,Regular vaper,6.0,31132
+Q65,No,97.0,515237
+Q65,Yes,3.0,16533
+Q70,Yes,37.0,196508
+Q70,No,63.0,335129
+Q71,Yes,31.0,55737
+Q71,No,69.0,126091
+Q72,Journey times to get to the hospital,40.0,22291
+Q72,Current length of waiting lists,31.0,17352
+Q72,Quality of care,18.0,9792
+Q72,Outcomes of care,7.0,4080
+Q72,Other patients’ experiences,4.0,2332
+Q72,Something else,5.0,2892
+Q72,None of these,19.0,10637
+Q72,I don’t know or I can’t remember,15.0,8611
+Q73,Yes,91.0,47696
+Q73,No,9.0,4998
+Q74,Good,82.0,45903
+Q74,Poor,4.0,2028
+Q75,Yes,34.0,61774
+Q75,No,66.0,121830

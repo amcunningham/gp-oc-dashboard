@@ -8,6 +8,9 @@
  * Bindings required:
  *   - secret  ANTHROPIC_API_KEY   (wrangler secret put ANTHROPIC_API_KEY)
  *   - KV      LOGS                (for question logging and rate counters)
+ *   - secret  LOG_SALT            (recommended: long random string mixed into the visitor
+ *                                  hash so log codes cannot be recomputed from an IP;
+ *                                  works without it, but codes are then only pseudonymous)
  * Optional environment variables (defaults shown):
  *   - ALLOWED_ORIGIN  https://amcunningham.github.io
  *   - MODEL           claude-haiku-4-5-20251001
@@ -69,7 +72,7 @@ export default {
         return json({ error: "Origin not allowed." }, 403, cors);
       const ip = request.headers.get("CF-Connecting-IP") || "unknown";
       const day = new Date().toISOString().slice(0, 10);
-      const who = (await sha256(ip + day)).slice(0, 12);
+      const who = (await sha256(ip + day + (env.LOG_SALT || ""))).slice(0, 12);
       const fbKey = `ratefb:${who}:${day}`;
       const n = parseInt(await env.LOGS.get(fbKey) || "0");
       if (n >= 20) return json({ error: "Feedback limit reached for today." }, 429, cors);
@@ -97,7 +100,7 @@ export default {
     const ip = request.headers.get("CF-Connecting-IP") || "unknown";
     const hour = new Date().toISOString().slice(0, 13);
     const day = hour.slice(0, 10);
-    const ipDayHash = (await sha256(ip + day)).slice(0, 12); // no raw IPs stored anywhere
+    const ipDayHash = (await sha256(ip + day + (env.LOG_SALT || ""))).slice(0, 12); // no raw IPs stored; salted so codes can't be recomputed from an IP
     const ipKey = `rate:${ipDayHash}:${hour}`;
     const dayKey = `rate:global:${day}`;
     const [ipCount, dayCount] = await Promise.all([

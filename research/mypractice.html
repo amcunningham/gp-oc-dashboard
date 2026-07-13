@@ -23,6 +23,8 @@
   .note { color:var(--note); }
   .ev { color:var(--mut); font-size:.85rem; margin:.3rem 0 0; }
   .cav { color:var(--mut); font-size:.85rem; border-left:3px solid var(--line); padding-left:.7rem; margin:.5rem 0; }
+  .card[data-src]::after { content: "Data: " attr(data-src); display:block; clear:both; margin-top:.6rem;
+    padding-top:.35rem; border-top:1px dotted var(--line); color:var(--mut); font-size:.78rem; }
   .status { color:var(--mut); font-size:.9rem; }
   .err { color:#a00; white-space:pre-wrap; }
   svg text { font-family:inherit; }
@@ -53,11 +55,12 @@
     useful — there is a feedback box at the end of your practice's summary.</p>
   </div>
   <p class="sub">Type your practice's ODS code (e.g. A81001) or part of its name. Everything shown comes from
-  published NHS England and GP Patient Survey data — nothing is uploaded, and queries run entirely in your
-  browser. Where the data allows, each measure is compared with the year before. Companion to
-  <a href="explore.html">the plain-English data explorer</a>; analysis notes in
-  <a href="PANEL_NOTES.md">PANEL_NOTES.md</a>. All comparisons are associations across ~5,000 practices,
-  not predictions for yours.</p>
+  published NHS England and GP Patient Survey data — lookups run entirely in your browser, and nothing is
+  sent to us unless you choose to submit feedback (<a href="about.html">details</a>).
+  Where the data allows, each measure is compared with the year before. Companion to
+  <a href="explore.html">the plain-English data explorer</a>; methods and code on
+  <a href="https://github.com/amcunningham/gp-oc-dashboard/tree/main/research">GitHub</a>. All comparisons are associations across England's
+  ~6,000 practices (~5,000 for phone measures, where supplier coverage is 85%), not predictions for yours.</p>
 
   <div class="card">
     <input type="text" id="q" placeholder="ODS code or practice name">
@@ -67,28 +70,28 @@
   </div>
 
   <div id="results" style="display:none">
-    <div class="card" id="ident"></div>
-    <div class="card" id="standout"></div>
-    <div class="card" id="transition" style="display:none"></div>
+    <div class="card" id="ident" data-src="Patients Registered at a GP Practice (NHS England, 1 Jul 2026) · NHS ODS · IMD (Fingertips)"></div>
+    <div class="card" id="standout" data-src="summary of the evidence cards below — each names the dataset it draws on"></div>
+    <div class="card" id="transition" style="display:none" data-src="Online Consultation Submissions (NHS England) · GP Patient Survey 2025 and 2026"></div>
     <details id="d-cont"><summary>Continuity — the evidence</summary>
-      <div class="card" id="continuity"></div>
+      <div class="card" id="continuity" data-src="GP Patient Survey 2026, Q6 and Q7 (2025 wave for the year before)"></div>
     </details>
     <details id="d-phones"><summary>Phones — the evidence</summary>
-      <div class="card" id="phones"></div>
-      <div class="card" id="daytime"></div>
+      <div class="card" id="phones" data-src="Cloud-Based Telephony (NHS England), Mar–May 2025 and 2026 · GP Patient Survey 2026"></div>
+      <div class="card" id="daytime" data-src="Cloud-Based Telephony daily detail, May 2025 and 2026"></div>
     </details>
     <details id="d-demand"><summary>Demand and capacity — the evidence</summary>
-      <div class="card" id="demand"></div>
-      <div class="card" id="capacity"></div>
-      <div class="card" id="waits"></div>
+      <div class="card" id="demand" data-src="Cloud-Based Telephony · Online Consultation Submissions · Appointments in General Practice, May 2025 and 2026"></div>
+      <div class="card" id="capacity" data-src="General Practice Workforce (NWRS), 31 May 2026 · Appointments in General Practice, May 2026"></div>
+      <div class="card" id="waits" data-src="Appointments in General Practice (booking-to-appointment waits), May 2026"></div>
     </details>
     <details id="d-survey"><summary>What your patients reported — the evidence</summary>
-      <div class="card" id="survey"></div>
-      <div class="card" id="history"></div>
-      <div class="card" id="fft"></div>
+      <div class="card" id="survey" data-src="GP Patient Survey 2025 and 2026"></div>
+      <div class="card" id="history" data-src="GP Patient Survey 2012–2023 (archived methodology — not comparable with 2024–26)"></div>
+      <div class="card" id="fft" data-src="Friends and Family Test for GP practices (NHS England), monthly since Jul 2022"></div>
     </details>
     <details id="d-context"><summary>What shapes these scores — size, deprivation, staffing</summary>
-      <div class="card" id="context"></div>
+      <div class="card" id="context" data-src="GP Patient Survey 2026 · General Practice Workforce · IMD (Fingertips)"></div>
     </details>
     <h2>Reading this page</h2>
     <div class="card cav" id="caveats">
@@ -101,14 +104,14 @@
       comparison). Appointment counts reflect what is recorded in appointment books, not total workload.
       NHS England flagged May 2026 online-consultation submissions as incomplete for five suppliers (Blinx,
       Evergreen Life, iPlato, Silicon Practice, PATCHS), so online contact counts may be undercounted for
-      some practices. Sources: Cloud Based Telephony (phone measures average March–May of each year;
-      April 2025 is not in the published collection), Online Consultation Submissions,
-      Appointments in General Practice, GP Patient Survey 2012–2026, GP Workforce census (31 May 2026),
-      Patients Registered at a GP Practice (1 July 2026 snapshot — the registered-population figure used
-      throughout this page). Evidence for each claim:
-      <a href="predictors.html">the models behind this page</a> and PANEL_NOTES.md.
+      some practices. Each card above names the published dataset it draws on; the registered-population
+      figure used throughout is the 1 July 2026 snapshot. How the claims were tested:
+      <a href="predictors.html">the models behind this page</a>. Full methods, sources and build code:
+      <a href="https://github.com/amcunningham/gp-oc-dashboard/tree/main/research">the project's GitHub page</a>.
     </div>
   </div>
+  <p class="sub" style="margin-top:1.5rem">Published NHS data about GP practices — descriptive, not a rating
+  or a league table. <a href="about.html">About this tool, privacy and terms</a>.</p>
 </div>
 
 <script type="module">
@@ -188,7 +191,7 @@ let conn, ready = false;
     ready = true;
     $("dbstatus").textContent = failed.length
       ? "Ready, with some data missing (details above)."
-      : "Ready. Data loaded for ~6,000 practices.";
+      : "Ready — look up any of England's ~6,000 practices.";
   } catch (e) {
     $("dbstatus").textContent = "";
     $("error").textContent = "Could not load data.\n" + (location.protocol === "file:"
@@ -628,7 +631,7 @@ async function run() {
 
   // ---- demand vs delivery: May 2026 with May 2025 comparison ----
   const dd = await one(`
-    SELECT b.inb_may*1.0 AS calls, COALESCE(pn.oc_rate_1k,0)*${Number(p.list_size)||0}/1000 AS oc_subs, pn.total AS appts,
+    SELECT b.inb_may*1.0 AS calls, COALESCE(pn.oc_rate_1k,0)*COALESCE(pn.list_size,${Number(p.list_size)||0})/1000 AS oc_subs, pn.total AS appts,
            b.inb_may0*1.0 AS calls0, COALESCE(pn0.oc_rate_1k,0)*COALESCE(pn0.list_size,${Number(p.list_size)||0})/1000 AS oc_subs0,
            pn0.total AS appts0
     FROM panel pn

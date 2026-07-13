@@ -22,6 +22,12 @@ logged (anonymised) for you to review.
    (Tip: create a *separate* key for the demo at console.anthropic.com and set a monthly
    spend limit on the account, so the blast radius is bounded whatever happens.)
 
+4b. **Add a log salt as a secret** (recommended). Same place: type Secret, name `LOG_SALT`,
+   value = a long random string (30+ characters; you never need it again). This is mixed into
+   the daily visitor hash so a log code cannot be recomputed by someone who knows an IP
+   address — making the logs effectively anonymous rather than pseudonymous. The Worker runs
+   fine without it; on the day you add it, hourly rate counters simply start fresh.
+
 5. **Optional variables** (Settings → Variables, type Plaintext):
    `ALLOWED_ORIGIN` = https://amcunningham.github.io (default already)
    `PER_IP_HOURLY` = 20 · `GLOBAL_DAILY` = 500 · `DEMO_ENABLED` = true
