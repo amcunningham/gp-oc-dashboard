@@ -21,7 +21,7 @@ recent published release as of 13 Jul 2026, with its publication date where veri
 | GP composition (detailed census) | `gp_composition_mar25.csv` (drives §4.31 / §4.21 models and the predictors page tables) | Mar 2025 | May 2026 detailed practice file already downloaded (`gp_composition_may26.csv`, `data/gpw_may26/`) | **No** | The published composition models pair Mar 2025 staffing with 2026 survey outcomes. Re-run on May 2026 composition at rebuild; expect the training-flag and partner/salaried coefficients to move slightly. |
 | NHS Payments | `xsec_ext_payments2425.parquet`, `practice_weighted_list` | 2024/25 | 2024/25 (latest annual; classified Management Information) | **Yes** | Note for any payments work: PCN Leadership/Support/Workforce/IIF/Enhanced Access categories were removed from the 2024/25 report. |
 | Registration / list size | `list_jul26.csv`, `practice_age_sex` (extract 1 Jul 2026); xsec `list_size` (GPAD-panel 12-month average) | Jul 2026 snapshot; xsec average Apr 2024–Mar 2025 | July 2026 (pub 9 Jul 2026) | **Yes** (snapshot files); xsec denominator is a different flavour — see §3 | Apply the PROJECTS.md denominator rule at rebuild. |
-| IMD | `data/practice_imd.csv` → xsec `imd_score/imd_quintile` | **IMD 2025** (all 6,007 xsec values match the file exactly) | English Indices of Deprivation 2025, published 30 Oct 2025 | **Yes** | The brief's "2019 was latest" is out of date: IoD2025 exists and the repo is already on it. One check remains for the rebuild: document how the LSOA-level IMD2025 was apportioned to practices (source of `practice_imd.csv` is not recorded in the repo). |
+| IMD | `data/practice_imd.csv` → xsec `imd_score/imd_quintile` | **IMD 2025** (all 6,007 xsec values match the file exactly) | English Indices of Deprivation 2025, published 30 Oct 2025 | **Yes** | The brief's "2019 was latest" is out of date: IoD2025 exists and the repo is already on it. Provenance resolved 13 Jul (see §3a): the file is the Fingertips/NGPP practice-population deprivation score (indicator 94240), i.e. the value published for the practice's registered population — not a postcode lookup. `README.md` still describes the file as "IMD 2019 scores"; correct at rebuild. |
 | QOF disease prevalence | `qof_prevalence_2425` (21 registers, 6,188 practices) | 2024/25 (pub 28 Aug 2025) | 2024/25; **2025/26 publishes 27 Aug 2026** (confirmed on its NHSE page) | **Yes** | New-but-unused: no model currently ingests it (xsec carries only `dm_prev`, which matches the 2024/25 file exactly, corr 1.0, diff 0). Fold into the typology feature space and the unmet-need study as planned. |
 | CVDPREVENT | `cvdprevent_practice` (32 indicators) | extract to Dec 2025, pulled 13 Jul 2026 | Dec 2025 appears to be the latest quarterly extract (the 2025 annual report, pub 11 Dec 2025, uses March 2025 core data; no March 2026 extract was findable on 13 Jul 2026) | **Yes, with a caveat** | Could not verify the extract schedule directly (the data-tool API timed out); recheck for a March 2026 extract before the unmet-need study quotes under-detection figures. New-but-unused otherwise. |
 | Fingertips | `xsec_ext_fingertips2425` (qof, dm_prev, cdr, conv, ref_rate, ca_em_rate/n), `fingertips_cancer_emergency_practice` | 2024/25, pulled 11–13 Jul 2026 | 2024/25 (annual; QOF-derived indicators cannot update before QOF 2025/26 on 27 Aug 2026) | **Yes** | None. Fingertips list-size remains banned as a denominator per the PROJECTS.md rule. |
@@ -83,6 +83,32 @@ The four flavours (PROJECTS.md rule) are all present in the repo. Current usage:
 - `practice_weighted_list.registered_patients` (NHS Payments 2024/25) is correctly quarantined to
   the Carr-Hill ratio.
 
+## 3a. IMD provenance — resolved: published-for-practice, not postcode-derived (added 13 Jul, follow-up)
+
+Question (AMC): is `practice_imd.csv` the value published for the practice (registered-population
+weighted) or an assignment from the practice's postcode LSOA? Answer: **published for the practice.**
+Three tests, run 13 Jul 2026:
+
+1. **Same-postcode test.** 677 pairs of practices share a postcode (payments-file postcodes); in 0 of
+   677 pairs do the two practices share an IMD_2025 score. A postcode→LSOA assignment would give
+   identical scores to every such pair, so that method is excluded.
+2. **Source match.** Fingertips National General Practice Profiles carries "Deprivation score
+   (IMD 2025)", indicator **94240** (GP-practice level, data source MHCLG, uploaded 25 Nov 2025 in
+   the NGPP December 2025 update; successor to indicator 93553, which remains IMD 2019). A fetched
+   sample of 308 practices from the Fingertips API matches `practice_imd.csv` to 2dp for 304/307
+   overlapping practices, the other 3 differing by exactly 0.005 (rounding boundary): our file is
+   the Fingertips value rounded to 2dp. NGPP derives this score by population-weighting LSOA-level
+   IoD2025 scores across each practice's registered patients (NGPP user guide, v8.3, Dec 2025).
+3. **Lineage.** Git history: the file was Fingertips indicator 93553 (IMD 2019, same
+   registered-population method) until commit 26016b7 ("update with imd2025", 12 Apr 2026) replaced
+   it; the new values correlate 0.97 with the old 93553 values across 6,127 practices, consistent
+   with an index revision rather than a method change.
+
+Caveats: the API comparison covers one parent area (307 practices), not all 6,148; and OHID states
+there are no plans to update the NGPP profile again in its current form, so the refresh route for
+future IMD revisions is uncertain. Fix-list item 9's "record the provenance" is discharged by this
+section; the remaining housekeeping is the stale `README.md` line ("IMD 2019").
+
 ## 4. xsec_master_2026 vs xsec_master_rebuilt — recommendation
 
 Switch the models to `xsec_master_rebuilt` at the 30 Jul rebuild, **after** its five remaining
@@ -114,30 +140,4 @@ standardised coefficients should move little, which is itself a useful validatio
 5. **Re-run composition models on the May 2026 detailed census** (`gp_composition_may26.csv`,
    already downloaded) instead of Mar 2025.
 6. **Settle the denominator**: adopt the canonical "Patients Registered" list for per-10k metrics or
-   document the GPAD-average exception; audit mypractice's capacity card for mixed workforce sources.
-7. **Integrate the new-but-unused sources** into the models they were pulled for: QOF 21-register
-   prevalence and CVDPREVENT into the typology + unmet-need study; weighted list as the
-   need-adjusted capacity denominator; age/sex structure as the demographic axis. Recheck for a
-   CVDPREVENT March 2026 extract first.
-8. **Diary the post-rebuild refreshes**: QOF 2025/26 on 27 Aug 2026 (prevalence file and every
-   QOF-derived Fingertips indicator), and the GPPS 2027 wave next July.
-9. **Housekeeping**: correct the dangling "§4.33" reference in the audit brief to batch-draft §4.17;
-   record the provenance of `practice_imd.csv` (IMD2025→practice apportionment method).
-
-## 6. Verification notes (how "latest" was established)
-
-Fetched 13 Jul 2026: NHSE Digital series pages for Appointments in General Practice (latest May
-2026, June due 30 Jul), General Practice Workforce (latest 31 May 2026, June due 23 Jul), Patients
-Registered at a GP Practice (July 2026 due 9 Jul, now out — repo holds the 1 Jul 2026 extract), QOF
-2025/26 page (explicit "Publication Date: 27 Aug 2026, upcoming"), NHS England FFT data page (landing
-page shows March 2026 but the Apr/May 2026 GP files exist at their upload URLs). Web-searched with
-publication-page confirmation: GPPS 2026 (published 9 Jul 2026), NHS Payments 2024/25 (latest
-annual), IoD/IMD 2025 (gov.uk, published 30 Oct 2025), NHSBSA EPD (April 2026 latest, monthly),
-OC submissions (April 2026 page live; May 2026 values present in the merged panel). Not directly
-verifiable: the CVDPREVENT quarterly extract schedule (site API timed out; inference from the annual
-report cycle) — flagged in the table rather than asserted.
-
-Local checks run this session: GPAD parquet vs regenerated CSV row/practice counts equal; workforce
-ratio test (§2); xsec `imd_score` = `practice_imd.csv` IMD2025 for 6,007/6,007; xsec `dm_prev` =
-QOF-2024/25 file exactly (corr 1.0); `panel_merged.oc_rate_1k` non-null through May 2026;
-`fft_gp_panel` populated through May 2026 (6,180 practices, 902k responses in the May file).
+   document the GPAD-aver
