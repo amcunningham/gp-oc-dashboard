@@ -36,6 +36,9 @@ interpretation; that gap is ours. Sources for the axis:
 - **Practice age/sex structure** - DONE (`data/practice_age_sex`, Jul 2026). Age-band shares + %female; demographic need axis.
 - **POMI online services** - DONE (`data/pomi_online_services_practice`, 2022-Aug 2024, practice-month). Direct online booking (`appts_online_transactions`) - the ONLY open practice-level booking source; ends Aug 2024; overlaps OC for the self-book-vs-triage question on early adopters.
 - **NHS App MI** - PULLED but **ICB-level only** (`data/nhs_app_mi`, 2020-2026); has logins/registrations/prescriptions, NOT appointments-booked and NOT practice granularity. Practice-level app booking sits behind the OKTA-gated NHS App Dashboard. **Correction to earlier note:** no OPEN practice-level online-booking data exists after Aug 2024.
+- **Fingertips cancer-emergency (practice)** - DONE (`data/fingertips_cancer_emergency_practice`, 2024/25). Emergency/late cancer presentation = unmet-need marker (late diagnosis).
+- **CVDPREVENT under-detection** - in the cvdprevent file (CVDP005HYP, 002/003CKD, 003/005DM, 002NDH = undiagnosed/uncoded) = unmet-need marker (under-detection).
+- **ACSC emergency admissions** - PULLED but **upper-tier LA level, 2020/21 only** (`data/acsc_emergency_icb`); NOT practice-level and stale. True practice-level ACSC/A&E needs HES via a DSA (application, not open).
 - **LSOA population-health apportionment** - NOT pulled (bigger job: patients-by-LSOA x IMD/Census). Deferred.
 - **Full GPPS record-level** - needs a data application (Ipsos / NHS England / UK Data Service); cannot be downloaded.
 
@@ -50,8 +53,9 @@ interpretation; that gap is ours. Sources for the axis:
 | 3 | **Access-model research** | The six-proposition critique; paper / policy | Mature | Fold in deflection-by-condition equity | `PANEL_NOTES.md` |
 | 4 | **Online-triage substitution study** | Event study: what adopting total triage does (feeds tool + typology) | Exploratory, unhardened | Matched control + DiD + inference | `projects/triage-substitution-study.md` |
 | 5 | **RCGP briefing** | 3-page policy brief; RCGP | Draft v0.3 (in notes, not a file yet) | Apply capacity amendment (`NOTES_BATCH_DRAFT` sec C) | (to be created) |
+| 6 | **Unmet-need study** | Which practices are NOT meeting need: expected need (morbidity+deprivation+age) vs delivered activity + access-failure, validated by under-detection & late-diagnosis. Attacks the de Dumast/Carr-Hill blind spot (consultations = met demand) | New (data assembled 13 Jul) | Build expected-vs-delivered residual; validate vs CVDPREVENT undiagnosed + cancer-emergency | `projects/` (brief TBC) |
 
-All five are facets of one goal: **decision-support for practices from public data.** The typology is the
+All six are facets of one goal: **decision-support for practices from public data.** The typology is the
 spine; the tool is its delivery; the research and triage study are the evidence; the briefing is one output.
 
 ---
