@@ -612,10 +612,11 @@ async function run() {
       ${mx > 5 ? `<div class="fb">
       <p class="ev">I can't tell from the published data why your practice shows this morning pattern —
       but you may know: what your menu plays at the Monday peak, or how your booking works. A line here
-      comes only to me, anonymously, and helps make sense of the national picture.</p>
+      comes only to me — with this practice's code but nothing about who sent it — and helps make sense of
+      the national picture.</p>
       <textarea id="fb-ivr" rows="2" maxlength="1000"
         placeholder="e.g. our 8am message tells callers we are full and to call back / directs to 111 / offers our online form…"></textarea>
-      <button onclick="sendFb(this,'mp-ivr','${code}','fb-ivr','up')">Send anonymously</button>
+      <button onclick="sendFb(this,'mp-ivr','${code}','fb-ivr','up')">Send</button>
       </div>` : ""}
       <p class="ev">May 2026 weekdays, with May 2025 alongside where your practice reported then. The two
       bank-holiday Mondays in each May are excluded, leaving two ordinary Mondays and four Wednesdays per
@@ -1179,8 +1180,8 @@ async function run() {
     because size and deprivation are related` : ""}. These are associations, not guarantees — the evidence for every
     claim is in the sections below.</p>
     <div class="fb">
-    <p class="ev">Does this summary match your experience of the practice? Anonymous, one line, and it helps
-    improve the tool.</p>
+    <p class="ev">Does this summary match your experience of the practice? One line. It reaches me with this
+    practice's code but nothing about who sent it, and it helps improve the tool.</p>
     <textarea id="fb-sum" rows="2" maxlength="1000"
       placeholder="Optional: what did I get wrong, or miss?"></textarea>
     <button onclick="sendFb(this,'mp-summary','${code}','fb-sum','up')">Broadly right</button>
