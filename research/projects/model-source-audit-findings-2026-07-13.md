@@ -140,4 +140,31 @@ standardised coefficients should move little, which is itself a useful validatio
 5. **Re-run composition models on the May 2026 detailed census** (`gp_composition_may26.csv`,
    already downloaded) instead of Mar 2025.
 6. **Settle the denominator**: adopt the canonical "Patients Registered" list for per-10k metrics or
-   document the GPAD-aver
+   document the GPAD-average exception; audit mypractice's capacity card for mixed workforce sources.
+7. **Integrate the new-but-unused sources** into the models they were pulled for: QOF 21-register
+   prevalence and CVDPREVENT into the typology + unmet-need study; weighted list as the
+   need-adjusted capacity denominator; age/sex structure as the demographic axis. Recheck for a
+   CVDPREVENT March 2026 extract first.
+8. **Diary the post-rebuild refreshes**: QOF 2025/26 on 27 Aug 2026 (prevalence file and every
+   QOF-derived Fingertips indicator), and the GPPS 2027 wave next July.
+9. **Housekeeping**: correct the dangling "§4.33" reference in the audit brief to batch-draft §4.17;
+   IMD provenance now recorded (§3a: Fingertips NGPP indicator 94240, registered-population weighted);
+   update the stale `README.md` description of `practice_imd.csv` from "IMD 2019" to IMD 2025 / 94240.
+
+## 6. Verification notes (how "latest" was established)
+
+Fetched 13 Jul 2026: NHSE Digital series pages for Appointments in General Practice (latest May
+2026, June due 30 Jul), General Practice Workforce (latest 31 May 2026, June due 23 Jul), Patients
+Registered at a GP Practice (July 2026 due 9 Jul, now out — repo holds the 1 Jul 2026 extract), QOF
+2025/26 page (explicit "Publication Date: 27 Aug 2026, upcoming"), NHS England FFT data page (landing
+page shows March 2026 but the Apr/May 2026 GP files exist at their upload URLs). Web-searched with
+publication-page confirmation: GPPS 2026 (published 9 Jul 2026), NHS Payments 2024/25 (latest
+annual), IoD/IMD 2025 (gov.uk, published 30 Oct 2025), NHSBSA EPD (April 2026 latest, monthly),
+OC submissions (April 2026 page live; May 2026 values present in the merged panel). Not directly
+verifiable: the CVDPREVENT quarterly extract schedule (site API timed out; inference from the annual
+report cycle) — flagged in the table rather than asserted.
+
+Local checks run this session: GPAD parquet vs regenerated CSV row/practice counts equal; workforce
+ratio test (§2); xsec `imd_score` = `practice_imd.csv` IMD2025 for 6,007/6,007; xsec `dm_prev` =
+QOF-2024/25 file exactly (corr 1.0); `panel_merged.oc_rate_1k` non-null through May 2026;
+`fft_gp_panel` populated through May 2026 (6,180 practices, 902k responses in the May file).

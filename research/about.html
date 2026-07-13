@@ -28,15 +28,16 @@
   <p class="sub">Last updated: <span class="todo">[DATE ON PUBLICATION]</span></p>
 
   <div class="card">
-    <p><b>What this is.</b> A free, independent tool that shows how English GP practices compare on
-    access, continuity and capacity, built entirely from data that NHS England and the GP Patient
-    Survey already publish about every practice. It is written for practices working under pressure,
-    to help them see where changes might be worth making. It was built by
-    <a href="https://www.linkedin.com/in/annemariecunningham/">Anne Marie Cunningham</a>, a GP,
-    and is not produced, endorsed or reviewed by NHS England or the NHS.</p>
+    <p><b>What this is.</b> I'm <a href="https://www.linkedin.com/in/annemariecunningham/">Anne Marie
+    Cunningham</a>, a GP. I built this tool to show how English GP practices compare on access,
+    continuity and capacity, using only data that NHS England and the GP Patient Survey already
+    publish about every practice. It is written for practices working under pressure, to help them
+    see where changes might be worth making. I make and run it in a personal capacity — it is not
+    produced, endorsed or reviewed by NHS England or the NHS, and it is not connected to any
+    organisation I work with.</p>
     <p><b>What this is not.</b> It is not a rating, a ranking or a league table, and nothing here is a
     judgement of the quality of care at any practice. The comparisons are descriptive associations
-    across roughly 5,000 practices — they say what tends to go together, not what causes what, and
+    across England's ~6,000 practices — they say what tends to go together, not what causes what, and
     not what any one practice should do. It is not medical, legal or business advice.</p>
   </div>
 
@@ -47,8 +48,8 @@
     mistakes — including confident-sounding ones. The generated query is always shown so anyone can
     check exactly what was asked of the data, and every figure can be verified against the published
     NHS sources named on each card. Please verify before acting on or publishing anything from this
-    tool. If you spot an error, use the feedback boxes or contact
-    <a href="https://www.linkedin.com/in/annemariecunningham/">Anne Marie Cunningham</a>.</p>
+    tool. If you spot an error, use the feedback boxes or
+    <a href="https://www.linkedin.com/in/annemariecunningham/">contact me</a> — I would rather know.</p>
     <p>The underlying data has known limits, stated on each page: telephony covers only practices
     whose supplier submits nationally, appointment books do not capture total workload, some
     online-consultation counts are incomplete, and survey estimates for small practices are noisy.</p>
@@ -66,55 +67,54 @@
     relate to identifiable professionals. This tool adds no evaluative claims about any individual
     or any named practice beyond what the official statistics state, and presents every figure with
     its context and caveats. If your practice is shown and you believe a figure is wrong or missing
-    context, contact <a href="https://www.linkedin.com/in/annemariecunningham/">Anne Marie
-    Cunningham</a> and it will be reviewed promptly.</p>
+    context, <a href="https://www.linkedin.com/in/annemariecunningham/">contact me</a> and I will
+    review it promptly.</p>
     <p>If you quote or republish material from this tool, please keep the caveats attached, attribute
     the underlying sources, and do not present anything here as a rating or ranking of practices.</p>
   </div>
 
   <h2>Privacy — what happens when you use these pages</h2>
   <div class="card">
-    <p><b>The practice page (mypractice.html).</b> Lookups run entirely in your browser: the practice
-    code or name you type is not sent to us or anyone else. If you choose to send feedback, your
-    comment, your rating and the practice code being viewed are sent to our server so the tool can be
-    improved. Feedback is deleted after 90 days.</p>
-    <p><b>The explorer (explore.html), shared demo.</b> Your question is sent to our server
+    <p id="practice-page"><b>The practice page (mypractice.html).</b> Lookups run entirely in your browser: the practice
+    code or name you type is not sent to me or anyone else. If you choose to send feedback, your
+    comment, your rating and the practice code being viewed are sent to my server so I can improve
+    the tool. I delete feedback after 90 days.</p>
+    <p id="explorer"><b>The explorer (explore.html), shared demo.</b> Your question is sent to my server
     (Cloudflare) and on to Anthropic's API to generate the query and — together with the generated
     SQL and a small sample of the public result rows — the written answer; Anthropic
-    does not use API data to train its models by default. Questions and answers are logged so the
-    tool can be improved, with a short code derived from your internet address that changes every
-    day; your actual internet address is never stored. Question logs are deleted after 30 days,
-    feedback after 90. The demo is rate-limited per visitor, which is why the daily code exists.</p>
+    does not use API data to train its models by default. I log questions and answers so I can
+    improve the tool, against a short code derived from your internet address that changes every
+    day; the address itself is never stored. I delete question logs after 30 days and feedback
+    after 90. The demo is rate-limited per visitor, which is why the daily code exists.</p>
     <p><b>The explorer with your own key.</b> Requests go directly from your browser to Anthropic (or
-    to your own local model). Nothing is sent to or logged by us. Your key is stored only in your
+    to your own local model). Nothing is sent to or logged by me. Your key is stored only in your
     browser's local storage, on your machine.</p>
     <p><b>No cookies, no analytics.</b> These pages set no cookies and run no analytics or trackers.
     Your browser's local storage is used only to remember your model settings and key, because the
     page cannot work without them; clearing your browser data removes it.</p>
     <p><b>Please don't type personal details.</b> Free-text boxes are for comments about the data and
     the tool. Don't include anything that could identify a living person — yourself, a patient, or a
-    colleague. Anything that looks like personal details, especially anything about a patient's
-    health, will be deleted from the logs.</p>
-    <p><b>Who is responsible and your rights.</b> The data controller for feedback and demo logs is
-    <a href="https://www.linkedin.com/in/annemariecunningham/">Anne Marie Cunningham</a>
-    (contact via LinkedIn). The lawful basis
-    is legitimate interest in improving a free public-interest tool. Because logs are held against a
-    code that changes daily rather than your name or address, we usually cannot link a log entry to
-    you — but you can contact us about anything you submitted, and you have the right to complain to
-    the <a href="https://ico.org.uk/">Information Commissioner's Office</a>.
-    Registered with the ICO as a data controller
-    <span class="todo">[add registration number Z------- when the confirmation arrives]</span>.</p>
+    colleague. If something looks like personal details, especially anything about a patient's
+    health, I will delete it from the logs.</p>
+    <p><b>Who is responsible and your rights.</b> I am the data controller for the feedback and demo
+    logs (<a href="https://www.linkedin.com/in/annemariecunningham/">contact me via LinkedIn</a>),
+    and I am registered with the ICO as a data controller
+    <span class="todo">[add registration number Z------- when the confirmation arrives]</span>.
+    The lawful basis is my legitimate interest in improving a free tool. Because logs are held
+    against a code that changes daily rather than your name or address, I usually cannot link a log
+    entry to you — but you can contact me about anything you submitted, and you have the right to
+    complain to the <a href="https://ico.org.uk/">Information Commissioner's Office</a>.</p>
   </div>
 
   <h2>Terms of use</h2>
   <div class="card">
-    <p>The tool is provided free, as is, in the hope it is useful but without any warranty of
-    accuracy, completeness or availability. Use it at your own judgement; verify figures against the
-    published sources before relying on them. Do not use the tool to present any practice's data as
-    a rating, ranking or endorsement, to attempt to identify individuals, or to overload the shared
-    demo (it is rate-limited and may be withdrawn at any time). These pages and terms may change;
-    the date above shows the current version. Nothing here affects the terms of the underlying NHS
-    publications, which remain available directly from their publishers.</p>
+    <p>I provide the tool free, as is, in the hope it is useful — but without any warranty of
+    accuracy, completeness or availability. Use it with your own judgement; verify figures against
+    the published sources before relying on them. Don't use the tool to present any practice's data
+    as a rating, ranking or endorsement, to attempt to identify individuals, or to overload the
+    shared demo (it is rate-limited, and I may withdraw it at any time). These pages and terms may
+    change; the date above shows the current version. Nothing here affects the terms of the
+    underlying NHS publications, which remain available directly from their publishers.</p>
   </div>
 
   <p class="sub">Questions, corrections, complaints:

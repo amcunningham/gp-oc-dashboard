@@ -5,3 +5,6 @@
 /data/
 ~$*
 *.crdownload
+
+# Unpublished drafts - never commit
+/drafts/

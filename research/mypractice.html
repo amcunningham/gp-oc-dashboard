@@ -56,7 +56,7 @@
   </div>
   <p class="sub">Type your practice's ODS code (e.g. A81001) or part of its name. Everything shown comes from
   published NHS England and GP Patient Survey data — lookups run entirely in your browser, and nothing is
-  sent to us unless you choose to submit feedback (<a href="about.html">details</a>).
+  sent to me unless you choose to submit feedback (<a href="about.html">details</a>).
   Where the data allows, each measure is compared with the year before. Companion to
   <a href="explore.html">the plain-English data explorer</a>; methods and code on
   <a href="https://github.com/amcunningham/gp-oc-dashboard/tree/main/research">GitHub</a>. All comparisons are associations across England's
@@ -111,7 +111,8 @@
     </div>
   </div>
   <p class="sub" style="margin-top:1.5rem">Published NHS data about GP practices — descriptive, not a rating
-  or a league table. <a href="about.html">About this tool, privacy and terms</a>.</p>
+  or a league table. <a href="about.html">About this tool, privacy and terms</a>
+  (<a href="about.html#practice-page">what happens to your data on this page</a>).</p>
 </div>
 
 <script type="module">
@@ -218,9 +219,9 @@ window.sendFb = async (btn, kind, ctx, taId, verdict) => {
       body: JSON.stringify({ verdict, comment, question: ctx, kind }) });
     btn.closest(".fb").innerHTML = r.ok
       ? "<span class='ev'>Thank you — received.</span>"
-      : "<span class='ev'>Could not send just now — sorry.</span>";
+      : "<span class='ev'>Couldn't send just now — sorry.</span>";
   } catch {
-    btn.closest(".fb").innerHTML = "<span class='ev'>Could not send just now — sorry.</span>";
+    btn.closest(".fb").innerHTML = "<span class='ev'>Couldn't send just now — sorry.</span>";
   }
 };
 // distribution line: light axis, band = middle 80%, notch = typical practice,
@@ -362,7 +363,7 @@ async function run() {
       : '<span class="note">(2024/25 average — no entry for this practice in the July 2026 NHS registration snapshot)</span>'}
     · ${p.pcn_name||""} · ${p.region||""} · IMD ${f1(p.imd_score)}
     ${smallSurvey ? ' · <span class="note">small survey sample — treat survey figures cautiously</span>' : ""}
-    ${reduced ? `<br><span class="note">This practice is missing from our main cross-section (a gap in our
+    ${reduced ? `<br><span class="note">This practice is missing from my main cross-section (a gap in my
     build, not in the practice's data), so a few details are unavailable: the told-to-contact-again measure,
     part of the staffing breakdown, and the postcode. Everything else, including comparisons with practices
     like yours, is shown. Full fix at the next data refresh.</span>` : ""}`;
@@ -609,9 +610,9 @@ async function run() {
       </table>
       <p><b>When calls end in the menus.</b> ${ivrText}</p>
       ${mx > 5 ? `<div class="fb">
-      <p class="ev">We cannot tell from the published data why your practice shows this morning pattern —
-      but you may know: what your menu plays at the Monday peak, or how your booking works. A line here goes
-      only to the site author, anonymously, and helps make sense of the national picture.</p>
+      <p class="ev">I can't tell from the published data why your practice shows this morning pattern —
+      but you may know: what your menu plays at the Monday peak, or how your booking works. A line here
+      comes only to me, anonymously, and helps make sense of the national picture.</p>
       <textarea id="fb-ivr" rows="2" maxlength="1000"
         placeholder="e.g. our 8am message tells callers we are full and to call back / directs to 111 / offers our online form…"></textarea>
       <button onclick="sendFb(this,'mp-ivr','${code}','fb-ivr','up')">Send anonymously</button>
@@ -666,7 +667,7 @@ async function run() {
       ${hasCalls ? "" : `<p class="ev">Your phone supplier does not report to the national collection, so
       calls — and therefore the contacts-per-appointment ratio — cannot be shown; appointments and online
       submissions are complete.</p>`}
-      <p class="ev">Read this as a description of demand, not a judgement: we built it as a proxy for capacity
+      <p class="ev">Read this as a description of demand, not a judgement: I built it as a proxy for capacity
       under pressure, but once phone answering and call volume are accounted for it shows no independent
       relationship with what patients report (<a href="predictors.html">the models behind this page</a>).
       Unanswered calls generate repeat calls, so the ratio partly reflects phone answering itself — and
@@ -758,11 +759,11 @@ async function run() {
       continuity; salaried GPs carry a direct association of similar size; regular locums show no
       relationship either way (note: ad-hoc locums are not published at practice level, so sessional cover
       is invisible here); and training practices score about two points higher than their staffing and
-      circumstances would predict. Admin staffing does not predict better answering or better scores. We
+      circumstances would predict. Admin staffing does not predict better answering or better scores. I
       infer training status from a registrar being in post in either the March 2025 or the May 2026 census
       (registrars rotate, so a single month can miss a genuine training practice), and it can still be wrong
       in either direction — if it is wrong for your practice, the feedback box at the end of your summary is
-      the place to tell us.</p>`;
+      the place to tell me.</p>`;
   } else { $("capacity").innerHTML = "<p>No workforce data for this practice.</p>"; }
 
   // ---- waiting times: how long booked appointments waited (May 2026) ----
@@ -943,7 +944,7 @@ async function run() {
   }
   $("context").innerHTML = `
     <div class="fb" style="border-top:none; margin-top:0; padding-top:0">
-    <p class="ev">We are unsure how useful this section is — tell us whether it helps:</p>
+    <p class="ev">I'm not sure how useful this section is — tell me whether it helps:</p>
     <textarea id="fb-ctx" rows="1" maxlength="1000" placeholder="Optional comment"></textarea>
     <button onclick="sendFb(this,'mp-context','${code}','fb-ctx','up')">Helpful</button>
     <button onclick="sendFb(this,'mp-context','${code}','fb-ctx','down')">Not helpful</button>
@@ -958,7 +959,7 @@ async function run() {
     unfair.</p>
     <p><b>Two of these you cannot change — though one of them works through things you can.</b> Patients at
     larger practices, and at practices serving more deprived populations, report lower satisfaction on
-    average (table below). Deprivation stays a disadvantage in every model we have run. Size behaves
+    average (table below). Deprivation stays a disadvantage in every model I have run. Size behaves
     differently: in the combined models (<a href="predictors.html">the models behind this page</a>), the
     disadvantage of being large is largely accounted for by two things large practices tend to lose —
     patients getting to see their preferred clinician, and calls being answered — and both of those are
@@ -1181,7 +1182,7 @@ async function run() {
     <p class="ev">Does this summary match your experience of the practice? Anonymous, one line, and it helps
     improve the tool.</p>
     <textarea id="fb-sum" rows="2" maxlength="1000"
-      placeholder="Optional: what did we get wrong, or miss?"></textarea>
+      placeholder="Optional: what did I get wrong, or miss?"></textarea>
     <button onclick="sendFb(this,'mp-summary','${code}','fb-sum','up')">Broadly right</button>
     <button onclick="sendFb(this,'mp-summary','${code}','fb-sum','down')">Not really</button>
     </div>`;
