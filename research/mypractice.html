@@ -861,7 +861,13 @@ async function run() {
       fifths:["smallest fifth","second-smallest fifth","middle fifth","second-largest fifth","largest fifth"] },
     { col:"imd_score", title:"Deprivation (IMD score of your patients' areas)", fmt:f1, unit:"",
       fifths:["least deprived fifth","second-least deprived fifth","middle fifth","second-most deprived fifth","most deprived fifth"] },
-    { col:"gp_per10k", title:"GPs per 10,000 patients (full-time equivalent)", fmt:f1, unit:"", fifths:GENERIC },
+    // GP/10k is a DESCRIPTIVE snapshot here, so it reads the latest census (wf = May 2026 composition),
+    // matching the capacity card above (myVal = capMe.gp10k). This is deliberately a different vintage
+    // from the predictors-page models, which keep Mar 2025 staffing (predictor before the Jan–Mar 2026
+    // survey). Do not "unify" the two onto one vintage — see model-source-audit findings, fix-list item 5.
+    { col:"gp_per10k", title:"GPs per 10,000 patients (full-time equivalent)", fmt:f1, unit:"", fifths:GENERIC,
+      expr:"10000.0*(w.partner_fte+w.salaried_fte+w.locum_fte+w.registrar_fte+w.foundation_other_fte)/x.list_size",
+      join:"JOIN wf w USING(gp_code)", myVal:(capMe ? Number(capMe.gp10k) : NaN) },
     { col:"appts_percap", title:"Appointments per 1,000 patients per month", fmt:f0, unit:"", fifths:GENERIC },
     { col:"sd_share", title:"Share of appointments booked same-day", fmt:v=>f1(v)+"%", unit:"", fifths:GENERIC },
   ];
@@ -869,14 +875,16 @@ async function run() {
   const rows = [];
   let cuts = {};
   for (const fac of FACTORS) {
+    const vexpr = fac.expr || `x.${fac.col}`;
+    const joinC = fac.join || "";
     const bins = await all(`WITH q AS (
-        SELECT NTILE(5) OVER (ORDER BY ${fac.col}) qt, satisfaction_2026 s, ${fac.col} v
-        FROM xsec WHERE ${fac.col} IS NOT NULL AND satisfaction_2026 IS NOT NULL AND gpps_n_2026>=30)
+        SELECT NTILE(5) OVER (ORDER BY ${vexpr}) qt, x.satisfaction_2026 s, ${vexpr} v
+        FROM xsec x ${joinC} WHERE ${vexpr} IS NOT NULL AND x.satisfaction_2026 IS NOT NULL AND x.gpps_n_2026>=30)
       SELECT qt, AVG(s) m, QUANTILE_CONT(s, 0.1) p10, QUANTILE_CONT(s, 0.9) p90,
         MIN(v) lo, MAX(v) hi, COUNT(*) n FROM q GROUP BY 1 ORDER BY 1`);
     if (bins.length !== 5) continue;
     cuts[fac.col] = bins;
-    const myVal = Number(p[fac.col]);
+    const myVal = (fac.myVal !== undefined) ? Number(fac.myVal) : Number(p[fac.col]);
     if (Number.isNaN(myVal)) { rows.push({ fac, missing:true }); continue; }
     let bi = 4; for (let i=0;i<5;i++) if (myVal <= Number(bins[i].hi)) { bi = i; break; }
     rows.push({ fac, bins, bi, myVal });
