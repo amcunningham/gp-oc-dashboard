@@ -16,7 +16,7 @@ Interactive dashboard analysing the online consultation (OC) platform market in 
 The `data/` folder contains derived datasets used in the analysis:
 
 - `full_oc_tertiles.csv` — Tertile assignments for 6,018 practices (GP_CODE, OC rate, tertile, region, supplier)
-- `practice_imd.csv` — Practice-level Index of Multiple Deprivation 2019 scores
+- `practice_imd.csv` — Practice-level Index of Multiple Deprivation 2025 scores (Fingertips NGPP indicator 94240: IoD2025 population-weighted across each practice's registered patients; replaced the IMD 2019 indicator 93553 export in Apr 2026)
 - `practice_feb26.json` — Cloud-based telephony practice-level summary (February 2026)
 
 ### Original data sources (not included due to size)
