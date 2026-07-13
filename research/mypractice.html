@@ -753,9 +753,6 @@ async function run() {
       <tr><td>Appointments per 1,000 patients per month</td><td class="num">${f0(p.appts_percap)}</td><td class="num">${f0(capNat.mapp)}</td>
         ${hasCapCell ? `<td class="num">${f0(capCell.cap1k)}</td>` : ""}</tr>
       </table>
-      <p class="ev">Staffing figures are rates, not headcounts: at your list size of ${f0(p.list_size)},
-      1.0 FTE per 10,000 equals ${f1(Number(p.list_size)/10000)} whole-time staff. Small practices
-      naturally show higher rates — one partner across a small list is a large number per 10,000.</p>
       <p class="ev">In the combined models: partners' association with experience runs largely through
       continuity; salaried GPs carry a direct association of similar size; regular locums show no
       relationship either way (note: ad-hoc locums are not published at practice level, so sessional cover
