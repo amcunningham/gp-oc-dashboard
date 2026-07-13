@@ -1174,9 +1174,9 @@ async function run() {
     <p class="ev">The patient-reported findings are ordered by how much of each is within a practice's control;
     the operational findings by strength of evidence across ~5,000 practices
     (<a href="predictors.html">the models behind this page</a>).
-    "Similar practices" means the same twenty-fifth of England's practices as yours: the same fifth for list
-    size and the same fifth for deprivation${hasCell ? ` (${f0(cell.n)} practices in your case — the cells
-    vary in size because size and deprivation are related)` : ""}. These are associations, not guarantees — the evidence for every
+    "Similar practices" means practices in the same fifth of England as yours for list size <i>and</i> the
+    same fifth for deprivation${hasCell ? ` — ${f0(cell.n)} practices in your case; the groups vary in size
+    because size and deprivation are related` : ""}. These are associations, not guarantees — the evidence for every
     claim is in the sections below.</p>
     <div class="fb">
     <p class="ev">Does this summary match your experience of the practice? Anonymous, one line, and it helps
