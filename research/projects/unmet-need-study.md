@@ -15,12 +15,14 @@ registered non-attenders) plus the operational access data (deflection, telephon
 - **McConnachie 2023** (BMJ Open, Scotland): delivered contact time vs LTC count -> deprived under-deliver at every morbidity level; +14% to equalise. Excludes non-attenders.
 - **Gopfert 2021** (BJGP, England): consultation length by deprivation x multimorbidity.
 - **de Dumast 2026** (BMJ Open): Carr-Hill under-weights morbidity; deprived practices LOSE under morbidity reweighting; residual widens = undermeasured need.
-- **Anselmi 2025** (Health Policy): person-based workload formula; practice fixed-effects NEGATIVE in deprived deciles (deliver less than predicted) = supply/access constraint, corrected upward; explicitly zeros negative ethnicity coefficients as "indications of unmet need." Notes practice-level *interactions* aren't publishable nationally.
+- **Anselmi 2025 (Health Policy) + 2026 (BJGP e434)** — the active funding-reform programme (Manchester / Health Foundation). Person-based workload formula from CPRD+HES; practice fixed-effects NEGATIVE in deprived deciles (deliver less than predicted) removed as "supply"; negative ethnicity coefficients set to zero "to account partially for unmet needs"; the 2026 paper applies the weights (uplift ~£678m / 11.6%). **They name our gap in print:** the weights "do not account for appointment content and duration, which may vary with patients' *capacity to engage* and socioeconomic background, and for which there are *currently no available measures*." Also confirm practice-level interactions aren't publishable nationally (= our 2-comparator wall). See also Wang 2024 (BMC Med) on inequalities in *recording* of 205 conditions -> supports the under-detection angle.
 - **Rolewicz 2020** (BMJ Open): unmet need in multimorbidity using the 2018 GPPS.
 
 **Common thread:** all measure workload/consultations = *met* demand; all find deprived under-delivery; all
 handle the unmet/non-presentation problem crudely (exclude non-attenders; zero-out coefficients; interpret
-the residual as supply). None measure the mechanism, and none the non-presentation. That is the open lane.
+the residual as supply). None measure the mechanism, none the non-presentation. The leading funding team
+says the measures for the capacity-to-engage / unmet-need layer *do not exist*. Building them from GPPS
+(reaches non-attenders) + operational data (deflection, telephony, OC) IS the contribution.
 
 ## The cascade (the design)
 
