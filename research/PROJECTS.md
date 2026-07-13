@@ -25,18 +25,19 @@ Single source of truth for every project. If a project grows its own copy of the
 - Gaps: telephony starts Oct 2024; POMI (direct booking) ended Aug 2024; OC undercount where suppliers
   don't report (Medicus/Visiba, §4.26).
 
-### Data sources to add (from the Arjus landscape review, 13 Jul)
+### Data sources (from the Arjus landscape review, 13 Jul) — pulled 13 Jul
 
 Arjus (arjus.co.uk) aggregates ~18 public datasets as **descriptive dashboards** - no typology, no
-interpretation; that gap is ours. Sources worth pulling for the axis:
+interpretation; that gap is ours. Sources for the axis:
 
-- **QOF disease prevalence 2024/25** - DONE (`data/qof_prevalence_2425`). Morbidity axis.
-- **CVDPREVENT** - granular cardiovascular management indicators (deeper morbidity/management).
-- **Carr-Hill weighted list size** - need-adjusted denominator for work/capacity ratios (better than raw list).
-- **Population-health / LSOA** - small-area deprivation, general health, disability, ethnicity, age (need axis).
-- **NHS App Management Information** - OPEN, monthly, practice-level, current to Apr 2026; app-based
-  appointment booking = live proxy for direct online booking (successor to dead POMI; covers 2025-26).
-- **Full GPPS record-level** - needs application (Ipsos / NHS England / UK Data Service) for individual need x deflection.
+- **QOF disease prevalence 2024/25** - DONE (`data/qof_prevalence_2425`, 21 registers). Morbidity axis.
+- **CVDPREVENT** - DONE (`data/cvdprevent_practice`, 32 CV detection/management indicators, to Dec 2025). CV-management axis.
+- **Carr-Hill weighted list** - DONE (`data/practice_weighted_list`, 2024/25). Need-adjusted capacity denominator (ratio ~1.0, range 0.4-4.0).
+- **Practice age/sex structure** - DONE (`data/practice_age_sex`, Jul 2026). Age-band shares + %female; demographic need axis.
+- **POMI online services** - DONE (`data/pomi_online_services_practice`, 2022-Aug 2024, practice-month). Direct online booking (`appts_online_transactions`) - the ONLY open practice-level booking source; ends Aug 2024; overlaps OC for the self-book-vs-triage question on early adopters.
+- **NHS App MI** - PULLED but **ICB-level only** (`data/nhs_app_mi`, 2020-2026); has logins/registrations/prescriptions, NOT appointments-booked and NOT practice granularity. Practice-level app booking sits behind the OKTA-gated NHS App Dashboard. **Correction to earlier note:** no OPEN practice-level online-booking data exists after Aug 2024.
+- **LSOA population-health apportionment** - NOT pulled (bigger job: patients-by-LSOA x IMD/Census). Deferred.
+- **Full GPPS record-level** - needs a data application (Ipsos / NHS England / UK Data Service); cannot be downloaded.
 
 ---
 

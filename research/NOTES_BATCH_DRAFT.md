@@ -716,3 +716,24 @@ CONCLUSION for the briefing: do NOT lump deflection and diversion. DEFLECTION is
 -- it lands specifically on the highest-need patients (learning disability, autism, mental health, limiting
 conditions), hardest in deprived areas. DIVERSION is need-neutral and largely appropriate triage. The access
 model's inequity is concentrated in "come back another day", not in "go to the pharmacy".
+
+---
+
+## E2. Second user feedback (12 Jul 2026, colleague via WhatsApp/AMC) — explorer, in use on a client practice
+
+Positive: "enjoying the use of your tool, just used to get some context on one of our new client
+practices." Requests, triaged:
+1. INLINE PROVENANCE per card — show exactly where each result's data came from *on the card*, not
+   only in the end-of-page sources block. "in-line would assist with checking." (quick-ish; the answer
+   pipeline already knows the source table/column — surface it per finding.)
+2. EXPORT — print/download the output as PDF/Docx. (moderate; client-side print-to-PDF is the fast path.)
+3. LESS WORDY — a high-level, ideally graphical, initial summary above the detail. "would feel easier."
+4. FOOTER T&Cs / privacy policy linking to relevant docs, + a plain-English explainer. (product/legal
+   decision — AMC call; needed before wider sharing.)
+5. INFO HYGIENE — the "reading this page" card exposes architecture detail (reference to the MD/
+   KEY_FINDINGS file). Not a security issue but unnecessary; trim. (quick.)
+6. MCP — "would be lovely." Colleague flags Ben Haresign's tool (haresign.net/tools/) as prior art with
+   an existing MCP — worth reviewing before building ours.
+
+ACTIONS (proposed): #5 and #1 are quick wins; #2 is a print stylesheet; #3 is a summary-card redesign;
+#4 is AMC's decision; #6 folds into the deferred MCP build (review Haresign first).
