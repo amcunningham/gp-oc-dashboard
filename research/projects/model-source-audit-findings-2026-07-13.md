@@ -1,0 +1,143 @@
+# Model & data-source currency audit — findings (13 Jul 2026)
+
+_Executes the brief in `model-source-audit.md`. Diagnostic only: no model was re-run, no live page or
+cross-section was modified. Every "latest available" below was verified on 13 Jul 2026 against the
+NHSE / OHID / NHSBSA / MHCLG publication page (fetched, not assumed); verification notes at the end.
+File-integrity check: on-disk byte counts of every notes/script/page file read for this audit matched
+`git show HEAD:...` exactly — no OneDrive truncation affected this session's reads._
+
+## 1. Currency / provenance table
+
+Column meanings: **our version** = period covered by the file in the repo; **latest available** = most
+recent published release as of 13 Jul 2026, with its publication date where verified.
+
+| source | file we use | our version / date | latest available | current? | action |
+|---|---|---|---|---|---|
+| GPAD appointments | `panel_merged.{parquet,csv}`, `waits_panel.parquet` | Mar 2023 – May 2026 | May 2026 (pub 25 Jun 2026); June 2026 due **30 Jul 2026** | **Yes** | Refresh at the 30 Jul rebuild (June edition publishes that morning). CSV/parquet now agree (242,345 rows, 6,386 practices) — the §4.25 corrupt-CSV incident is repaired, but `build_xsec.py` still reads the CSV; switch it to the parquet at rebuild. |
+| OC submissions | `panel_merged.oc_rate_1k`; `panel_oc.csv` | merged panel: to May 2026 (non-null for 6,128 practices); standalone `panel_oc`: **to Mar 2026** | April 2026 publication is live on NHSE Digital; May 2026 values are already present in the merged panel | **Split** | `panel_oc.csv` is two releases behind the merged panel. `did_anima.py` derives its adopter flag ("Continuum by latest month") from `panel_oc`, so the flag is as of Mar 2026. Re-extend `panel_oc` (or read supplier from the same source as the merged panel) before re-running the DiD. |
+| Cloud-based telephony | `cbt_ivr_panel.csv` (+ rush/volumes/daytime files) | Oct 2024 – May 2026 | May 2026 (pub 25 Jun 2026); June edition due late Jul | **Yes** | June edition (first with practice-level call-waiting times per the rebuild list item 4) lands around the 30 Jul rebuild. |
+| GPPS | `data/GPPS_2026_Practice_data...csv`; `*_2026` columns in xsec | 2026 wave (fieldwork Jan–Mar 2026) | 2026, published **9 Jul 2026** | **Yes** | Models confirmed on 2026 columns: `did_anima.py` outcomes use `*_2026`; `f2f_increasers.py` outcome is `satisfaction_2026`; predictors-page models (§4.22–4.23, §4.31) are on the 2026 wave. The xsec's unsuffixed GPPS columns are the 2025 wave by design (baseline), not staleness. |
+| Workforce (NWRS) | xsec `gp_fte/nurse_fte/dpc_fte/admin_fte` + `*_per10k`; `workforce_panel.parquet` | xsec snapshot: **Mar 2025 (202503), doubled** (see §2); panel: 2018–Mar 2026; raw May 2026 CSVs downloaded to `data/gpw_may26/` but not ingested | 31 May 2026 (pub 25 Jun 2026); June due 23 Jul 2026 | **No** (bugged and 14 months old in xsec) | Fix the ×2 (see §2); ingest May 2026 (or June, out 23 Jul) into `workforce_panel`; at rebuild decide the xsec snapshot month — Mar 2026 aligns workforce with the GPPS 2026 fieldwork window better than Mar 2025 does. |
+| GP composition (detailed census) | `gp_composition_mar25.csv` (drives §4.31 / §4.21 models and the predictors page tables) | Mar 2025 | May 2026 detailed practice file already downloaded (`gp_composition_may26.csv`, `data/gpw_may26/`) | **No** | The published composition models pair Mar 2025 staffing with 2026 survey outcomes. Re-run on May 2026 composition at rebuild; expect the training-flag and partner/salaried coefficients to move slightly. |
+| NHS Payments | `xsec_ext_payments2425.parquet`, `practice_weighted_list` | 2024/25 | 2024/25 (latest annual; classified Management Information) | **Yes** | Note for any payments work: PCN Leadership/Support/Workforce/IIF/Enhanced Access categories were removed from the 2024/25 report. |
+| Registration / list size | `list_jul26.csv`, `practice_age_sex` (extract 1 Jul 2026); xsec `list_size` (GPAD-panel 12-month average) | Jul 2026 snapshot; xsec average Apr 2024–Mar 2025 | July 2026 (pub 9 Jul 2026) | **Yes** (snapshot files); xsec denominator is a different flavour — see §3 | Apply the PROJECTS.md denominator rule at rebuild. |
+| IMD | `data/practice_imd.csv` → xsec `imd_score/imd_quintile` | **IMD 2025** (all 6,007 xsec values match the file exactly) | English Indices of Deprivation 2025, published 30 Oct 2025 | **Yes** | The brief's "2019 was latest" is out of date: IoD2025 exists and the repo is already on it. One check remains for the rebuild: document how the LSOA-level IMD2025 was apportioned to practices (source of `practice_imd.csv` is not recorded in the repo). |
+| QOF disease prevalence | `qof_prevalence_2425` (21 registers, 6,188 practices) | 2024/25 (pub 28 Aug 2025) | 2024/25; **2025/26 publishes 27 Aug 2026** (confirmed on its NHSE page) | **Yes** | New-but-unused: no model currently ingests it (xsec carries only `dm_prev`, which matches the 2024/25 file exactly, corr 1.0, diff 0). Fold into the typology feature space and the unmet-need study as planned. |
+| CVDPREVENT | `cvdprevent_practice` (32 indicators) | extract to Dec 2025, pulled 13 Jul 2026 | Dec 2025 appears to be the latest quarterly extract (the 2025 annual report, pub 11 Dec 2025, uses March 2025 core data; no March 2026 extract was findable on 13 Jul 2026) | **Yes, with a caveat** | Could not verify the extract schedule directly (the data-tool API timed out); recheck for a March 2026 extract before the unmet-need study quotes under-detection figures. New-but-unused otherwise. |
+| Fingertips | `xsec_ext_fingertips2425` (qof, dm_prev, cdr, conv, ref_rate, ca_em_rate/n), `fingertips_cancer_emergency_practice` | 2024/25, pulled 11–13 Jul 2026 | 2024/25 (annual; QOF-derived indicators cannot update before QOF 2025/26 on 27 Aug 2026) | **Yes** | None. Fingertips list-size remains banned as a denominator per the PROJECTS.md rule. |
+| Prescribing (NHSBSA EPD) | xsec `abx_per1k`, `statins_per1k`, `items_per_pt` | single month **Mar 2025**, backfilled from the old master, not source-reproducible (XSEC_REBUILD_PROPOSAL §157) | EPD April 2026 (monthly, ~2-month lag) | **No** (13 months old and unreproducible) | Re-pull from the EPD API at rebuild. Two upstream changes to handle: SNOMED_CODE became a string field (11 May 2026) and from Apr 2026 the data reflect ICB mergers. Consider a 12-month window rather than a single month. |
+| ODS epraccur | not in repo; xsec `closure_exposed`/`merger_recipient` backfilled from the old master | derivation not reproducible | epraccur is quarterly (a mid-2026 quarter is current) | **No** (source absent) | Pull epraccur at rebuild: it also supplies the practice-name source the §4.25 design principle requires (practices with no survey still render). |
+| POMI | `pomi_online_services_practice` | Apr 2022 – Aug 2024 | collection **ended Aug 2024**; no successor open practice-level booking data | **Yes** (terminal) | None — archival. The PROJECTS.md correction stands: no open practice-level online-booking data after Aug 2024. |
+| NHS App MI | `nhs_app_mi` | 2020–2026, pulled 13 Jul 2026 | ICB-level only | **Yes** | None; practice-level remains OKTA-gated. |
+| FFT (GP) | `fft_gp_panel` | Jul 2022 – **May 2026** | May 2026 GP file (uploaded Jul 2026; the FFT landing page's "latest month = March 2026" banner lags its own file uploads — the Apr and May 2026 `.xlsm` files exist and are what `fetch_fft.py` ingested) | **Yes** | None. |
+
+## 2. The workforce ×2 bug — verified live, and its blast radius
+
+Re-verified from scratch: joining `xsec_master_2026` to `workforce_panel.parquet` (period 202503) on
+practice code gives `gp_fte(xsec) / gp_fte(panel)` = 2.0000 for all 5,964 joinable practices (min
+1.99999, max 2.00000). Spot value: A81001 xsec 7.41 vs panel 3.71. Cause as documented in
+NOTES_BATCH_DRAFT §4.17 (companion numbering): the original build summed the workforce file's total
+row and its component rows. (The brief cites "§4.17/§4.33"; no §4.33 exists in either notes file —
+the second reference is dangling and should be corrected to the batch-draft §4.17.)
+
+Where the doubled values do and do not matter:
+
+- **Live pages: wrong numbers on screen.** `mypractice.html` and `explore.html` both read
+  `xsec_master_2026` and display `gp_per10k` (and nurse/dpc per-10k). Every absolute staffing figure
+  shown to the tool's ~26 users is 2× the true value. Not edited this session per the brief; this is
+  the single highest-priority fix at the 30 Jul rebuild.
+- **Standardised model coefficients: unaffected.** The predictors-page models report points per SD;
+  uniform scaling leaves SD-standardised coefficients unchanged. The published §4.21–4.23 and §4.31
+  coefficient tables do not need retraction. §4.31's composition variables come from
+  `gp_composition_mar25.csv`, not the doubled xsec columns, so the partner/salaried/locum/trainee
+  splits were never doubled.
+- **Unstandardised uses: self-consistent but mislabeled.** `did_anima.py` and `f2f_increasers.py`
+  include raw `gp_per10k` as a covariate; doubling a covariate halves only its own coefficient and
+  leaves every other estimate, the propensity match, and the DiD effects unchanged. Conclusions
+  stand; any quoted gp_per10k coefficient magnitude is half its true-scale value.
+- **Cross-source comparisons: at risk.** Any figure that mixes xsec FTE with a correctly-scaled
+  source (national FTE benchmarks, the composition file, §4.30's "GP FTE/10k rose 4.8→6.0" panel
+  numbers) silently compares doubled with undoubled. The mypractice capacity card shows "GP mix vs
+  the typical practice" — verify at rebuild which source each element reads.
+- **`nurse_fte` has a second, separate defect:** the live master sourced it from a column that is
+  empty at Mar 2025; the rebuilt cross-section uses the populated `nurses_fte` column (94.7%
+  coverage). Carry that correction over.
+
+Fix: use the corrected `workforce_panel` values (as `build_xsec_full.py` already does), never a
+halving patch on the live file.
+
+## 3. List-size denominators — one inconsistency to resolve
+
+The four flavours (PROJECTS.md rule) are all present in the repo. Current usage:
+
+- xsec `list_size` = 12-month average of the GPAD panel's monthly registered count (Apr 2024–Mar
+  2025), and every xsec per-capita/per-10k metric (`gp_per10k`, `sd_percap`, `appts_percap`, etc.)
+  divides by it. Internally consistent: no xsec metric was found dividing a count from one source by
+  a denominator from another.
+- The rule names NHSE "Patients Registered at a GP Practice" as canonical. The GPAD panel's monthly
+  list is NHSE-derived and close, but it is not the canonical snapshot; the two differ by up to ~3%.
+  At rebuild, either (a) re-derive per-10k metrics from the matching-month canonical registered
+  list, or (b) document the GPAD-average as the deliberate xsec denominator and keep it uniform.
+  Option (a) matches the written rule; whichever is chosen, `practice_age_sex.total_list` (Jul 2026
+  snapshot) must not be mixed into 2024/25-window rates.
+- `practice_weighted_list.registered_patients` (NHS Payments 2024/25) is correctly quarantined to
+  the Carr-Hill ratio.
+
+## 4. xsec_master_2026 vs xsec_master_rebuilt — recommendation
+
+Switch the models to `xsec_master_rebuilt` at the 30 Jul rebuild, **after** its five remaining
+backfilled columns are re-derived from source. Grounds (all re-checked against
+XSEC_REBUILD_PROPOSAL): the rebuild reproduces 72/98 columns exactly (corr 1.0, mad 0), corrects the
+workforce doubling and the nurse-FTE empty-column defect, and restores 126 practices the live master
+dropped by building against a stale GPAD extract (all 6,007 live practices retained; the 33
+non-recovered supplement rows fail inclusion legitimately). Outstanding before promotion:
+`abx_per1k`, `statins_per1k`, `items_per_pt` (EPD pull — currently NULL for the 126 recovered
+practices), `closure_exposed`, `merger_recipient` (epraccur derivation), and folding the external
+merges into `build_xsec_full.py` so the whole table regenerates in one command. Re-running the
+predictors models on the rebuilt table will shift n by ~2% and absolute staffing by ×0.5;
+standardised coefficients should move little, which is itself a useful validation check.
+
+## 5. Ordered fix list for the 30 July rebuild
+
+1. **Workforce ×2** — rebuild on corrected `workforce_panel` values (and `nurses_fte`); regenerate
+   every displayed staffing figure on mypractice/explore. Highest priority: wrong numbers are
+   currently on public pages.
+2. **Switch `build_xsec.py` to the parquet** (never the CSV) and adopt the rebuilt cross-section as
+   base, survey-first with left joins (§4.25 design principle).
+3. **Complete the rebuilt table's external columns from source**: EPD (Apr 2026, mind the SNOMED
+   string change and ICB mergers), epraccur (closure flags + practice names), then promote
+   `xsec_master_rebuilt` and re-run the predictors models.
+4. **Refresh time-anchored inputs to the editions publishing that week**: GPAD June 2026 (30 Jul),
+   CBT June 2026 (~23–30 Jul, first call-waiting times), workforce June 2026 (23 Jul), and re-extend
+   `panel_oc` past Mar 2026 before re-running `did_anima.py` (its adopter flag is otherwise four
+   months stale against a May-2026 merged panel).
+5. **Re-run composition models on the May 2026 detailed census** (`gp_composition_may26.csv`,
+   already downloaded) instead of Mar 2025.
+6. **Settle the denominator**: adopt the canonical "Patients Registered" list for per-10k metrics or
+   document the GPAD-average exception; audit mypractice's capacity card for mixed workforce sources.
+7. **Integrate the new-but-unused sources** into the models they were pulled for: QOF 21-register
+   prevalence and CVDPREVENT into the typology + unmet-need study; weighted list as the
+   need-adjusted capacity denominator; age/sex structure as the demographic axis. Recheck for a
+   CVDPREVENT March 2026 extract first.
+8. **Diary the post-rebuild refreshes**: QOF 2025/26 on 27 Aug 2026 (prevalence file and every
+   QOF-derived Fingertips indicator), and the GPPS 2027 wave next July.
+9. **Housekeeping**: correct the dangling "§4.33" reference in the audit brief to batch-draft §4.17;
+   record the provenance of `practice_imd.csv` (IMD2025→practice apportionment method).
+
+## 6. Verification notes (how "latest" was established)
+
+Fetched 13 Jul 2026: NHSE Digital series pages for Appointments in General Practice (latest May
+2026, June due 30 Jul), General Practice Workforce (latest 31 May 2026, June due 23 Jul), Patients
+Registered at a GP Practice (July 2026 due 9 Jul, now out — repo holds the 1 Jul 2026 extract), QOF
+2025/26 page (explicit "Publication Date: 27 Aug 2026, upcoming"), NHS England FFT data page (landing
+page shows March 2026 but the Apr/May 2026 GP files exist at their upload URLs). Web-searched with
+publication-page confirmation: GPPS 2026 (published 9 Jul 2026), NHS Payments 2024/25 (latest
+annual), IoD/IMD 2025 (gov.uk, published 30 Oct 2025), NHSBSA EPD (April 2026 latest, monthly),
+OC submissions (April 2026 page live; May 2026 values present in the merged panel). Not directly
+verifiable: the CVDPREVENT quarterly extract schedule (site API timed out; inference from the annual
+report cycle) — flagged in the table rather than asserted.
+
+Local checks run this session: GPAD parquet vs regenerated CSV row/practice counts equal; workforce
+ratio test (§2); xsec `imd_score` = `practice_imd.csv` IMD2025 for 6,007/6,007; xsec `dm_prev` =
+QOF-2024/25 file exactly (corr 1.0); `panel_merged.oc_rate_1k` non-null through May 2026;
+`fft_gp_panel` populated through May 2026 (6,180 practices, 902k responses in the May file).
