@@ -319,12 +319,18 @@ async function run() {
   }
   // Registered population: prefer the current NHS snapshot (1 July 2026) over the
   // 2024/25 average that the analysis dataset carries. All rates and size-fifth
-  // placements on this page then use the current list.
+  // placements on this page then use the current list — UNLESS the snapshot value is
+  // implausibly small. A few practices carry a placeholder list of ~1 in the July 2026
+  // extract (real lists in the thousands); adopting that would make every per-capita
+  // figure explode (GP/10k in the tens of thousands, etc.), so fall back to the robust
+  // 2024/25 average when the snapshot is under 100 or under a fifth of that average.
   p.list_2425 = p.list_size;
   let listIsCurrent = false;
   try {
     const lj = await one(`SELECT list_jul26 FROM lst WHERE gp_code='${lookupCode}'`);
-    if (lj && lj.list_jul26 != null) { p.list_size = Number(lj.list_jul26); listIsCurrent = true; }
+    const cur = lj && lj.list_jul26 != null ? Number(lj.list_jul26) : null;
+    const plausible = cur != null && cur >= 100 && (p.list_2425 == null || cur >= 0.2 * Number(p.list_2425));
+    if (plausible) { p.list_size = cur; listIsCurrent = true; }
   } catch { /* list file missing: fall back to the 2024/25 average */ }
   $("results").style.display = "block";
   const code = p.gp_code;
@@ -360,7 +366,7 @@ async function run() {
   $("ident").innerHTML = `<span class="big">${p.gp_name}</span> (${code}${p.postcode ? ", " + p.postcode : ""})<br>
     ${f0(p.list_size)} patients ${listIsCurrent
       ? '<span class="note">(NHS registration snapshot, 1 July 2026)</span>'
-      : '<span class="note">(2024/25 average — no entry for this practice in the July 2026 NHS registration snapshot)</span>'}
+      : '<span class="note">(2024/25 average — no usable entry for this practice in the July 2026 NHS registration snapshot)</span>'}
     · ${p.pcn_name||""} · ${p.region||""} · IMD ${f1(p.imd_score)}
     ${smallSurvey ? ' · <span class="note">small survey sample — treat survey figures cautiously</span>' : ""}
     ${reduced ? `<br><span class="note">This practice is missing from my main cross-section (a gap in my
