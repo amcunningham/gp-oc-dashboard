@@ -59,7 +59,7 @@ interpretation; that gap is ours. Sources for the axis:
 | 2 | **Practice typology** (central) | Cluster on work/capacity/deprivation/morbidity -> "practices like you", should-you-triage guidance, comparison for movers | Spine exists (`practice_typology_k5`, `supply_typology_all6k`); needs morbidity axis | Fold QOF prevalence (+CVDPREVENT) into feature space; rebuild; validate | `data/*typology*`, (brief TBC) |
 | 3 | **Access-model research** | The six-proposition critique; paper / policy | Mature | Fold in deflection-by-condition equity | `PANEL_NOTES.md` |
 | 4 | **Online-triage substitution study** | Event study: what adopting total triage does (feeds tool + typology) | Exploratory, unhardened | Matched control + DiD + inference | `projects/triage-substitution-study.md` |
-| 5 | **RCGP briefing** | 3-page policy brief; RCGP | Draft v0.3 (in notes, not a file yet) | Apply capacity amendment (`NOTES_BATCH_DRAFT` sec C) | (to be created) |
+| 5 | **RCGP briefing** | 3-page policy brief; RCGP | Draft v0.3 (in notes, not a file yet) | Apply capacity amendment — held in `drafts/rcgp-capacity-amendment.md` (local, **gitignored — kept out of the public repo**), pending AMC sign-off | (to be created) |
 | 6 | **Unmet-need study** | Which practices are NOT meeting need: expected need (morbidity+deprivation+age) vs delivered activity + access-failure, validated by under-detection & late-diagnosis. Attacks the de Dumast/Carr-Hill blind spot (consultations = met demand) | New (data assembled 13 Jul) | Build expected-vs-delivered residual; validate vs CVDPREVENT undiagnosed + cancer-emergency | `projects/` (brief TBC) |
 
 All six are facets of one goal: **decision-support for practices from public data.** The typology is the
@@ -75,8 +75,10 @@ spine; the tool is its delivery; the research and triage study are the evidence;
   table" framing locked. **Do NOT use any named practice as a case study** - cohort-level only.
 - **Interpretation is the moat.** Peer-relative + evidence-weighted salience (which metrics predict experience)
   is what Arjus / Ben Haresign / a raw dashboard cannot do.
-- **Notes reconciliation.** `PANEL_NOTES.md` clean to sec 4.14; `NOTES_BATCH_DRAFT.md` holds sec 4.15-4.31 +
-  companion additions awaiting a single review/merge (three `[CHECK]` numbers cleared 13 Jul).
+- **Notes reconciliation — DONE 20 Jul 2026.** Sec 4.15–4.34.1 merged into `PANEL_NOTES.md` (renumbered,
+  de-duplicated). `NOTES_BATCH_DRAFT.md` slimmed to a residual (KEY_FINDINGS 14–17 pending sign-off; rebuild
+  list; user feedback). The RCGP capacity amendment was moved to `drafts/` (gitignored) as it is not for the
+  public repo.
 
 ---
 

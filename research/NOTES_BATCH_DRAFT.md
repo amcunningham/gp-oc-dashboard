@@ -1,6 +1,6 @@
 # Residual — items not yet banked (was NOTES_BATCH_DRAFT.md)
 
-**Sections 4.15–4.34.1 were merged into PANEL_NOTES.md on 20 Jul 2026** (renumbered and de-duplicated) and removed from here. What remains below: two items still **pending AMC sign-off** (A, C), and two operational records kept for reference (D — the 30 July rebuild list; E/E2 — user feedback).
+**Sections 4.15–4.34.1 were merged into PANEL_NOTES.md on 20 Jul 2026** (renumbered and de-duplicated) and removed from here. What remains below: two items still **pending AMC sign-off** (A, C), and two operational records kept for reference (D — the 30 July rebuild list; E/E2 — user feedback). **The RCGP capacity amendment (was section C) was moved to `drafts/rcgp-capacity-amendment.md` (gitignored, not public) on 20 Jul 2026.**
 
 ---
 
@@ -64,22 +64,6 @@
 > accounted for. Validation: the phone systems alone predict 37% of practice-level variation
 > in reported phone ease — machine telemetry and survey agree about which practices are which.
 > Full tables: research/predictors.html.
-
----
-
-## C. RCGP briefing capacity amendment (replaces the current bullet's final sentences)
-
-> **PENDING AMC SIGN-OFF — not yet applied.**
-
-
-> Fully qualified GP capacity per patient fell about 6% between 2019 and early 2025, then
-> rose 2.5% in the year to May 2026 — recovering over a third of the loss in a single year
-> and leaving capacity about 4% below its 2019 level. Changes in a practice's GP and
-> administrative staffing, measured at survey fieldwork, show small positive associations
-> with experience change within the year; operational changes to phone systems carry effects
-> three to four times larger over the same period; and seven-year staffing change predicts
-> experience durably. The 2026 improvement is operational in character; the workforce turn,
-> if sustained, is what the longer-run evidence says will consolidate it.
 
 ---
 
