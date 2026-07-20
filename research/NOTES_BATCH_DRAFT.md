@@ -84,7 +84,7 @@
    couldnt_contact_2025 into ingest_gpps2026.py's QSET and dedupe the two ingest versions
    before any re-run; optional EXRL (fully-qualified) column mapping post-2018 in
    workforce_panel; optional exact *_basew weighting for explorer benchmarks.
-7. README: one-line description for adoption_risk_2027.csv (now deliberately public).
+7. ~~README: one-line description for adoption_risk_2027.csv (now deliberately public).~~ **REVERSED 20 Jul 2026: adoption_risk_2027.csv (per-practice adoption scores) moved to `drafts/` (gitignored, NOT public) — internal/RCGP-first, pending a release decision. Build-script path updated.**
 8. Re-run the §4.14 substitution analysis with waiting-time outcomes (standing diary item).
 9. From first user feedback (see E): latest-census — DONE for the tool same day (31 May 2026
    census now drives the capacity card; the *models* still use March 2025 workforce inputs and

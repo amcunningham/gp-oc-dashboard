@@ -881,66 +881,9 @@ awaiting AMC sign-off; CBT/phone-ease mechanism test; graveyard cause-of-closure
 from these data; 2027 wave: LLR gradient trend, adopter stabilisation test (does the adopters'
 gap stop widening).
 
-## 4.11 Adoption is selected, vintage-graded, and forecastable (10 Jul 2026) - PUBLICATION TRACK
+## 4.11 Adoption is selected, vintage-graded, and forecastable — [moved to drafts/ on 20 Jul 2026]
 
-Mutually exclusive adoption waves (OC intake >=100 subs/1k/month; panel starts Apr 2023 so
-pioneer adoption timing is left-censored): pioneers by Apr 2023 (n=434), surged 2023-24 (344),
-2024-25 (594), 2025-26 (1,173), never (3,500). Full values in data/adoption_waves_summary.csv.
-
-VINTAGE GRADIENT. Pioneers: large (median 11.5k), urban (90%), continuity-poor since 2012
-(~31 vs never-adopters' 39) but NOT access-distressed in 2019 - predicted by structure (list
-size OR 1.44/SD, urban, low continuity OR 0.77/SD; AUC 0.66), not by satisfaction gaps or
-slide. Later waves flip to distress selection: the 2025-26 wave arrived with deflection 11.3%
-(vs 8.5 never), phones -6.8, slide -0.4/yr. The 2023-24 wave is the anomaly - most affluent
-(IMD 19.9), least declining. Two adoption regimes: workflow-for-scale first, lifeline later.
-GP workforce does NOT distinguish waves: FQ GP/10k ~4.7-5.0 (2019) and ~4.5-4.8 (2026) in
-every group, all losing 4-6% - adoption is about intake failure, not staffing differentials.
-Within-wave variance is UNIFORM (Levene p=0.94): waves differ in means (1-3pp) not spreads
-(sd ~10) - shifted distributions, not tribes; vintage says little about any single practice.
-
-PIONEER STEADY STATE. 370/434 still heavy users (median 225/1k). Their 2026 adjusted outcomes
-sit almost exactly on their pre-adoption trajectory (extrapolated -4.2, observed -4.0
-satisfaction) - long-run trend-neutral - EXCEPT deflection -1.8pp better than expectation:
-the one durable observable dividend of the model, landing on the worst-weighted experience.
-
-PREDICTION (out-of-time validated). Logit trained on the 2024-25 transition (features
-available beforehand: 2023 survey gaps, 2012-23 slide, real list size, IMD, GP FTE, OC base)
-predicts the UNSEEN 2025-26 adopters at AUC 0.692 (train 0.668 - no overfit); decile adoption
-rates 5.8% -> 50.7%. Stable drivers: list size OR ~1.5, OC-base headroom ~0.5, poor phones
-~0.8. Deprivation unstable across specs - earlier "affluent adopt first" claim WITHDRAWN.
-Base rate accelerating: 10.5% of pool (24-25) -> 24.0% (25-26). QRISK-style reading applies:
-reliable for populations/deciles, a coin flip for individuals; better at ruling out.
-data/adoption_risk_2027.csv scores all 4,057 not-yet-adopters (rank robust; absolute p
-assumes next year resembles last). NOT for the public repo - internal/RCGP first.
-
-PRE-REGISTERED DESIGN for the 2027 wave (recorded before adopters are known):
-(1) 2026-27 adopters will concentrate in the top predicted deciles of adoption_risk_2027.csv.
-(2) Naive adopter-vs-rest comparisons on GPPS 2027 will show deficits largely attributable
-    to selection; the fair estimate matches each adopter to non-adopters with similar
-    predicted probability (propensity) and similar 2012-26 trajectory.
-(3) Expected under our model: year-one access-satisfaction dip attenuating with exposure;
-    continuity effect heterogeneous (routing-dependent, per 4.4); deflection improvement
-    concentrated in high-deflection adopters.
-(4) Also due with 2027 wave: LLR deflection-gradient trend; do pioneer/early-adopter gaps
-    stop widening (stabilisation test).
-
-LITERATURE POSITION (checked 10 Jul 2026): existing work is cross-sectional GPPS x OC
-(JMIR 2024), patient-level usage (OpenSAFELY 2024), single-system trend-adjusted evaluation
-(NIHR). Nothing found on decade-trajectory selection into adoption, adoption vintages,
-validated adoption risk scores, or pre-registered selection-corrected designs. Candidate
-venues: BMJ Quality & Safety (methods/selection angle) or BJGP (substantive). AMC to lead;
-analyses reproducible from repo scripts + public data.
-
-ADDENDUM to 4.11 (10 Jul 2026, evening): practices have been contractually required to keep
-online consultation tools open throughout core hours since 1 OCTOBER 2025 (25/26 access
-changes) - inside the between-waves adoption window. Part of the 2025-26 surge cohort is
-therefore mandate-nudged rather than purely distress-selected; the 26/27 contract (same-day
-urgent duty, call-back ban, no capping) will push further. Selection regimes: structural
-(pioneers) -> distress (2024-26) -> compliance (Oct 2025 onward, accelerating 2026-27).
-NHSE publicly attributed the 2026 satisfaction rise to expanding online access on publication
-day (Pulse, 9 Jul 2026) - a between-year national correlation credited to a tool without
-adjustment for who adopted; our change models contradict the general claim and support it
-only within the former high-deflection group.
+_This 'PUBLICATION TRACK' section and the per-practice adoption-risk score (`adoption_risk_2027.csv`) were moved out of the public repo to `drafts/` (gitignored) on 20 Jul 2026 — internal/RCGP-first, pending a release decision. Held in `drafts/panel-notes-4.11-adoption-publication-track.md`._
 
 ## 4.12 Weighting conventions and late additions (10 Jul 2026)
 
