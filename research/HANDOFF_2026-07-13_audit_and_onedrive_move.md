@@ -12,10 +12,12 @@ ordered fix list for the 30 Jul rebuild. Key commits: 882cf11 (audit), 110c9e2 (
 f4af355 (README IMD fix), 3ffc7ba (recovered page edits). All pushed.
 
 **Headline audit findings** (details in the findings file):
-- **Workforce ×2 bug re-confirmed live**: xsec `gp_fte` etc. are exactly 2.0000× the corrected
-  `workforce_panel` (n=5,964). mypractice.html and explore.html display the doubled per-10k figures.
-  Standardised model coefficients unaffected; absolute displayed staffing wrong. **This is the next
-  piece of work** (fix list item 2, item 1 now done).
+- **Workforce ×2 bug — RESOLVED 14 Jul 2026 (commit `8bbe440`), re-verified 20 Jul.** _(Was: xsec
+  `gp_fte` etc. exactly 2.0000× corrected `workforce_panel`, n=5,964; live pages showed doubled
+  per-10k.)_ Fixed by regenerating the 8 workforce columns from corrected `workforce_panel` (period
+  202503, `nurses_fte`); xsec now matches `workforce_panel` and `xsec_master_rebuilt` to 6 dp
+  (A81001 `gp_fte` 3.71, not 7.41). Live pages load the corrected file; no doubling in their JS.
+  Standardised model coefficients were unaffected throughout.
 - Stale: xsec workforce snapshot Mar 2025 (May 2026 published; raw in `data/gpw_may26/`); composition
   models on Mar 2025 census (`gp_composition_may26.csv` already downloaded); xsec prescribing = EPD
   Mar 2025 and not source-reproducible (latest EPD Apr 2026); `panel_oc.csv` ends Mar 2026 (Apr 2026
@@ -54,9 +56,9 @@ f4af355 (README IMD fix), 3ffc7ba (recovered page edits). All pushed.
    this stalled on the permission dialog; do manually or retry.)
 2. Commit & push incubator (25 files) and bin-collection (1 file).
 3. Claude projects/sessions: remove old OneDrive folder connections; connect `C:\GitHub`.
-4. **Next substantive work: the workforce ×2 hotfix** — regenerate the 8 workforce columns in
-   `xsec_master_2026` from the corrected `workforce_panel` (period 202503; use `nurses_fte` for
-   nurse FTE), refresh the staffing figures the live pages display, redeploy. Then the rest of the
-   fix list in the findings file §5.
+4. ~~**Next substantive work: the workforce ×2 hotfix**~~ — **DONE 14 Jul, commit `8bbe440`
+   (verified 20 Jul).** Regenerated the 8 workforce columns in `xsec_master_2026` from corrected
+   `workforce_panel` (202503, `nurses_fte`); live pages redeployed. Remaining items are the rest of
+   the fix list in the findings file §5 (rebuild-time, not a hotfix).
 5. Git hygiene notes that no longer apply post-move: index null-sha1/lock corruption was OneDrive;
    `git config user.email` is set. The OneDrive byte-check hazard is obsolete for `C:\GitHub`.

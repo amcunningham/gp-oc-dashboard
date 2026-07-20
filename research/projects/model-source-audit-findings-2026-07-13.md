@@ -33,6 +33,12 @@ recent published release as of 13 Jul 2026, with its publication date where veri
 
 ## 2. The workforce ×2 bug — verified live, and its blast radius
 
+> **STATUS: RESOLVED 14 Jul 2026 (commit `8bbe440`), re-verified 20 Jul 2026.** The 8 workforce
+> columns in `xsec_master_2026` were regenerated from the corrected `workforce_panel` (period
+> 202503, `nurses_fte`) and now match `workforce_panel` and `xsec_master_rebuilt` to 6 dp (A81001
+> `gp_fte` 3.71, not 7.41). Both live pages load the corrected `xsec_master_2026.parquet`; no
+> doubling remains in their JavaScript. The analysis below is retained as the historical record.
+
 Re-verified from scratch: joining `xsec_master_2026` to `workforce_panel.parquet` (period 202503) on
 practice code gives `gp_fte(xsec) / gp_fte(panel)` = 2.0000 for all 5,964 joinable practices (min
 1.99999, max 2.00000). Spot value: A81001 xsec 7.41 vs panel 3.71. Cause as documented in
@@ -45,7 +51,8 @@ Where the doubled values do and do not matter:
 - **Live pages: wrong numbers on screen.** `mypractice.html` and `explore.html` both read
   `xsec_master_2026` and display `gp_per10k` (and nurse/dpc per-10k). Every absolute staffing figure
   shown to the tool's ~26 users is 2× the true value. Not edited this session per the brief; this is
-  the single highest-priority fix at the 30 Jul rebuild.
+  the single highest-priority fix at the 30 Jul rebuild. _[RESOLVED 14 Jul, commit `8bbe440` — fixed
+  ahead of the rebuild; live pages now show corrected figures.]_
 - **Standardised model coefficients: unaffected.** The predictors-page models report points per SD;
   uniform scaling leaves SD-standardised coefficients unchanged. The published §4.21–4.23 and §4.31
   coefficient tables do not need retraction. §4.31's composition variables come from
