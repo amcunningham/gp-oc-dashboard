@@ -1502,3 +1502,66 @@ CONCLUSION for the briefing: do NOT lump deflection and diversion. DEFLECTION is
 -- it lands specifically on the highest-need patients (learning disability, autism, mental health, limiting
 conditions), hardest in deprived areas. DIVERSION is need-neutral and largely appropriate triage. The access
 model's inequity is concentrated in "come back another day", not in "go to the pharmacy".
+
+## 4.35 Briefing-session analyses: size–continuity, deflection dynamics, online access tested (21 Jul 2026; AMC signed off for banking; single-session, not yet re-run through repo scripts)
+
+Produced for the capacity/continuity briefing (project 5; document in drafts/, gitignored). Full
+methods note: drafts/briefing-analysis-notes-2026-07-21.md. Weighted GPPS bases, HC1, standard
+controls (IMD, log list, %65+, rural, dispensing, region); list denominator = list_jul26 snapshot.
+
+CONTINUITY x SIZE (2026, n=5,996, weighted): <4k/4–6k/6–10k/10–14k/14–20k/20k+ =
+55.7/50.1/43.8/39.4/39.3/37.4%. MONOTONIC — no mid-size peak. Adjusted spread smallest-vs-largest
+~21pp (raw ~18): deprivation confounds AGAINST small practices (mean IMD 28.1 <4k vs 20.5 20k+), so
+adjustment widens the gap. Holds within IMD Q4–5 (51.8 -> 31.5 across bands). Elite >=80% cohort
+median list 4,588 vs national 8,824. Unmeasured patient selection into small practices not excluded.
+CONCENTRATION: patients in >14k practices 15.4% (2013) -> 40.0% (2026); >20k 3.7 -> 18.9; <6k 25.2
+-> 10.5 (practice_list_history).
+
+WORKFORCE REPLICATION (resolves the amendment check): practice_workforce_2019_latest.csv
+gp_fq_fte_latest == May-2026 composition FQ exactly; 2019 column = archived-methodology series.
+Per 10k: 4.70 (2019) -> 4.41 (Mar 25) = −6.2%; -> 4.52–4.54 (May 26) = +2.4–2.6%/yr; net −3.4 to
+−4.0% — the §4.16 −6.4/+2.5/−4.0 figures replicate from held files. Panel gp_fte_fq (4.53/10k,
+201903) is a different definition (§4.30); gives −2.7%; do not mix.
+
+CONTINUITY x DEFLECTION (n=5,674): raw weighted r = −0.38 (diversion −0.14). Adjusted (+GP FTE,
+appts/capita): −6.2pp continuity per SD deflection (p~1e−109), holds in every size band (−4.7 to
+−7.0); diversion −0.9 (p=0.001, fragile). Deflection-quartile continuity 51.5 -> 32.7. Both are
+capacity symptoms — co-occurrence, not a lever. CROSS-LAGGED (n=5,896): lagged continuity ->
+deflection −0.091 SD (p=3.5e−15); lagged deflection -> continuity −0.129 SD (p=2.3e−28); prior-change
+model null; stability r~0.6 both. Mutual, small, consistent with shared capacity driver.
+
+REMOTE DELIVERY (Q22 practice-level, n~5,200): remote share by IMD quintile 22.7 -> 28.6%;
+telephone-led (19.8 -> 25.3; video/text/message ~3% flat). corr(remote, GPAD phone share) +0.44;
+corr(remote, OC rate) +0.08; IMD gradient unchanged controlling OC. Survey-vs-GPAD mode agreement is
+also a validation point.
+
+ONLINE ACCESS TESTED (extends KF15/16; CBT 2025=Mar+May, 2026=Mar–May; OC windows from
+panel_merged): (a) OPERATIONAL GAINS — Δanswer-rate ~ ΔOC +1.05pp/SD (p=2e−7); ADOPTION EVENT null
+(−0.14, p=0.84); ΔIVR null both. (b) DEFERRAL — cross-section deflection ~ OC −0.83pp/SD (p=1e−37),
+diversion null; WITHIN-PRACTICE Δdeflection ~ ΔOC −0.19pp/SD (p=0.002), adoption null; SELECTION
+runs the other way: baseline deflection -> OC growth +0.186 SD (p=6e−37) and -> adoption +3.7pp/SD —
+failing front doors move online (cf. KF16 rescue), so the negative association is not favourable
+selection. AMC correction applied: Q12 is patient-reported regardless of channel, so form-closure
+deferral IS capturable — the "invisible online deferral" objection fails as stated. (c) HOW MANAGED —
+OC growth unrelated to ΔFQ-GP and Δadmin staffing (p=0.38/0.47) but tracks Δappointments +0.21 SD/SD
+(top quartile +45/1k/mo vs +12): throughput from the same staff; OC->deflection coefficient unchanged
+controlling activity+staffing (−0.197 -> −0.196) => residual consistent with requests resolved
+without an appointment. CAVEATS: quartile staffing means outlier-contaminated (trust the standardised
+regressions); GPAD counts appointments not duration (async responses countable); workload per
+clinician unmeasured.
+
+Q7/Q6 CROSSTAB VERIFICATION (GPPS_National_Crosstab_21072026*.xlsx; banks the §4.34 "+6"):
+continuity most->least deprived 38.1 -> 44.2 (gap 6.1pp; age-standardised 5.4 — age mix ~0.7pp only).
+Within-age gaps: 16–24 +16pp, 25–34 +8, mid-bands +4–5, 75–84 +2, 85+ +1 — the inequity concentrates
+in deprived young adults. Q6 has-preferred-clinician REVERSED: most-deprived 34.0% vs least 29.3% —
+deprived patients seek continuity more, attain it less. Two quintile-filtered exports match the
+unfiltered grid cell-for-cell.
+
+POLICY-CLAIMS CHECK (briefing framing): 2023 recovery plan pairs digital with 26,000 DPC staff and
+claims are operational ("frees up the phones"); 2025/26 contract: core-hours OC = "a key intervention
+in the government's ambition to end the 8am scramble" (verbatim). No substitution claim exists —
+critiques should test the claims made. Context: DPC roles 1.90 -> 2.78 FTE/10k 2019->2026 (+46%)
+while FQ GP per patient fell.
+
+REBUILD-LIST ADDITIONS: re-run the §4.35 change/selection/mediation models through repo scripts at
+the 30 Jul rebuild; move the Q7 crosstab verification alongside §4.34.
