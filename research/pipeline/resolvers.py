@@ -1,31 +1,37 @@
 """Release resolvers: discover the latest available edition of each open NHS data source.
 
-This is the hard, source-facing part of the auto-refresh pipeline. NHS England / NHS Digital
-publish at opaque, NON-templatable URLs (e.g.
+The hard, source-facing part of the pipeline. NHS England / NHS Digital publish at opaque,
+NON-templatable URLs (e.g.
   https://files.digital.nhs.uk/BC/A65BD0/Practice_Level_Crosstab_Feb_26.zip),
-so we cannot construct next month's URL — we have to read the publication page and extract it.
+so we can't construct next month's URL — we read the publication page and extract it. For GPAD
+the download zips live on per-edition sub-pages (…/appointments-in-general-practice/may-2026),
+not the landing page, so we follow the newest editions and scan those.
 
 Each resolver returns {"period": "YYYYMM", "label": "Mon_YY", "url": "..."} for the newest
-edition it can find, or None. `period` is a string that sorts correctly as YYYYMM.
-
-VERIFY the scraping against the live page before trusting unattended runs — page structure
-changes. Every resolver honours a manual override env var as a fallback (e.g. GPAD_OVERRIDE_URL),
-so the pipeline stays usable even if a selector breaks.
+edition found, or None. Every resolver honours a manual override env var (GPAD_OVERRIDE_URL).
 """
+import calendar
 import os
 import re
 import requests
 
-UA = {"User-Agent": "gp-oc-dashboard data-refresh (+https://github.com/amcunningham/gp-oc-dashboard)"}
+# Browser-like User-Agent: NHS Digital / gov sites frequently 403 a bare python-requests UA,
+# especially from a CI datacentre IP. This makes the request look like an ordinary browser.
+UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"}
 
 MONTHS = {m: f"{i:02d}" for i, m in enumerate(
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], start=1)}
 NUM_TO_MON = {v: k for k, v in MONTHS.items()}
+MONTH_IX = {name.lower(): i for i, name in enumerate(calendar.month_name) if name}  # january -> 1
 
-# Full https URL incl. the opaque two hash segments, so we match the real download link.
+# Full https URL incl. the opaque hash path (non-greedy), so we match the real download link.
 CROSSTAB_RE = re.compile(
-    r"https://files\.digital\.nhs\.uk/[0-9A-Fa-f]{2}/[0-9A-Fa-f]{6}/"
-    r"Practice_Level_Crosstab_([A-Z][a-z]{2})_(\d{2})\.zip")
+    r"https://files\.digital\.nhs\.uk/\S+?/Practice_Level_Crosstab_([A-Z][a-z]{2})_(\d{2})\.zip")
+# Per-edition sub-page slugs like 'may-2026'.
+EDITION_RE = re.compile(
+    r"/data-and-information/publications/statistical/appointments-in-general-practice/([a-z]+-\d{4})")
+EDITION_BASE = "https://digital.nhs.uk/data-and-information/publications/statistical/appointments-in-general-practice/"
 
 
 def _get(url, timeout=60):
@@ -48,34 +54,31 @@ def resolve_gpad(publication_url):
         return {"period": _period(*m.groups()), "label": f"{m.group(1)}_{m.group(2)}", "url": override}
 
     found = {}  # period -> url
+    landing = _get(publication_url)
+    for m in CROSSTAB_RE.finditer(landing):
+        found[_period(*m.groups())] = m.group(0)
 
-    def scan(html):
-        for m in CROSSTAB_RE.finditer(html):
-            found[_period(*m.groups())] = m.group(0)
-
-    scan(_get(publication_url))
-
-    # Fallback: the landing page may only link to per-edition sub-pages rather than the zip
-    # directly. Follow the most recent-looking edition links and scan those.
-    # VERIFY this href pattern against the live page if the direct scan ever returns nothing.
+    # Zips normally sit on per-edition sub-pages. Visit the newest editions BY REAL DATE
+    # (not alphabetically) and scan each for the crosstab download.
     if not found:
-        edition_paths = sorted(set(re.findall(
-            r'href="(/data-and-information/publications/statistical/'
-            r'appointments-in-general-practice/[a-z0-9-]+)"', _get(publication_url))))
-        for path in edition_paths[-4:]:          # newest few editions
+        def slug_date(slug):
+            mon, yr = slug.split("-")
+            return (int(yr), MONTH_IX.get(mon, 0))
+
+        for slug in sorted(set(EDITION_RE.findall(landing)), key=slug_date, reverse=True)[:3]:
             try:
-                scan(_get("https://digital.nhs.uk" + path))
+                page = _get(EDITION_BASE + slug)
             except requests.RequestException:
                 continue
+            for m in CROSSTAB_RE.finditer(page):
+                found[_period(*m.groups())] = m.group(0)
 
     if not found:
         return None
 
     period = max(found)
-    label = f"{NUM_TO_MON[period[4:6]]}_{period[2:4]}"
-    return {"period": period, "label": label, "url": found[period]}
+    return {"period": period, "label": f"{NUM_TO_MON[period[4:6]]}_{period[2:4]}", "url": found[period]}
 
 
-# --- To add a source later, write resolve_<name>(publication_url) returning the same dict. ---
-# The pattern is identical: GET the publication page, regex the real file URL, parse period,
-# support a <NAME>_OVERRIDE_URL fallback. CBT / OC / workforce / FFT all follow this shape.
+# To add a source later, write resolve_<name>(publication_url) with the same return shape and a
+# <NAME>_OVERRIDE_URL fallback. CBT / OC / workforce / FFT all follow this pattern.

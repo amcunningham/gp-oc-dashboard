@@ -60,7 +60,17 @@ def main():
     src = man["sources"]["gpad"]
     src["last_checked_utc"] = datetime.datetime.utcnow().isoformat(timespec="seconds") + "Z"
 
-    latest = resolvers.resolve_gpad(src["publication_url"])
+    try:
+        latest = resolvers.resolve_gpad(src["publication_url"])
+    except Exception as e:
+        # A failed/blocked page fetch or a changed layout must not crash the whole run.
+        print(f"RESOLVER ERROR: {type(e).__name__}: {e}")
+        print("Could not read/parse the publication page (network block or changed layout). "
+              "No changes made. If this persists, VERIFY the resolver against the live page, "
+              "or set GPAD_OVERRIDE_URL to the crosstab .zip URL as a one-off.")
+        MANIFEST.write_text(json.dumps(man, indent=2) + "\n")
+        out("changed", "false")
+        return 0
     if latest is None:
         print("Resolver found no release — the page structure may have changed. VERIFY.")
         MANIFEST.write_text(json.dumps(man, indent=2) + "\n")
