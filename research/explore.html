@@ -419,7 +419,59 @@ list size, rurality, staffing, age structure, ethnicity, region; details in PANE
     calls (~30 of them 8-10am), so roughly 40 of every 100 submissions are ADDITIONAL recorded
     contact volume (unmet, induced, or shifted demand - indistinguishable). Replicated across
     two independent year-pairs (Jan-Mar and April). Sample: early-onboarded cloud-telephony
-    practices (~2,800-3,000); within-practice, observational.`;
+    practices (~2,800-3,000); within-practice, observational.
+14. About a quarter of calls to practices end in the automated phone system (IVR) before
+    reaching the hold queue — stable nationally (26–29%, Oct 2024–May 2026) but hugely
+    variable between practices (median 24%, top decile above 36%, maximum ~94%). Higher IVR-
+    ended share is associated with worse patient experience on every measure (phone ease
+    −3.3pp/SD, contact experience −1.8, told-to-contact-again +0.8) after adjusting for
+    queue answering, capacity, staffing, online intake, deprivation, size and region. What
+    predicts a heavy IVR: list size (+2.8pp/SD) and calls per patient (+2.7/SD, partly
+    reverse-causal), with a residual ethnicity gradient (+0.7/SD net of deprivation);
+    online-intake volume is unrelated (r=0.005). Structure explains under a fifth of the
+    variation (R²=0.18) — heavy IVR use is largely a practice choice. Within the heaviest
+    users, most practices' IVR terminations run lower at 8–10am than off-peak (automation
+    serving prescription-line traffic), but ~800 practices terminate more at peak and their
+    termination tracks demand — Monday mornings exceed Wednesdays by ~5pp, roughly three
+    times the gap in ordinary practices — consistent with capacity-triggered message changes
+    turning the IVR into automated deflection at exactly the moments patients most seek
+    appointments. National statistics count IVR-ended calls as "dealt with", blending
+    automation that served the patient, diversion, and abandonment indistinguishably.
+15. Among calls that reach the queue, the share answered runs from 45% (bottom decile of
+    practices) to 95% (top); phone ease runs 47% to 75% across those deciles. Queue
+    answering is unrelated to admin staffing per patient (coefficient ≈0, p=0.98) and is
+    predicted by list size (about −6pp per doubling), deprivation (−0.2/IMD point), online
+    intake (+1.5/SD) and IVR share (−2.4/SD — heavy IVR and poor answering co-occur).
+    Practices combining heavy IVR with poor answering (n=734, mean list 14,000) score 48%
+    phone ease; light-IVR good answerers (n=749, mean list 7,500) score 77%.
+16. What predicted a practice's 2025→2026 improvement, everything competing in one model (2,751
+    phone-data practices): the event of adopting triage-first intake (−1.8 to −2.3pp across
+    experience measures — the transition itself, since marginal online volume is neutral
+    once adoption is flagged); improvement in queue answering (+0.5pp contact experience,
+    −0.2pp deflection — the broadest lever); falls in IVR share (+1.0pp phone ease
+    specifically); and admin staffing growth (+0.5pp phone ease, surviving all controls). GP
+    staffing changes show small effects within the year (+0.2–0.3pp/SD, fieldwork-aligned)
+    and larger ones over seven years (+0.6pp/SD); nurse and other-role changes show none at
+    either horizon. The adoption penalty shrinks with baseline deflection (interaction
+    +0.75/SD, pre-specified): transitions cost most where the front door already worked. NHS
+    England's public attribution of the 2026 rise to expanding online access is not
+    supported at practice level.
+17. In cross-sectional models of the 2026 survey (three outcomes: overall experience Q32, most-
+    recent-contact experience Q16, phone ease Q1; ~4,700 phone-data practices, replicated in
+    all ~5,900), the strongest single term is patients reporting they were told to contact
+    the practice again (−4.2 to −5.9pp/SD with everything controlled), and the strongest
+    positive is patients getting to see their preferred clinician (+3.0 to +3.4). With these
+    in the model, the disadvantages of practice size and of heavy online intake largely
+    dissolve — and deprivation's disadvantage falls from −2.3 to −0.6: deprived-area
+    practices score worse substantially because more of their patients report being turned
+    away. Practices hosting a GP registrar score 1.7–2.7pp higher than their staffing and
+    circumstances predict, on all three outcomes, despite slightly lower continuity
+    (registrars rotate) — replicating Ahluwalia et al., BJGP 2014
+    (doi:10.3399/bjgp14X677545). Same-day booking share, the Monday answering gap, and
+    contacts-per-appointment show no independent relationship with what patients report once
+    answering, call volume and continuity are accounted for. Validation: the phone systems
+    alone predict 37% of practice-level variation in reported phone ease. Full tables:
+    research/predictors.html.`;
 
 const INTERPRET_SYS = `You are helping a reader understand a query result from a practice-level
 open dataset on GP appointment access in England (GPAD, GPPS, workforce, IMD; details in the

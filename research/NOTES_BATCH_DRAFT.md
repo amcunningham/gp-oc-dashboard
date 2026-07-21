@@ -1,12 +1,12 @@
 # Residual — items not yet banked (was NOTES_BATCH_DRAFT.md)
 
-**Sections 4.15–4.34.1 were merged into PANEL_NOTES.md on 20 Jul 2026** (renumbered and de-duplicated) and removed from here. What remains below: two items still **pending AMC sign-off** (A, C), and two operational records kept for reference (D — the 30 July rebuild list; E/E2 — user feedback). **The RCGP capacity amendment (was section C) was moved to `drafts/rcgp-capacity-amendment.md` (gitignored, not public) on 20 Jul 2026.**
+**Sections 4.15–4.34.1 were merged into PANEL_NOTES.md on 20 Jul 2026** (renumbered and de-duplicated) and removed from here. What remains below: the Explorer KEY_FINDINGS 14–17 (A) — **now posted to explore.html on 20 Jul 2026** — and two operational records kept for reference (D — the 30 July rebuild list; E/E2 — user feedback). **The RCGP capacity amendment (was section C) was moved to `drafts/rcgp-capacity-amendment.md` (gitignored, not public) on 20 Jul 2026.**
 
 ---
 
 ## A. Explorer KEY_FINDINGS (14–17)
 
-> **PENDING AMC SIGN-OFF — not yet applied.**
+> **POSTED to `explore.html` (KEY_FINDINGS block) on 20 Jul 2026, AMC signed off.** Kept below for the record.
 
 
 > 14. About a quarter of calls to practices end in the automated phone system (IVR) before

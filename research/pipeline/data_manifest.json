@@ -1,0 +1,15 @@
+{
+  "_comment": "State of record for the auto-refresh pipeline. One entry per source. 'latest_period' (YYYYMM) is the newest edition already ingested into the derived tables; the resolver compares the live publication against it to decide whether to run. BEFORE first use, set each 'latest_period' to the true current value so the pipeline only fires on the NEXT release. 'expected_practices_min/max' feed the validation gate that catches silent practice drops (see PANEL_NOTES corrupt-CSV incident).",
+  "sources": {
+    "gpad": {
+      "name": "Appointments in General Practice (practice-level crosstab)",
+      "publication_url": "https://digital.nhs.uk/data-and-information/publications/statistical/appointments-in-general-practice",
+      "latest_period": "202605",
+      "latest_release_label": "May_26",
+      "last_resolved_url": "",
+      "last_checked_utc": "",
+      "expected_practices_min": 5800,
+      "expected_practices_max": 6600
+    }
+  }
+}

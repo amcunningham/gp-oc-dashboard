@@ -8,3 +8,7 @@
 
 # Unpublished drafts - never commit
 /drafts/
+
+# Local trash staging (holds files awaiting manual deletion, e.g. old named-practice
+# briefings and stale git locks) - never commit
+/_to_delete/
