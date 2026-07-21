@@ -1,0 +1,39 @@
+name: data-refresh
+on:
+  schedule:
+    - cron: "30 6 23-31 * *"
+  workflow_dispatch: {}
+permissions:
+  contents: write
+  pull-requests: write
+concurrency:
+  group: data-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install duckdb pandas pyarrow requests openpyxl
+      - name: Run refresh pipeline (GPAD)
+        id: refresh
+        run: python research/pipeline/refresh.py --source gpad
+      - name: Commit changes and open PR
+        if: steps.refresh.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BRANCH="data-refresh/gpad-${{ steps.refresh.outputs.period }}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add research/data/gpad_agg research/pipeline/data_manifest.json
+          git commit -m "Data refresh: GPAD ${{ steps.refresh.outputs.label }}"
+          git push -u origin "$BRANCH"
+          gh pr create \
+            --title "Data refresh: GPAD ${{ steps.refresh.outputs.label }} (${{ steps.refresh.outputs.period }})" \
+            --body-file research/pipeline/_pr_body.md
