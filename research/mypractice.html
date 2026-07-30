@@ -403,8 +403,9 @@ async function run() {
       SUM(continuity_2026*continuity_basew)/SUM(continuity_basew) eng,
       SUM(has_pref_hcp_2026*gpps_n_2026)/SUM(gpps_n_2026) engh
     FROM xsec WHERE continuity_2026 IS NOT NULL AND gpps_n_2026>=30`);
-  const myCont0 = Number(p.continuity_2026);
-  if (cd && !Number.isNaN(myCont0)) {
+  const cont0Missing = p.continuity_2026 == null || p.continuity_2026 === '';
+  const myCont0 = cont0Missing ? NaN : Number(p.continuity_2026);
+  if (cd && !cont0Missing && !Number.isNaN(myCont0)) {
     const cLo = Math.max(0, Math.floor(Math.min(Number(cd.p10), myCont0)/10)*10 - 5);
     const cHi = Math.min(100, Math.ceil(Math.max(Number(cd.p90), myCont0)/10)*10 + 5);
     $("continuity").innerHTML = `
@@ -414,8 +415,8 @@ async function run() {
       (<a href="predictors.html">the models behind this page</a>) — and it is substantially a matter of how
       appointments are allocated, not something fixed by a practice's size or circumstances.</p>
       <table>
-      <tr><th></th><th class="num">2025</th><th class="num">2026</th><th class="num">England 2026</th>
-        ${hasCell?`<th class="num">Practices like yours<br>(n=${f0(cell.n)})</th>`:""}</tr>
+      <tr><th></th><th class="num">Your practice<br>2025</th><th class="num">Your practice<br>2026</th><th class="num">England<br>2026</th>
+        ${hasCell?`<th class="num">Practices like yours<br>2026 (n=${f0(cell.n)})</th>`:""}</tr>
       <tr><td>Have a clinician they prefer to see (Q6)</td><td class="num">${f1(p.has_pref_hcp)}%</td>
         <td class="num">${f1(p.has_pref_hcp_2026)}%</td><td class="num">${f1(cd.engh)}%</td>
         ${hasCell?`<td class="num">${f1(cell.hp)}%</td>`:""}</tr>
@@ -423,11 +424,13 @@ async function run() {
         <td class="num big">${f1(p.continuity_2026)}%</td><td class="num">${f1(cd.eng)}%</td>
         ${hasCell?`<td class="num">${f1(cell.c)}%</td>`:""}</tr>
       </table>
-      <p>Where you sit on Q7 among all practices — the bar covers the middle 80%, the vertical line marks the
-      typical (median) practice${hasCell ? `, the <span class="note">◆</span> is the average for practices
-      like yours` : ""}, and the dot is you.</p>
+      <details class="chartbox"><summary>Show where you sit across all practices (chart)</summary>
+      <p>The bar covers the middle 80% of practices, the vertical line marks the typical (median) practice${
+        hasCell ? `, the <span class="note">◆</span> is the average for practices like yours` : ""}, and the
+      dot is you.</p>
       ${distLine(cLo, cHi, cd.p10, cd.p90, cd.med, hasCell ? cell.c : null, myCont0,
         "Where your practice sits among all practices on patients seeing their preferred clinician")}
+      </details>
       ${ocRamp && Number(p.continuity_2026) > Number(p.continuity) ? `<p><b>Worth noting:</b> your reported
       continuity rose (${f1(p.continuity)}% to ${f1(p.continuity_2026)}%) across the same period in which
       your online intake grew substantially. Nationally, continuity more often falls with that move.
@@ -609,11 +612,11 @@ async function run() {
       if (mx > 5) ivrText = `A markedly larger share of your calls ends within the IVR during the 8–10am rush
         — about one practice in five shows this. Automated self-service, redirection, and callers giving up
         in the menus are counted the same way, so the data cannot say why. A message triggered by full
-        capacity would fire hardest on Monday mornings (compare your Monday and Wednesday morning rows with
-        the national table); an automated prescription line would not. Reviewing the messages your menu plays
+        capacity would fire hardest on Monday mornings (compare your Monday and Wednesday morning rows
+        above); an automated prescription line would not. Reviewing the messages your menu plays
         during the Monday-morning peak would establish which.`;
       else if (mx > -5) ivrText = `Your IVR endings are spread fairly evenly across the day, where at the
-        typical practice more calls end in the IVR outside the rush (national table) — so slightly more of
+        typical practice more calls end in the IVR outside the rush — so slightly more of
         your morning callers than usual end in the menus. Automated self-service, redirection, and callers
         giving up are not distinguishable in the published data.`;
       else ivrText = `More of your calls end within the IVR outside the 8–10am rush than during it — the most
@@ -638,21 +641,22 @@ async function run() {
       </table>
       <p><b>Your Monday–Wednesday answering gap in May 2026: ${f1(Math.abs(gap))} points ${gap>=0?"lower":"higher"} on
       Monday.</b> A caller who reached your queue on a Monday was ${gap>=0?"less":"more"} likely to get
-      through to a person than the same caller on a Wednesday.</p>
+      through to a person than the same caller on a Wednesday. ${gap < 0
+        ? "That is unusual — at the typical practice the Monday answer rate runs about 3.7 points below Wednesday's, so most practices answer fewer calls on Monday, not more."
+        : `The typical (median) practice's gap is 3.7 points, and only the worst-affected one in ten exceeds 16 points — so yours is ${Math.abs(gap)>=16?"among the widest in the country":Math.abs(gap)>=7?"well above the typical practice":Math.abs(gap)>=5?"above the typical practice":"close to the typical practice"}.`}</p>
       ${bandTable}
       <table>
-      <tr><th colspan="2">The national picture, May 2026 (weekdays, bank holidays excluded)</th></tr>
-      <tr><td>Typical (median) Monday–Wednesday answering gap</td><td class="num">3.7 points</td></tr>
-      <tr><td>One practice in ten has a gap larger than</td><td class="num">16 points</td></tr>
-      <tr><td>Typical share of calls ended within the IVR, 8–10am compared with the rest of the day</td><td class="num">4.1 points lower at 8–10am</td></tr>
-      ${mx>5?`<tr><td>Practices where the IVR share is instead at least 5 points higher at 8–10am, like yours</td><td class="num">about 1 in 5</td></tr>
-      <tr><td>In those practices: typical Monday-morning IVR share minus Wednesday-morning</td><td class="num">2.9 points (under 1 elsewhere)</td></tr>`:""}
-      </table>
-      <table>
-      <tr><th colspan="2">Your calls ended within the IVR, May 2026 (all weekdays)</th></tr>
+      <tr><th>Your calls ended within the IVR, May 2026 (all weekdays)</th><th class="num">Your practice</th></tr>
       <tr><td>During the 8–10am rush</td><td class="num">${f1(rate810)}%</td></tr>
       <tr><td>Rest of the day</td><td class="num">${f1(rateRest)}%</td></tr>
       </table>
+      <p>At your practice, IVR endings are ${f1(Math.abs(mx))} points ${mx>=0?"higher":"lower"} during the
+      8–10am rush than across the rest of the day. At the typical (median) practice nationally they run about
+      4.1 points <b>lower</b> in the rush${mx>=0?" — the opposite direction to yours":""}. (The national
+      figures give only this difference, not a level to compare the two rows above against.)</p>
+      ${mx>5?`<p class="ev">Your practice is among the roughly one in five where more calls end in the IVR
+      during the 8–10am rush than across the rest of the day. In those practices the Monday-morning IVR share
+      typically runs about 2.9 points above Wednesday-morning (under 1 point elsewhere).</p>`:""}
       <p><b>When calls end in the menus.</b> ${ivrText}</p>
       ${mx > 5 ? `<div class="fb">
       <p class="ev">I can't tell from the published data why your practice shows this morning pattern —
@@ -700,7 +704,7 @@ async function run() {
       submissions) — so appointments can outnumber inbound contacts, especially where one triage call becomes
       several booked slots.</p>
       <table>
-      <tr><th></th><th class="num">May 2025</th><th class="num">May 2026</th></tr>
+      <tr><th></th><th class="num">Your practice<br>May 2025</th><th class="num">Your practice<br>May 2026</th></tr>
       <tr><td>Phone calls received</td><td class="num">${f0(dd.calls0)}</td><td class="num">${f0(dd.calls)}</td></tr>
       <tr><td>Online submissions</td><td class="num">${f0(dd.oc_subs0)}</td><td class="num">${f0(dd.oc_subs)}</td></tr>
       <tr><td>Appointments delivered</td><td class="num">${f0(dd.appts0)}</td><td class="num">${f0(dd.appts)}</td></tr>
@@ -851,7 +855,7 @@ async function run() {
     SUM(has_pref_hcp_2026*gpps_n_2026)/SUM(gpps_n_2026) h26 FROM xsec`);
   $("survey").innerHTML = `
     <table>
-    <tr><th></th><th class="num">2025</th><th class="num">2026</th><th class="num">England 2026</th>
+    <tr><th></th><th class="num">Your practice<br>2025</th><th class="num">Your practice<br>2026</th><th class="num">England<br>2026</th>
       ${hasCell?`<th class="num">Practices like yours<br>2026 (n=${f0(cell.n)})</th>`:""}</tr>
     <tr><td>Overall experience good</td><td class="num">${f1(p.satisfaction)}%</td><td class="num big">${f1(p.satisfaction_2026)}%</td><td class="num">${f1(eng.s26)}%</td>
       ${hasCell?`<td class="num">${f1(cell.m)}%</td>`:""}</tr>
@@ -1044,7 +1048,7 @@ async function run() {
       to ${f0(oc.o26)} per 1,000 per month.</b> A change this size usually leaves marks in the survey, so
       read your year-on-year changes with the move in mind:</p>
       <table>
-      <tr><th>What your patients report</th><th class="num">2025</th><th class="num">2026</th></tr>
+      <tr><th>What your patients report</th><th class="num">Your practice<br>2025</th><th class="num">Your practice<br>2026</th></tr>
       <tr><td>Overall experience good</td><td class="num">${f1(p.satisfaction)}%</td><td class="num">${f1(p.satisfaction_2026)}%</td></tr>
       <tr><td>Experience of contacting the practice</td><td class="num">${f1(p.access_satisfaction)}%</td><td class="num">${f1(p.access_satisfaction_2026)}%</td></tr>
       <tr><td>Easy to get through on the phone</td><td class="num">${f1(p.phone_easy)}%</td><td class="num">${f1(p.phone_easy_2026)}%</td></tr>
@@ -1099,8 +1103,9 @@ async function run() {
       tied to patients reporting a good experience of access.`);
   }
   // 1.5 continuity: the strongest single correlate of overall experience, and changeable
-  const myCont = Number(p.continuity_2026);
-  if (hasCell && !Number.isNaN(myCont) && cell.c != null) {
+  const contMissing = p.continuity_2026 == null || p.continuity_2026 === '';
+  const myCont = contMissing ? NaN : Number(p.continuity_2026);
+  if (hasCell && !contMissing && !Number.isNaN(myCont) && cell.c != null) {
     const contSample = smallSurvey
       ? ` With ${f0(p.gpps_n_2026)} survey responses this should be read as indicative.` : "";
     if (myCont < Number(cell.c) - 5) flags.push({ pri:1, grp:"rep", html:`
@@ -1135,7 +1140,7 @@ async function run() {
   const peAgrees = cellPe != null && !Number.isNaN(myPe)
     ? (myPe < cellPe - 2
       ? ` Your patients notice: ${f1(myPe)}% report finding the phone easy, against ${f1(cellPe)}% at similar practices.`
-      : ` Your patients' reports do not yet show it — ${f1(myPe)}% find the phone easy, in line with similar practices (${f1(cellPe)}%).`)
+      : ` Your patients' reported experience of the phone is in line with similar practices, though — ${f1(myPe)}% find it easy, against ${f1(cellPe)}%.`)
     : "";
   if (diag.ans != null && diag.sizeAns != null) {
     if (ansFlagged) flags.push({ pri:1, grp:"op", html:`
