@@ -364,7 +364,8 @@ async function run() {
           AND COALESCE(l.list_jul26, x.list_size) IS NOT NULL AND imd_score IS NOT NULL),
       ms AS (SELECT COALESCE(MIN(sq),5) v FROM (SELECT sq, MAX(list_size) hi FROM s GROUP BY sq) WHERE hi >= ${Number(p.list_size)}),
       mi AS (SELECT COALESCE(MIN(iq),5) v FROM (SELECT iq, MAX(imd_score) hi FROM s GROUP BY iq) WHERE hi >= ${Number(p.imd_score)})
-      SELECT AVG(sat) m, AVG(acc) a, AVG(pe) pe, AVG(d) d, AVG(cont) c, AVG(hp) hp, COUNT(*) n
+      SELECT AVG(sat) m, AVG(acc) a, AVG(pe) pe, AVG(d) d, AVG(cont) c, AVG(hp) hp, COUNT(*) n,
+        (SELECT v FROM ms) sqv, (SELECT v FROM mi) iqv, MIN(list_size) lmin, MAX(list_size) lmax
       FROM s WHERE sq=(SELECT v FROM ms) AND iq=(SELECT v FROM mi)`);
   }
   const hasCell = cell && Number(cell.n) >= 30;
@@ -386,7 +387,15 @@ async function run() {
     ${reduced ? `<br><span class="note">This practice is missing from my main cross-section (a gap in my
     build, not in the practice's data), so a few details are unavailable: the told-to-contact-again measure,
     part of the staffing breakdown, and the postcode. Everything else, including comparisons with practices
-    like yours, is shown. Full fix at the next data refresh.</span>` : ""}`;
+    like yours, is shown. Full fix at the next data refresh.</span>` : ""}
+    ${hasCell ? `<br><span class="note"><b>"Practices like yours"</b> throughout this page means the
+    ${f0(cell.n)} practices in the same fifth of England as yours for <b>both</b> list size and deprivation:
+    here, the ${
+      {1:"smallest",2:"second-smallest",3:"middle",4:"second-largest",5:"largest"}[Number(cell.sqv)]
+    } fifth by list size (${f0(cell.lmin)}–${f0(cell.lmax)} registered patients) and the ${
+      {1:"least deprived",2:"second least-deprived",3:"middle",4:"second most-deprived",5:"most deprived"}[Number(cell.iqv)]
+    } fifth by deprivation. Comparing like with like this way helps separate what a practice can change from
+    the circumstances it works in.</span>` : ""}`;
 
   // ---- continuity: the strongest survey correlate of overall experience ----
   const cd = await one(`SELECT MEDIAN(continuity_2026) med, QUANTILE_CONT(continuity_2026, 0.1) p10,
@@ -648,8 +657,8 @@ async function run() {
       ${mx > 5 ? `<div class="fb">
       <p class="ev">I can't tell from the published data why your practice shows this morning pattern —
       but you may know: what your menu plays at the Monday peak, or how your booking works. A line here
-      comes only to me — with this practice's code but nothing about who sent it — and helps make sense of
-      the national picture.</p>
+      comes only to <a href="about.html">me</a> — with this practice's code but nothing about who sent it —
+      and helps make sense of the national picture.</p>
       <textarea id="fb-ivr" rows="2" maxlength="1000"
         placeholder="e.g. our 8am message tells callers we are full and to call back / directs to 111 / offers our online form…"></textarea>
       <button onclick="sendFb(this,'mp-ivr','${code}','fb-ivr','up')">Send</button>
@@ -1221,8 +1230,9 @@ async function run() {
     because size and deprivation are related` : ""}. These are associations, not guarantees — the evidence for every
     claim is in the sections below.</p>
     <div class="fb">
-    <p class="ev">Does this summary match your experience of the practice? One line. It reaches me with this
-    practice's code but nothing about who sent it, and it helps improve the tool.</p>
+    <p class="ev">Does this summary match your experience of the practice? One line. It reaches
+    <a href="about.html">me</a> with this practice's code but nothing about who sent it, and it helps improve
+    the tool.</p>
     <textarea id="fb-sum" rows="2" maxlength="1000"
       placeholder="Optional: what did I get wrong, or miss?"></textarea>
     <button onclick="sendFb(this,'mp-summary','${code}','fb-sum','up')">Broadly right</button>
