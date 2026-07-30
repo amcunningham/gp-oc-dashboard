@@ -54,6 +54,11 @@
     your practice identify where changes could be made. This is a very early draft and your feedback is very
     useful — there is a feedback box at the end of your practice's summary.</p>
   </div>
+  <!-- DRAFT 30 Jul 2026 — front "updated" note, pending AMC sign-off; pairs with the Phones call-waiting note; additive/reversible -->
+  <p class="ev" id="update-note" style="border-left:4px solid var(--acc)"><b>Updated July 2026</b> with the
+  latest NHS telephony data — including the practice-level call-answering times first published for June 2026
+  (the share of calls answered within two minutes). These figures are more recent than this year's patient
+  survey; see <b>Phones</b> for what they show.</p>
   <p class="sub">Type your practice's ODS code (e.g. A81001) or part of its name. Everything shown comes from
   published NHS England and GP Patient Survey data — lookups run entirely in your browser, and nothing is
   sent to me unless you choose to submit feedback (<a href="about.html">details</a>).
@@ -82,8 +87,8 @@
       <!-- DRAFT 30 Jul 2026 — call-waiting note, pending AMC sign-off; additive/reversible -->
       <p class="ev" id="callwaiting-note"><b>Call-waiting times (draft note — pending sign-off).</b>
       The national call-waiting figures now published for June 2026 — the share of calls answered within two
-      minutes — come after this year's patient survey fieldwork (January to March 2026), so they describe how
-      the phones are running now and cannot explain the survey scores above. Across practices, answering a
+      minutes — come after this year's patient survey fieldwork (January to March 2026), so they are more
+      recent than the survey scores above and cannot explain them. Across practices, answering a
       higher share of calls within two minutes goes with better patient-reported phone ease (about 6.8 points
       higher for each standard-deviation improvement), and this accounts for roughly 30% of why larger
       practices tend to score worse on getting through by phone. As elsewhere on this page these are
@@ -424,7 +429,23 @@ async function run() {
       free slot with anyone?${smallSurvey ? ` With ${f0(p.gpps_n_2026)} survey responses, treat your figures
       as indicative.` : ""}</p>`;
   } else {
-    $("continuity").innerHTML = "<p>No 2026 continuity figures for this practice.</p>";
+    const prefTxt = !Number.isNaN(Number(p.has_pref_hcp_2026))
+      ? `<p>At your practice, ${f1(p.has_pref_hcp_2026)}% of survey respondents reported having a particular
+         clinician they prefer to see${!Number.isNaN(Number(p.gpps_n_2026)) ? ` (from ${f0(p.gpps_n_2026)}
+         responses in total)` : ""} — too few of them for a reliable figure on whether they get to see that
+         clinician, so it is not published.</p>`
+      : "";
+    $("continuity").innerHTML = `
+      <p>No continuity figure is published for your practice for 2026 — here is why. The continuity measure
+      (Q7 — whether patients get to see the clinician they prefer) is only asked of people who first say they
+      <em>have</em> a particular clinician they prefer to see (Q6). When only a small number of a practice's
+      respondents name a preferred clinician, the NHS withholds the Q7 figure because it would rest on too few
+      people to be reliable, and it appears blank here.</p>
+      ${prefTxt}
+      <p class="ev">A blank here does not mean continuity is poor. It most often reflects how the practice
+      works: large or digital-first practices, and those serving more transient populations, tend to have
+      fewer patients with a regular named clinician — which is exactly what removes the question's base — or
+      it can simply follow from a small number of survey responses.</p>`;
   }
 
   // ---- Friends & Family Test: monthly timeliness signal ----
