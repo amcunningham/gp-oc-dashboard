@@ -59,7 +59,7 @@
   latest NHS telephony data — including the practice-level call-answering times first published for June 2026
   (the share of calls answered within two minutes). These figures are more recent than this year's patient
   survey; see <b>Phones</b> for what they show.</p>
-  <p class="sub">Type your practice's ODS code (e.g. A81001) or part of its name. Everything shown comes from
+  <p class="sub">Type your practice's ODS code (e.g. A81001), part of its name, or its postcode. Everything shown comes from
   published NHS England and GP Patient Survey data — lookups run entirely in your browser, and nothing is
   sent to me unless you choose to submit feedback (<a href="about.html">details</a>).
   Where the data allows, each measure is compared with the year before. Companion to
@@ -68,7 +68,7 @@
   ~6,000 practices (~5,000 for phone measures, where supplier coverage is 85%), not predictions for yours.</p>
 
   <div class="card">
-    <input type="text" id="q" placeholder="ODS code or practice name">
+    <input type="text" id="q" placeholder="ODS code, name or postcode">
     <button id="go">Look up</button>
     <div class="status" id="dbstatus">Loading data engine…</div>
     <div class="err" id="error"></div>
@@ -287,18 +287,23 @@ async function run() {
   $("error").textContent = "";
   const raw = esc($("q").value);
   if (!raw) return;
-  const isCode = /^[A-Za-z][0-9A-Za-z]{5}$/.test(raw.replace(/\s/g,""));
+  const cleaned = raw.replace(/\s/g,"");
+  // Treat as an ODS code only if it is the 6-char code shape, contains a digit, has no space, and
+  // does not end in two letters (which would be a postcode like W138ER). "argyle" (all letters, no
+  // digit) therefore falls through to the name/postcode search instead of being read as a code.
+  const isCode = !/\s/.test(raw) && /^[A-Za-z][0-9A-Za-z]{5}$/.test(cleaned) && /\d/.test(cleaned) && !/[A-Za-z]{2}$/.test(cleaned);
   let lookupCode;
   if (isCode) {
-    lookupCode = raw.replace(/\s/g,"").toUpperCase();
+    lookupCode = cleaned.toUpperCase();
   } else {
     const matches = await all(`SELECT x.gp_code, x.gp_name, x.postcode, COALESCE(l.list_jul26, x.list_size) AS list_size
       FROM xsec x LEFT JOIN lst l USING(gp_code)
-      WHERE x.gp_name ILIKE '%${raw}%' OR x.gp_code ILIKE '${raw.replace(/\s/g,"").toUpperCase()}%'
+      WHERE x.gp_name ILIKE '%${raw}%' OR x.gp_code ILIKE '${cleaned.toUpperCase()}%'
+        OR REPLACE(UPPER(x.postcode),' ','') LIKE '${cleaned.toUpperCase()}%'
       UNION ALL
       SELECT s.gp_code, s.gp_name, '' AS postcode, COALESCE(l.list_jul26, s.list_size) AS list_size
       FROM xsup s LEFT JOIN lst l USING(gp_code)
-      WHERE s.gp_name ILIKE '%${raw}%' OR s.gp_code ILIKE '${raw.replace(/\s/g,"").toUpperCase()}%'
+      WHERE s.gp_name ILIKE '%${raw}%' OR s.gp_code ILIKE '${cleaned.toUpperCase()}%'
       ORDER BY list_size DESC NULLS LAST LIMIT 10`);
     if (matches.length === 0) {
       $("error").textContent = "No practice matched. Try more of the name, or the six-character ODS code.";
