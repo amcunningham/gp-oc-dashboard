@@ -12,3 +12,10 @@
 # Local trash staging (holds files awaiting manual deletion, e.g. old named-practice
 # briefings and stale git locks) - never commit
 /_to_delete/
+
+# Raw NHS download bundles under research/data — keep only the extracted/processed outputs
+research/data/cbt_jun26/callsanswered/
+research/data/cbt_jun26/durations/
+research/data/cbt_jun26/*.zip
+research/data/cbt_jun26/*.xlsx
+research/data/rebuild_20260730/downloads/
