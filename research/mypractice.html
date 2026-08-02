@@ -124,7 +124,7 @@
 import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.29.0/+esm";
 const $ = id => document.getElementById(id);
 const DATA_BASE = location.protocol === "file:"
-  ? "https://raw.githubusercontent.com/amcunningham/gp-oc-dashboard/main/research/data/"
+  ? "https://cdn.jsdelivr.net/gh/amcunningham/gp-oc-dashboard@main/research/data/"   // jsDelivr CDN (cached/fast) rather than raw.githubusercontent.com
   : new URL("data/", location.href).href;
 const TABLES = {
   xsec: "xsec_master_2026.parquet",
@@ -503,10 +503,10 @@ async function run() {
     const szName = hasSz ? SIZE_FIFTHS[Number(sz.qt)-1] : "";
     const ansLo = Math.max(0, Math.floor(Math.min(Number(nat.a10), Number(b.ans_queue))/10)*10 - 5);
     const ivrHi = Math.min(100, Math.ceil(Math.max(Number(nat.i90), Number(b.ivr_share))/10)*10 + 5);
-    let cw = null, cwNat = null;
+    let cw = null;
+    const cwNat = { mt: 0.622, m810: 0.555 };   // national median % answered <2 min, June 2026 (precomputed — avoids scanning the table each lookup)
     try {
       cw = await one(`SELECT pct_u2_total, pct_u2_810 FROM cbtwait WHERE gp_code='${code}'`);
-      cwNat = await one(`SELECT MEDIAN(pct_u2_total) mt, MEDIAN(pct_u2_810) m810 FROM cbtwait`);
     } catch (e) { cw = null; }
     $("phones").innerHTML = `
       <p><b>What your patients report, first:</b> ${f1(p.phone_easy_2026)}% report finding it easy to get
