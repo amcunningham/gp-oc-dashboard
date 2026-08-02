@@ -83,16 +83,7 @@
     </details>
     <details id="d-phones"><summary>Phones — the evidence</summary>
       <div class="card" id="phones" data-src="Cloud-Based Telephony (NHS England), Mar–May 2025 and 2026 · GP Patient Survey 2026"></div>
-      <div class="card" id="daytime" data-src="Cloud-Based Telephony daily detail, May 2025 and 2026"></div>
-      <!-- DRAFT 30 Jul 2026 — call-waiting note, pending AMC sign-off; additive/reversible -->
-      <p class="ev" id="callwaiting-note"><b>Call-waiting times (draft note — pending sign-off).</b>
-      The national call-waiting figures now published for June 2026 — the share of calls answered within two
-      minutes — come after this year's patient survey fieldwork (January to March 2026), so they are more
-      recent than the survey scores above and cannot explain them. Across practices, answering a
-      higher share of calls within two minutes goes with better patient-reported phone ease (about 6.8 points
-      higher for each standard-deviation improvement), and this accounts for roughly 30% of why larger
-      practices tend to score worse on getting through by phone. As elsewhere on this page these are
-      associations across practices, not a promise that faster answering will move your own score.</p>
+      <div class="card" id="daytime" data-src="Cloud-Based Telephony daily detail, May 2025 and 2026 · call-answering-within-2-minutes June 2026"></div>
     </details>
     <details id="d-demand"><summary>Demand and capacity — the evidence</summary>
       <div class="card" id="demand" data-src="Cloud-Based Telephony · Online Consultation Submissions · Appointments in General Practice, May 2025 and 2026"></div>
@@ -146,6 +137,7 @@ const TABLES = {
   waits: "waits_panel.parquet",
   lst: "list_jul26.csv",   // registered patients, 1 July 2026 snapshot (NHS England)
   fft: "fft_gp_panel.parquet",   // monthly GP Friends & Family Test, Jul 2022+
+  cbtwait: "cbt_jun26/cbt_waiting_jun26_practice.csv",   // June 2026 practice-level % of answered calls picked up <2 min (Table 4b)
 };
 let conn, ready = false;
 (async () => {
@@ -511,6 +503,11 @@ async function run() {
     const szName = hasSz ? SIZE_FIFTHS[Number(sz.qt)-1] : "";
     const ansLo = Math.max(0, Math.floor(Math.min(Number(nat.a10), Number(b.ans_queue))/10)*10 - 5);
     const ivrHi = Math.min(100, Math.ceil(Math.max(Number(nat.i90), Number(b.ivr_share))/10)*10 + 5);
+    let cw = null, cwNat = null;
+    try {
+      cw = await one(`SELECT pct_u2_total, pct_u2_810 FROM cbtwait WHERE gp_code='${code}'`);
+      cwNat = await one(`SELECT MEDIAN(pct_u2_total) mt, MEDIAN(pct_u2_810) m810 FROM cbtwait`);
+    } catch (e) { cw = null; }
     $("phones").innerHTML = `
       <p><b>What your patients report, first:</b> ${f1(p.phone_easy_2026)}% report finding it easy to get
       through to you on the phone${hasCell ? ` — similar practices: ${f1(cell.pe)}%` : ""}. Everything below
@@ -520,6 +517,10 @@ async function run() {
       automated menu stage (the IVR — answered by a recorded message, redirected to another service, or
       abandoned by the caller), or it joins the queue to speak to a person. Of the calls that join the queue,
       some are answered and some are given up on or end while waiting.</p>
+      <p class="ev">The phone measures here are compared with practices of a similar <b>size</b> — not size and
+      deprivation as elsewhere on this page. Bigger practices field more calls and tend to answer more slowly,
+      so size is the fair comparison; how deprived an area is makes almost no difference to call handling in
+      the national data, so adding it would not change the benchmark.</p>
       <p>Figures are averaged over March–May of each year, so that one month of staff leave, a rota gap or
       a demand spike does not colour the whole picture. (The 2025 column averages March and May only —
       April 2025 is not in the published collection.)</p>
@@ -547,6 +548,16 @@ async function run() {
       reaching the queue${hasSz ? `; typical for practices your size is ${f1(sz.si)}%` : ""}.</p>
       ${distLine(0, ivrHi, nat.i10, nat.i90, nat.mi, hasSz ? sz.si : null, b.ivr_share,
         "Where your share of calls ended within the IVR sits among all practices")}
+      ${cw && cw.pct_u2_total != null ? `<table>
+      <tr><th>How quickly calls are answered — newest data, June 2026</th><th class="num">Your practice</th><th class="num">Typical practice</th></tr>
+      <tr><td>Answered calls picked up within 2 minutes</td><td class="num big">${f1(100*Number(cw.pct_u2_total))}%</td>
+        <td class="num">${cwNat && cwNat.mt != null ? f1(100*Number(cwNat.mt))+"%" : "–"}</td></tr>
+      <tr><td>…during the 8–10am rush</td><td class="num">${f1(100*Number(cw.pct_u2_810))}%</td>
+        <td class="num">${cwNat && cwNat.m810 != null ? f1(100*Number(cwNat.m810))+"%" : "–"}</td></tr>
+      </table>
+      <p class="ev">This is the newest telephony data (June 2026). It is more recent than this year's patient
+      survey, so it sits alongside the scores above rather than explaining them. Across practices, answering
+      more calls within two minutes goes with better patient-reported phone ease.</p>` : ""}
       <p class="ev">At practices that answer more of their queue, more patients report the phone easy to
       use; where more calls end within the IVR, fewer do — the strongest and second-strongest phone patterns
       in the 2026 survey. How staffing, size and the other measures relate to answering and to what patients
@@ -1182,8 +1193,11 @@ async function run() {
     flags.push({ pri:3, grp:"op", html:`
       <p><b>You are in the fifth of practices with the fewest GPs per patient.</b> In that fifth,
       ${f1(diag.gpLowAvg)}% of patients report a good overall experience, against ${f1(diag.gpHighAvg)}% at
-      the best-staffed — the steepest gradient on this page, and the slowest to change. The operational
-      findings above should be read in that context. ${link("d-context","See what shapes these scores")}.</p>`});
+      the best-staffed — a stronger predictor of patient experience than deprivation or practice size
+      (<a href="predictors.html">the models behind this page</a>). For most practices GP numbers turn on
+      funding and recruitment; for some — digital-first or at-scale models — they are more of a deliberate
+      choice. Either way, the operational findings above should be read in that context.
+      ${link("d-context","See what shapes these scores")}.</p>`});
   }
   // 4 (operational). channel option (only when deflection is flagged and online intake is in the lowest third)
   if (flags.some(f=>f.name==="defl") && diag.ocNow != null && diag.ocNow < 32) {
