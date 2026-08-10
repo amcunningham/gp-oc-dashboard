@@ -48,7 +48,7 @@
   <p class="sub" style="margin:0 0 .6rem">Contact, continuity and capacity — your practice against practices
   like yours, from published NHS data.</p>
   <div class="card" style="border-left:4px solid var(--acc)">
-    <p style="margin:.2rem 0"><b>GP practices are under immense strain.</b> Contact volumes have grown faster
+    <p style="margin:.2rem 0"><b>GP practices are under sustained pressure.</b> Contact volumes have grown faster
     than the capacity to meet them, and there are fewer fully-qualified full-time-equivalent GPs per patient
     than in 2019. This page is written for practices working under that pressure. Hopefully it might help
     your practice identify where changes could be made. This is a very early draft and your feedback is very
@@ -516,7 +516,7 @@ async function run() {
     $("phones").innerHTML = `
       <p><b>What your patients report, first:</b> ${f1(p.phone_easy_2026)}% report finding it easy to get
       through to you on the phone${hasCell ? ` — similar practices: ${f1(cell.pe)}%` : ""}. Everything below
-      shows what sits behind that number, and the phone data predicts it well
+      shows the phone measures that go with it, and the phone data predicts it well
       (<a href="predictors.html">the models behind this page</a>).</p>
       <p>Two things happen to a call after it is picked up by your phone system: it either ends during the
       automated menu stage (the IVR — answered by a recorded message, redirected to another service, or
@@ -527,7 +527,7 @@ async function run() {
       so size is the fair comparison; how deprived an area is makes almost no difference to call handling in
       the national data, so adding it would not change the benchmark.</p>
       <p>Figures are averaged over March–May of each year, so that one month of staff leave, a rota gap or
-      a demand spike does not colour the whole picture. (The 2025 column averages March and May only —
+      a demand spike does not skew the overall picture. (The 2025 column averages March and May only —
       April 2025 is not in the published collection.)</p>
       <table>
       <tr><th></th><th class="num">Your practice<br>Mar–May 2025</th><th class="num">Your practice<br>Mar–May 2026</th>
@@ -640,8 +640,8 @@ async function run() {
         are not distinguishable in the published data.`;
       $("daytime").innerHTML = `
       <p><b>Monday compared with Wednesday.</b> Monday is the busiest day for practice phones nationally, and
-      Wednesday the most ordinary, so comparing the two shows how your phone response holds up under the
-      week's heaviest demand. The answer rate here is the share of queueing calls (those that got past the
+      Wednesday the most ordinary, so comparing the two shows how your phone answering on the busiest day
+      compares with an ordinary one. The answer rate here is the share of queueing calls (those that got past the
       menus) that a person answered.</p>
       <table>
       <tr><th>Your practice</th>${has25?`<th class="num">Monday<br>May 2025</th><th class="num">Wednesday<br>May 2025</th>`:""}
@@ -1061,7 +1061,7 @@ async function run() {
     $("transition").style.display = "block";
     $("transition").innerHTML = `<p><b>Your practice moved substantially online between the last two survey
       years: from ${oc.o25 == null ? "no recorded online intake" : f0(oc.o25) + " submissions per 1,000 patients per month"}
-      to ${f0(oc.o26)} per 1,000 per month.</b> A change this size usually leaves marks in the survey, so
+      to ${f0(oc.o26)} per 1,000 per month.</b> A change this size usually shows up in the survey results, so
       read your year-on-year changes with the move in mind:</p>
       <table>
       <tr><th>What your patients report</th><th class="num">Your practice<br>2025</th><th class="num">Your practice<br>2026</th></tr>
@@ -1144,9 +1144,9 @@ async function run() {
     if (myPe < cellPe - 5) flags.push({ pri:2, grp:"rep", html:`
       <p><b>${f1(myPe)}% of your patients report finding it easy to get through on the phone, against
       ${f1(cellPe)}% at similar practices.</b> This is what patients report about your phones${diag.ans != null
-        ? `; the phone data shows what sits behind it — ${f1(diag.ans)}% of queueing calls answered
+        ? `; the phone measures that go with it: ${f1(diag.ans)}% of queueing calls answered
       (typical for your size: ${f1(diag.sizeAns)}%), ${f1(diag.ivr)}% of calls ending within the IVR`
-        : `; your phone supplier does not report to the national collection, so what sits behind it
+        : `; your phone supplier does not report to the national collection, so the phone measures that go with it
       cannot be shown here`}. ${link("d-phones","See the phone evidence")}.</p>`});
     else if (myPe > cellPe + 5) oks.push(`Your patients find the phone easier than at similar practices
       (${f1(myPe)}% against ${f1(cellPe)}% reporting it easy).`);
