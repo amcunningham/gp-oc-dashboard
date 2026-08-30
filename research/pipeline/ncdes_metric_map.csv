@@ -1,0 +1,18 @@
+canonical_metric,start_period,end_period,indicator_code,definition_version,rate_kind,comparability_note
+smr_med_error,202304,202403,NCDMI180,description_stable,fractional,Indicator code renamed from April 2024; published description is unchanged but underlying code-set changes remain possible.
+smr_med_error,202404,202703,SMR01A,description_stable,fractional,Indicator code renamed from April 2024; published description is unchanged but underlying code-set changes remain possible.
+smr_severe_frailty,202304,202403,NCDMI181,description_stable,fractional,Indicator code renamed from April 2024; published description is unchanged but underlying code-set changes remain possible.
+smr_severe_frailty,202404,202703,SMR01B,description_stable,fractional,Indicator code renamed from April 2024; published description is unchanged but underlying code-set changes remain possible.
+smr_addictive_medicines,202304,202403,NCDMI188,description_stable,fractional,Indicator code renamed from April 2024; published description is unchanged but underlying code-set changes remain possible.
+smr_addictive_medicines,202404,202703,SMR01C,description_stable,fractional,Indicator code renamed from April 2024; published description is unchanged but underlying code-set changes remain possible.
+smr_care_home,202304,202403,NCDMI189,description_stable,fractional,Indicator code renamed from April 2024; published description is unchanged but underlying code-set changes remain possible.
+smr_care_home,202404,202703,SMR01D,description_stable,fractional,Indicator code renamed from April 2024; published description is unchanged but underlying code-set changes remain possible.
+doac_monitoring,202304,202403,NCD111,description_stable,fractional,Indicator code renamed from April 2024; published description is unchanged but underlying code-set changes remain possible.
+doac_monitoring,202404,202703,SMR03,description_stable,fractional,Indicator code renamed from April 2024; published description is unchanged but underlying code-set changes remain possible.
+ld_check_action_plan_ethnicity,202304,202403,NCD120,description_stable,fractional,Indicator code renamed from April 2024; the published description remains substantively unchanged.
+ld_check_action_plan_ethnicity,202404,202703,HI03,description_stable,fractional,Indicator code renamed from April 2024; the published description remains substantively unchanged.
+autism_diagnosis_count,202304,202403,NCDMI137,description_stable,count,Recorded diagnosis count is a case-ascertainment/context measure and not performance.
+autism_diagnosis_count,202404,202703,HI21,description_stable,count,Recorded diagnosis count is a case-ascertainment/context measure and not performance.
+fit_pre_referral,202306,202403,NCD123,referral_event,fractional,Denominator is lower-GI fast-track referral events; do not combine across the September 2024 switch to patients.
+fit_pre_referral,202404,202408,CAN02,referral_event,fractional,Denominator is lower-GI urgent suspected-cancer referral events; do not combine across the September 2024 switch to patients.
+fit_pre_referral,202409,202703,CAN04,patient,fractional,Denominator is patients with at least one lower-GI urgent suspected-cancer referral; not directly comparable with referral-event versions.

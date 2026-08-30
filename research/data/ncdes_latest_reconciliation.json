@@ -1,0 +1,147 @@
+{
+  "period": "202607",
+  "raw_file": "data/ncdes/releases/202607__NCDesJuly26.zip",
+  "raw_sha256": "4555975e2b28462207582d25bd7a5073c34f8983296d5f4085df7fc4eb53d005",
+  "metric_panel": "research/data/ncdes_practice_metric_panel.parquet",
+  "metric_panel_sha256": "e815e74c65700ceaad62f37d5aa9051a6b4e2f9edfe85533837c561a9441e6fb",
+  "comparison_count": 8,
+  "all_match": true,
+  "comparisons": [
+    {
+      "canonical_metric": "autism_diagnosis_count",
+      "source_indicator_code": "HI21",
+      "raw": {
+        "practices": 5882,
+        "numerator": null,
+        "denominator": null,
+        "count_value": 1170508.0
+      },
+      "processed": {
+        "practices": 5882,
+        "numerator": null,
+        "denominator": null,
+        "count_value": 1170508.0
+      },
+      "matches": true
+    },
+    {
+      "canonical_metric": "doac_monitoring",
+      "source_indicator_code": "SMR03",
+      "raw": {
+        "practices": 5882,
+        "numerator": 242329.0,
+        "denominator": 1614739.0,
+        "count_value": null
+      },
+      "processed": {
+        "practices": 5882,
+        "numerator": 242329.0,
+        "denominator": 1614739.0,
+        "count_value": null
+      },
+      "matches": true
+    },
+    {
+      "canonical_metric": "fit_pre_referral",
+      "source_indicator_code": "CAN04",
+      "raw": {
+        "practices": 5882,
+        "numerator": 132951.0,
+        "denominator": 165746.0,
+        "count_value": null
+      },
+      "processed": {
+        "practices": 5882,
+        "numerator": 132951.0,
+        "denominator": 165746.0,
+        "count_value": null
+      },
+      "matches": true
+    },
+    {
+      "canonical_metric": "ld_check_action_plan_ethnicity",
+      "source_indicator_code": "HI03",
+      "raw": {
+        "practices": 5882,
+        "numerator": 64233.0,
+        "denominator": 334475.0,
+        "count_value": null
+      },
+      "processed": {
+        "practices": 5882,
+        "numerator": 64233.0,
+        "denominator": 334475.0,
+        "count_value": null
+      },
+      "matches": true
+    },
+    {
+      "canonical_metric": "smr_addictive_medicines",
+      "source_indicator_code": "SMR01C",
+      "raw": {
+        "practices": 5882,
+        "numerator": 132575.0,
+        "denominator": 1861809.0,
+        "count_value": null
+      },
+      "processed": {
+        "practices": 5882,
+        "numerator": 132575.0,
+        "denominator": 1861809.0,
+        "count_value": null
+      },
+      "matches": true
+    },
+    {
+      "canonical_metric": "smr_care_home",
+      "source_indicator_code": "SMR01D",
+      "raw": {
+        "practices": 5882,
+        "numerator": 61170.0,
+        "denominator": 268721.0,
+        "count_value": null
+      },
+      "processed": {
+        "practices": 5882,
+        "numerator": 61170.0,
+        "denominator": 268721.0,
+        "count_value": null
+      },
+      "matches": true
+    },
+    {
+      "canonical_metric": "smr_med_error",
+      "source_indicator_code": "SMR01A",
+      "raw": {
+        "practices": 5882,
+        "numerator": 37725.0,
+        "denominator": 609323.0,
+        "count_value": null
+      },
+      "processed": {
+        "practices": 5882,
+        "numerator": 37725.0,
+        "denominator": 609323.0,
+        "count_value": null
+      },
+      "matches": true
+    },
+    {
+      "canonical_metric": "smr_severe_frailty",
+      "source_indicator_code": "SMR01B",
+      "raw": {
+        "practices": 5882,
+        "numerator": 47156.0,
+        "denominator": 336819.0,
+        "count_value": null
+      },
+      "processed": {
+        "practices": 5882,
+        "numerator": 47156.0,
+        "denominator": 336819.0,
+        "count_value": null
+      },
+      "matches": true
+    }
+  ]
+}

@@ -1,0 +1,433 @@
+{
+  "release_checks": [
+    {
+      "period": "202304",
+      "source_rows": 155350,
+      "practices": 5975,
+      "metrics": 7,
+      "suppressed_values": 1690,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202304.parquet",
+      "staging_sha256": "39a8a62a2f8e9dae4866c7cd47cee05ad85d5e3a329f04a155f017ef578771d5"
+    },
+    {
+      "period": "202305",
+      "source_rows": 154388,
+      "practices": 5938,
+      "metrics": 7,
+      "suppressed_values": 8844,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202305.parquet",
+      "staging_sha256": "1319600a1a716e0c826faa3323e616596d12688d27a423c130634bdec7cc180e"
+    },
+    {
+      "period": "202306",
+      "source_rows": 190656,
+      "practices": 5958,
+      "metrics": 8,
+      "suppressed_values": 280,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202306.parquet",
+      "staging_sha256": "b725457bd5e6973dd2a00a00afac21a1b477b6a8a60b536e2aa0afa305f95922"
+    },
+    {
+      "period": "202307",
+      "source_rows": 179940,
+      "practices": 5998,
+      "metrics": 8,
+      "suppressed_values": 241,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202307.parquet",
+      "staging_sha256": "ed27ebff9fcb1ee2d7a7fbe441e7e7604ec0e2c7bd63c50f8b80ff65defbb751"
+    },
+    {
+      "period": "202308",
+      "source_rows": 190944,
+      "practices": 5967,
+      "metrics": 8,
+      "suppressed_values": 209,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202308.parquet",
+      "staging_sha256": "c8fac212d0adf003f110555ed74eb302567aa005ef1095abbda475b484ee00d7"
+    },
+    {
+      "period": "202309",
+      "source_rows": 195808,
+      "practices": 6119,
+      "metrics": 8,
+      "suppressed_values": 200,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202309.parquet",
+      "staging_sha256": "db8ce80de8a1f52b6efde37bd9b791aa8523a33fa80aac9086bf14116a7494ea"
+    },
+    {
+      "period": "202310",
+      "source_rows": 186510,
+      "practices": 6217,
+      "metrics": 8,
+      "suppressed_values": 182,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202310.parquet",
+      "staging_sha256": "317308c57b006f32e5ac347ea239a6cfe3305841cc964f9aea1b4fa4c3c46342"
+    },
+    {
+      "period": "202311",
+      "source_rows": 186240,
+      "practices": 6208,
+      "metrics": 8,
+      "suppressed_values": 175,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202311.parquet",
+      "staging_sha256": "a8e34df432fb213d275304a053fb2831b320b5d4d95b65a53186e47ea3eb6a85"
+    },
+    {
+      "period": "202312",
+      "source_rows": 186570,
+      "practices": 6219,
+      "metrics": 8,
+      "suppressed_values": 179,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202312.parquet",
+      "staging_sha256": "89837f7c82deadf3f201838de6ef382838d71ca5ebaf388c5d37217ed2bb6d6b"
+    },
+    {
+      "period": "202401",
+      "source_rows": 186450,
+      "practices": 6215,
+      "metrics": 8,
+      "suppressed_values": 166,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202401.parquet",
+      "staging_sha256": "2fb52e005b118a24e582f40f6f3758934638f57c7a75e68799abe1acc106e11d"
+    },
+    {
+      "period": "202402",
+      "source_rows": 184710,
+      "practices": 6157,
+      "metrics": 8,
+      "suppressed_values": 147,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202402.parquet",
+      "staging_sha256": "9430d974f6d0d214099d3d65be107c3111757b7b42ca25a6c3bb5b141e55b86f"
+    },
+    {
+      "period": "202403",
+      "source_rows": 186780,
+      "practices": 6226,
+      "metrics": 8,
+      "suppressed_values": 150,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202403.parquet",
+      "staging_sha256": "961caa3b201daa9acf5409b5e22f4f377e4f5c761aa99b2a90ac590255d1f747"
+    },
+    {
+      "period": "202404",
+      "source_rows": 150390,
+      "practices": 5013,
+      "metrics": 8,
+      "suppressed_values": 215,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202404.parquet",
+      "staging_sha256": "9cdbd491a21fdc570c10ccf488c9e201e1e3e9a28b59806c8e200fd8e779d659"
+    },
+    {
+      "period": "202405",
+      "source_rows": 150150,
+      "practices": 5005,
+      "metrics": 8,
+      "suppressed_values": 180,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202405.parquet",
+      "staging_sha256": "48b6ad735793d4a197c7f32fb3043275460e578ded37c278a7a7624e7685a0b2"
+    },
+    {
+      "period": "202406",
+      "source_rows": 152550,
+      "practices": 5085,
+      "metrics": 8,
+      "suppressed_values": 182,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202406.parquet",
+      "staging_sha256": "2228e294c51b7175ed3873fa6ae85f594e7f707bb8724c7b46a8130d7fc0b33e"
+    },
+    {
+      "period": "202407",
+      "source_rows": 165300,
+      "practices": 5510,
+      "metrics": 8,
+      "suppressed_values": 166,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202407.parquet",
+      "staging_sha256": "49ecf20ceec38a809a34b645408a9d3f5e3b5854cd7c0b9cc74da326a53ec1da"
+    },
+    {
+      "period": "202408",
+      "source_rows": 172770,
+      "practices": 5759,
+      "metrics": 8,
+      "suppressed_values": 165,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202408.parquet",
+      "staging_sha256": "f9572f93d63e27e5e325a45b644c79257dd427c17caa016f7514a1fafa524c17"
+    },
+    {
+      "period": "202409",
+      "source_rows": 173730,
+      "practices": 5791,
+      "metrics": 8,
+      "suppressed_values": 146,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202409.parquet",
+      "staging_sha256": "b897c796ac2cacdabe292fe4cc42b83d1944445d3c88123fce1e8c531db6214b"
+    },
+    {
+      "period": "202410",
+      "source_rows": 179220,
+      "practices": 5974,
+      "metrics": 8,
+      "suppressed_values": 151,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202410.parquet",
+      "staging_sha256": "8a3e33e80a2d75edad2008e252c5bbb7cfe45113b3f362fb110e203bd8fd9e8e"
+    },
+    {
+      "period": "202411",
+      "source_rows": 179130,
+      "practices": 5971,
+      "metrics": 8,
+      "suppressed_values": 177,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202411.parquet",
+      "staging_sha256": "6c18852d9d78e337e3887e4568d79721d45f9e6c0b15301f725bd28548252381"
+    },
+    {
+      "period": "202412",
+      "source_rows": 182370,
+      "practices": 6079,
+      "metrics": 8,
+      "suppressed_values": 152,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202412.parquet",
+      "staging_sha256": "fcd7cd8f9c4ea305fc747b6f65b492ddb806cc38d59cb96784e4d0c529f3711b"
+    },
+    {
+      "period": "202501",
+      "source_rows": 183540,
+      "practices": 6118,
+      "metrics": 8,
+      "suppressed_values": 131,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202501.parquet",
+      "staging_sha256": "de47e3c49f6980d9e48e8661b5227b4e620efde6fc586aca7186d59df932f170"
+    },
+    {
+      "period": "202502",
+      "source_rows": 183030,
+      "practices": 6101,
+      "metrics": 8,
+      "suppressed_values": 120,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202502.parquet",
+      "staging_sha256": "d956de1f31823cb751d94005192fd090cafdbe7d438a34285c11450755fc3d4a"
+    },
+    {
+      "period": "202503",
+      "source_rows": 184196,
+      "practices": 6140,
+      "metrics": 8,
+      "suppressed_values": 114,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202503.parquet",
+      "staging_sha256": "67f0a21640cde5421f3bb6b76a376717f4daa34bbe0096df3f8f5f0473b7d9e3"
+    },
+    {
+      "period": "202504",
+      "source_rows": 174420,
+      "practices": 5814,
+      "metrics": 8,
+      "suppressed_values": 159,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202504.parquet",
+      "staging_sha256": "472c2227c211e8f74d856e2f642c1f5f184a5c45b881fcc741e640506bb0f75e"
+    },
+    {
+      "period": "202505",
+      "source_rows": 174330,
+      "practices": 5811,
+      "metrics": 8,
+      "suppressed_values": 153,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202505.parquet",
+      "staging_sha256": "9d582647236ec1f4f6653f227697b710e90d91919be5cd45fc31a1edb14ebce5"
+    },
+    {
+      "period": "202506",
+      "source_rows": 174420,
+      "practices": 5814,
+      "metrics": 8,
+      "suppressed_values": 154,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202506.parquet",
+      "staging_sha256": "d6c742f045c99ad3de196dd33fcae84d3c9bf78b8023246528c63540cdbfb0e1"
+    },
+    {
+      "period": "202507",
+      "source_rows": 176280,
+      "practices": 5876,
+      "metrics": 8,
+      "suppressed_values": 166,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202507.parquet",
+      "staging_sha256": "519507b5b30daf55cd607152edce459fed1eea6926868a23d754d5d5c7c672d9"
+    },
+    {
+      "period": "202508",
+      "source_rows": 182130,
+      "practices": 6071,
+      "metrics": 8,
+      "suppressed_values": 161,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202508.parquet",
+      "staging_sha256": "c8282878eb241fead1d0617c671754128c2bdc0f1debc9a3efeb3ee001f4ca79"
+    },
+    {
+      "period": "202509",
+      "source_rows": 181980,
+      "practices": 6066,
+      "metrics": 8,
+      "suppressed_values": 184,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202509.parquet",
+      "staging_sha256": "be5b72a0ed16176ec3e0427e2dc49f7179c839719b42d5f6bc7e942c2a7143bd"
+    },
+    {
+      "period": "202510",
+      "source_rows": 181620,
+      "practices": 6054,
+      "metrics": 8,
+      "suppressed_values": 182,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202510.parquet",
+      "staging_sha256": "4cbb0e085ba82367c70415258505303489a56f78398c0f3b404637e4bc734f84"
+    },
+    {
+      "period": "202511",
+      "source_rows": 181440,
+      "practices": 6048,
+      "metrics": 8,
+      "suppressed_values": 169,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202511.parquet",
+      "staging_sha256": "2b5d96f32e5462482c26040617465495d747b7d141ab60db103e552eeba10efc"
+    },
+    {
+      "period": "202512",
+      "source_rows": 182010,
+      "practices": 6067,
+      "metrics": 8,
+      "suppressed_values": 150,
+      "crc_fallback": true,
+      "staging_file": "data/ncdes/staging/ncdes_202512.parquet",
+      "staging_sha256": "d40277b7997d4bb0f25044359e6d4e2324f3d3ef71cd12de8e8ebe8f5e627b03"
+    },
+    {
+      "period": "202601",
+      "source_rows": 181950,
+      "practices": 6065,
+      "metrics": 8,
+      "suppressed_values": 138,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202601.parquet",
+      "staging_sha256": "f31aeafa28c4229a486d95ca44dda2272774ec2fc9f2974b14eb795a1487f4a4"
+    },
+    {
+      "period": "202602",
+      "source_rows": 181980,
+      "practices": 6066,
+      "metrics": 8,
+      "suppressed_values": 135,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202602.parquet",
+      "staging_sha256": "ecc9b4fd05ef73b676ea238934718cb5cf483f0af5a70d04fa3e8ba71de495e2"
+    },
+    {
+      "period": "202603",
+      "source_rows": 182520,
+      "practices": 6084,
+      "metrics": 8,
+      "suppressed_values": 128,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202603.parquet",
+      "staging_sha256": "1e14616edb47f9c013ad6de42fd8226be4c0f94a121b55990966d477a40706b0"
+    },
+    {
+      "period": "202604",
+      "source_rows": 166170,
+      "practices": 5539,
+      "metrics": 8,
+      "suppressed_values": 195,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202604.parquet",
+      "staging_sha256": "ee5af55358d0768eb31ec7ed0c4ffdf008a60275a643270323779767071255f0"
+    },
+    {
+      "period": "202605",
+      "source_rows": 165990,
+      "practices": 5533,
+      "metrics": 8,
+      "suppressed_values": 165,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202605.parquet",
+      "staging_sha256": "82897a37cb12dc93373ea6963d6d8a8592ada18ae1897dd9237d08ccd0229b21"
+    },
+    {
+      "period": "202606",
+      "source_rows": 165720,
+      "practices": 5524,
+      "metrics": 8,
+      "suppressed_values": 183,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202606.parquet",
+      "staging_sha256": "9e9dcbcf48640f22a2e932003f1c736cacf3d3cca3226c09e656f54a2bde08e2"
+    },
+    {
+      "period": "202607",
+      "source_rows": 176460,
+      "practices": 5882,
+      "metrics": 8,
+      "suppressed_values": 170,
+      "crc_fallback": false,
+      "staging_file": "data/ncdes/staging/ncdes_202607.parquet",
+      "staging_sha256": "e64996e80db15c71d58d7970b09894b608937a6a3d33fd239605fd37203f5dc1"
+    }
+  ],
+  "panel_summary": {
+    "metric_rows": 1876542,
+    "distinct_practices": 6325,
+    "distinct_months": 40,
+    "first_month": "2023-04",
+    "last_month": "2026-07",
+    "distinct_metrics": 8,
+    "rows_with_suppression": 5142.0,
+    "unexplained_missing_numerators": 0.0,
+    "unexplained_missing_denominators": 0.0,
+    "unexplained_missing_counts": 0.0,
+    "numerators_over_denominators": 0.0,
+    "negative_source_values": 0,
+    "wide_practice_month_rows": 236057
+  },
+  "outputs": {
+    "measure_panel": {
+      "path": "research/data/ncdes_practice_measure_panel.parquet",
+      "sha256": "2e8cb71b9cafd7d067df510e8b7d91463282dea6aba270f6c4d7f85ea0a8c2ea"
+    },
+    "metric_panel": {
+      "path": "research/data/ncdes_practice_metric_panel.parquet",
+      "sha256": "e815e74c65700ceaad62f37d5aa9051a6b4e2f9edfe85533837c561a9441e6fb"
+    },
+    "wide_panel": {
+      "path": "research/data/ncdes_practice_month.parquet",
+      "sha256": "9d1219b0d2ea89403eea876aca083796b9469e3d7ad03e35c9f24e7e2cab5003"
+    }
+  }
+}
