@@ -33,6 +33,29 @@
   <p class="sub">The models behind <a href="mypractice.html">the practice lookup</a>. Practice-level analysis
   of English practices; full analysis notes in <a href="PANEL_NOTES.md">PANEL_NOTES.md</a>.
   Everything here is association across practices, not cause and effect.</p>
+
+  <div class="card" style="border-left:4px solid #b04a2a;">
+    <p><b>Correction (September 2026).</b> The operational (GPAD) fields in
+    <code>xsec_master_2026</code> — appointment volume, same-day activity, telephone/face-to-face mode,
+    DNA rate, waiting-time bands, list size, per-patient appointments and workforce rates per 10,000 —
+    were previously calculated for April 2024–March 2025 while the GPPS 2026 outcomes describe January–April
+    2026. Those GPAD fields have now been recalculated for <b>April 2025–March 2026</b>, aligning the
+    exposure window to the survey. All numbers on this page are from the corrected data.</p>
+    <p><b>Withdrawn claim.</b> The previously reported positive association between appointment volume
+    and patient experience does not survive the correction. In the combined all-practices model
+    (n≈5,912), the coefficients for <i>appointments per 1,000 patients per month</i> move from +0.32,
+    +0.27, +0.70 (old, Apr-24–Mar-25 exposures) to −0.05, −0.13, +0.31 for overall experience (Q32),
+    most recent contact (Q16) and phone ease (Q1) respectively, and none is statistically distinguishable
+    from zero (p = 0.77, 0.43, 0.16). Higher appointment volume does <b>not</b> independently predict
+    better patient experience once the aligned exposures are used. Other coefficients shifted by 0.05–0.20
+    percentage points; the overall pattern (deflection, continuity, size, deprivation, admin-staffing,
+    training-practice) is unchanged.</p>
+    <p>Kept unchanged: raw workforce FTE (still March 2025), <code>oc_rate_12m</code> (separate April
+    2024–March 2025 OC-submissions measure), GPPS outcomes, IMD, clinical and prescribing fields.
+    Thirteen practices with fewer than 12 GPAD months in the aligned window keep their row but have the
+    entire refreshed GPAD block set to missing (n = 5,994 complete of 6,007). See the
+    <code>refresh_gpad_2526.py</code> script and commit history for the exact recalculation.</p>
+  </div>
   <nav class="toc">
     <a href="#q32">Overall experience</a> <a href="#q16">Most recent contact</a>
     <a href="#q1">Phone ease</a> <a href="#reading">Reading the tables</a>
@@ -88,14 +111,14 @@
     <tr><td>Nurses per 10,000</td><td class="num">+1.00</td><td class="num ns">+0.28</td><td class="num ns">+0.22</td></tr>
     <tr><td>Other clinical staff per 10,000</td><td class="num">+0.92</td><td class="num ns">+0.16</td><td class="num ns">&minus;0.03</td></tr>
     <tr><td>Admin staff per 10,000</td><td class="num">+1.00</td><td class="num">&minus;1.11</td><td class="num">&minus;0.45</td></tr>
-    <tr><td>Appointments per 1,000 per month</td><td class="num">+1.52</td><td class="num">+0.53</td><td class="num ns">+0.06</td></tr>
+    <tr><td>Appointments per 1,000 per month</td><td class="num">+1.16</td><td class="num ns">&minus;0.05</td><td class="num ns">&minus;0.22</td></tr>
     <tr><td>Patients 65+, %</td><td class="num">+2.95</td><td class="num ns">+0.36</td><td class="num ns">+0.23</td></tr>
     <tr><td>Patients from an ethnic minority background, %</td><td class="num">&minus;2.75</td><td class="num">&minus;1.26</td><td class="num">&minus;1.02</td></tr>
     <tr><td colspan="4"><b>Interactions</b></td></tr>
     <tr><td>Admin staffing &times; practice size</td><td class="num">–</td><td class="num">&minus;0.27</td><td class="num ns">+0.04</td></tr>
     <tr><td>Admin staffing &times; online volume</td><td class="num">–</td><td class="num ns">&minus;0.03</td><td class="num ns">&minus;0.09</td></tr>
     <tr><td>R&sup2; (share of variation explained)</td><td class="num"></td><td class="num">0.277</td><td class="num">0.539</td></tr>
-    <tr><td>Practices in model</td><td class="num"></td><td class="num">4,736</td><td class="num">4,736</td></tr>
+    <tr><td>Practices in model</td><td class="num"></td><td class="num">4,732</td><td class="num">4,732</td></tr>
     </table>
   </div>
 
@@ -126,14 +149,14 @@
     <tr><td>Nurses per 10,000</td><td class="num">+0.78</td><td class="num">+0.42</td><td class="num">+0.31</td></tr>
     <tr><td>Other clinical staff per 10,000</td><td class="num">+1.00</td><td class="num">+0.50</td><td class="num ns">+0.23</td></tr>
     <tr><td>Admin staff per 10,000</td><td class="num">+0.89</td><td class="num">&minus;1.15</td><td class="num">&minus;0.37</td></tr>
-    <tr><td>Appointments per 1,000 per month</td><td class="num">+1.40</td><td class="num">+0.67</td><td class="num ns">+0.09</td></tr>
+    <tr><td>Appointments per 1,000 per month</td><td class="num">+0.97</td><td class="num ns">&minus;0.09</td><td class="num ns">&minus;0.38</td></tr>
     <tr><td>Patients 65+, %</td><td class="num">+2.67</td><td class="num ns">&minus;0.37</td><td class="num">&minus;0.42</td></tr>
     <tr><td>Patients from an ethnic minority background, %</td><td class="num">&minus;2.53</td><td class="num">&minus;1.25</td><td class="num">&minus;0.63</td></tr>
     <tr><td colspan="4"><b>Interactions</b></td></tr>
     <tr><td>Admin staffing &times; practice size</td><td class="num">&ndash;</td><td class="num">&minus;0.53</td><td class="num ns">&minus;0.14</td></tr>
     <tr><td>Admin staffing &times; online volume</td><td class="num">&ndash;</td><td class="num ns">+0.20</td><td class="num ns">+0.14</td></tr>
     <tr><td>R&sup2; (share of variation explained)</td><td class="num"></td><td class="num">0.305</td><td class="num">0.620</td></tr>
-    <tr><td>Practices in model</td><td class="num"></td><td class="num">4,736</td><td class="num">4,736</td></tr>
+    <tr><td>Practices in model</td><td class="num"></td><td class="num">4,732</td><td class="num">4,732</td></tr>
     </table>
   </div>
 
@@ -164,14 +187,14 @@
     <tr><td>Nurses per 10,000</td><td class="num ns">+0.14</td><td class="num">+0.56</td><td class="num">+0.45</td></tr>
     <tr><td>Other clinical staff per 10,000</td><td class="num">+1.00</td><td class="num">+1.07</td><td class="num">+0.72</td></tr>
     <tr><td>Admin staff per 10,000</td><td class="num">+0.93</td><td class="num">&minus;1.47</td><td class="num">&minus;0.56</td></tr>
-    <tr><td>Appointments per 1,000 per month</td><td class="num">+1.32</td><td class="num">+1.06</td><td class="num ns">+0.42</td></tr>
+    <tr><td>Appointments per 1,000 per month</td><td class="num">+0.75</td><td class="num ns">&minus;0.31</td><td class="num ns">&minus;0.59</td></tr>
     <tr><td>Patients 65+, %</td><td class="num">+2.52</td><td class="num">&minus;1.45</td><td class="num">&minus;1.38</td></tr>
     <tr><td>Patients from an ethnic minority background, %</td><td class="num">&minus;1.83</td><td class="num">&minus;1.01</td><td class="num ns">&minus;0.12</td></tr>
     <tr><td colspan="4"><b>Interactions</b></td></tr>
     <tr><td>Admin staffing &times; practice size</td><td class="num">–</td><td class="num">&minus;0.73</td><td class="num ns">&minus;0.25</td></tr>
     <tr><td>Admin staffing &times; online volume</td><td class="num">–</td><td class="num">+0.51</td><td class="num">+0.41</td></tr>
     <tr><td>R&sup2; (share of variation explained)</td><td class="num"></td><td class="num">0.475</td><td class="num">0.665</td></tr>
-    <tr><td>Practices in model</td><td class="num"></td><td class="num">4,736</td><td class="num">4,736</td></tr>
+    <tr><td>Practices in model</td><td class="num"></td><td class="num">4,732</td><td class="num">4,732</td></tr>
     </table>
   </div>
 
@@ -184,9 +207,9 @@
     capacity, though:</p>
     <table>
     <tr><th>Reported deflection (Q12), 2026</th><th class="num">Lowest tenth</th><th class="num">Median</th><th class="num">Highest tenth</th><th class="num">n</th></tr>
-    <tr><td>All practices</td><td class="num">1.2%</td><td class="num">5.8%</td><td class="num">15.0%</td><td class="num">5,941</td></tr>
-    <tr><td>Fifth of practices with fewest fully-qualified GPs per patient</td><td class="num">2.2%</td><td class="num">7.8%</td><td class="num">16.6%</td><td class="num">1,189</td></tr>
-    <tr><td>Fewest GPs and most deprived fifth on both</td><td class="num">3.4%</td><td class="num">8.9%</td><td class="num">19.0%</td><td class="num">326</td></tr>
+    <tr><td>All practices</td><td class="num">1.2%</td><td class="num">5.8%</td><td class="num">15.0%</td><td class="num">5,942</td></tr>
+    <tr><td>Fifth of practices with fewest fully-qualified GPs per patient</td><td class="num">2.2%</td><td class="num">7.6%</td><td class="num">16.8%</td><td class="num">1,187</td></tr>
+    <tr><td>Fewest GPs and most deprived fifth on both</td><td class="num">3.5%</td><td class="num">9.4%</td><td class="num">19.5%</td><td class="num">328</td></tr>
     </table>
     <p>Practices under the same measured pressure differ several-fold: a tenth of even the most pressured
     keep the figure at or below 3.4% — beneath the national median — while a tenth exceed 19%. What
@@ -214,12 +237,12 @@
     mechanism explicit:</p>
     <table>
     <tr><th colspan="2">Seeing the preferred clinician (Q7) predicted from the full external model
-      (n=4,790, R&sup2;=0.233; points per standard deviation)</th></tr>
-    <tr><td>GP partners per 10,000</td><td class="num">+2.45</td></tr>
-    <tr><td>Salaried GPs per 10,000</td><td class="num">+1.03</td></tr>
-    <tr><td>Regular locum GPs per 10,000</td><td class="num ns">+0.33</td></tr>
-    <tr><td>Trainee GPs per 10,000</td><td class="num">&minus;2.07</td></tr>
-    <tr><td>Training practice (hosted a registrar)</td><td class="num">+2.16</td></tr>
+      (n=4,786, R&sup2;=0.229; points per standard deviation)</th></tr>
+    <tr><td>GP partners per 10,000</td><td class="num">+2.07</td></tr>
+    <tr><td>Salaried GPs per 10,000</td><td class="num">+0.90</td></tr>
+    <tr><td>Regular locum GPs per 10,000</td><td class="num ns">+0.25</td></tr>
+    <tr><td>Trainee GPs per 10,000</td><td class="num">&minus;1.98</td></tr>
+    <tr><td>Training practice (hosted a registrar)</td><td class="num">+2.07</td></tr>
     </table>
     <p>Partners have the strongest positive association with continuity of any staff group. Trainees, who
     rotate, are associated with lower continuity — yet training practices as organisations are
@@ -255,7 +278,7 @@
     <tr><th>Admin staff per 10,000 patients (fifths of practices)</th>
       <th class="num">Fewest</th><th class="num">2nd</th><th class="num">Middle</th><th class="num">4th</th><th class="num">Most</th></tr>
     <tr><td>Median queue-answer rate, May 2026</td>
-      <td class="num">84.1%</td><td class="num">82.6%</td><td class="num">81.0%</td><td class="num">81.4%</td><td class="num">81.8%</td></tr>
+      <td class="num">84.2%</td><td class="num">82.4%</td><td class="num">81.7%</td><td class="num">81.0%</td><td class="num">81.9%</td></tr>
     </table>
     <p>The pattern is flat, and stays flat comparing practices of similar size. Admin headcount includes
     many roles besides answering phones, so total admin staffing is a poor guide to how well a practice's
@@ -285,27 +308,27 @@
     the phone measures.</p>
     <table>
     <tr><th>Predictor</th><th class="num">Overall (Q32)</th><th class="num">Most recent contact (Q16)</th><th class="num">Phone easy (Q1)</th></tr>
-    <tr><td>Told to contact again another day (Q12)</td><td class="num">&minus;4.30</td><td class="num">&minus;6.16</td><td class="num">&minus;6.85</td></tr>
-    <tr><td>Get to see preferred clinician (Q7)</td><td class="num">+3.16</td><td class="num">+3.58</td><td class="num">+5.48</td></tr>
-    <tr><td>Have a preferred clinician (Q6)</td><td class="num">+1.23</td><td class="num">+0.70</td><td class="num">+0.54</td></tr>
-    <tr><td>Online submissions per 1,000</td><td class="num">&minus;1.29</td><td class="num">&minus;1.97</td><td class="num">&minus;4.35</td></tr>
-    <tr><td>Same-day share %</td><td class="num">+0.47</td><td class="num">+0.54</td><td class="num ns">+0.15</td></tr>
-    <tr><td>Size (log list)</td><td class="num">&minus;1.08</td><td class="num">&minus;1.75</td><td class="num">&minus;5.47</td></tr>
-    <tr><td>Deprivation (IMD)</td><td class="num">&minus;0.32</td><td class="num">&minus;0.50</td><td class="num">&minus;1.10</td></tr>
-    <tr><td>GP partners per 10k</td><td class="num">+0.62</td><td class="num">+0.40</td><td class="num">+0.42</td></tr>
-    <tr><td>Salaried GPs per 10k</td><td class="num">+1.03</td><td class="num">+0.78</td><td class="num">+0.59</td></tr>
-    <tr><td>Regular locum GPs per 10k</td><td class="num ns">+0.15</td><td class="num ns">+0.04</td><td class="num ns">+0.08</td></tr>
-    <tr><td>Trainee GPs per 10k</td><td class="num">+0.67</td><td class="num">+0.67</td><td class="num">+0.91</td></tr>
-    <tr><td>Training practice</td><td class="num">+1.77</td><td class="num">+1.59</td><td class="num">+1.81</td></tr>
-    <tr><td>Nurses per 10k</td><td class="num ns">+0.23</td><td class="num">+0.31</td><td class="num ns">+0.27</td></tr>
-    <tr><td>Other clinical per 10k</td><td class="num ns">&minus;0.12</td><td class="num ns">+0.12</td><td class="num">+0.46</td></tr>
-    <tr><td>Admin per 10k</td><td class="num">&minus;0.38</td><td class="num">&minus;0.36</td><td class="num">&minus;0.58</td></tr>
-    <tr><td>Appointments per 1,000</td><td class="num">+0.32</td><td class="num">+0.27</td><td class="num">+0.70</td></tr>
-    <tr><td>Patients 65+ %</td><td class="num">+0.37</td><td class="num ns">&minus;0.20</td><td class="num">&minus;1.37</td></tr>
-    <tr><td>Ethnic minority background %</td><td class="num">&minus;1.02</td><td class="num">&minus;0.65</td><td class="num ns">&minus;0.48</td></tr>
-    <tr><td>Admin &times; size</td><td class="num ns">+0.03</td><td class="num ns">&minus;0.13</td><td class="num">&minus;0.28</td></tr>
-    <tr><td>Admin &times; online volume</td><td class="num ns">&minus;0.18</td><td class="num ns">&minus;0.11</td><td class="num ns">+0.05</td></tr>
-    <tr><td>R&sup2; / practices</td><td class="num">0.535</td><td class="num">0.608</td><td class="num">0.599 (n=5,913)</td></tr>
+    <tr><td>Told to contact again another day (Q12)</td><td class="num">&minus;4.35</td><td class="num">&minus;6.23</td><td class="num">&minus;6.95</td></tr>
+    <tr><td>Get to see preferred clinician (Q7)</td><td class="num">+3.21</td><td class="num">+3.63</td><td class="num">+5.55</td></tr>
+    <tr><td>Have a preferred clinician (Q6)</td><td class="num">+1.25</td><td class="num">+0.71</td><td class="num">+0.56</td></tr>
+    <tr><td>Online submissions per 1,000</td><td class="num">&minus;1.29</td><td class="num">&minus;1.96</td><td class="num">&minus;4.35</td></tr>
+    <tr><td>Same-day share %</td><td class="num">+0.57</td><td class="num">+0.60</td><td class="num ns">+0.18</td></tr>
+    <tr><td>Size (log list)</td><td class="num">&minus;0.95</td><td class="num">&minus;1.61</td><td class="num">&minus;5.28</td></tr>
+    <tr><td>Deprivation (IMD)</td><td class="num ns">&minus;0.20</td><td class="num">&minus;0.37</td><td class="num">&minus;0.92</td></tr>
+    <tr><td>GP partners per 10k</td><td class="num">+0.57</td><td class="num">+0.33</td><td class="num ns">+0.28</td></tr>
+    <tr><td>Salaried GPs per 10k</td><td class="num">+1.00</td><td class="num">+0.75</td><td class="num">+0.51</td></tr>
+    <tr><td>Regular locum GPs per 10k</td><td class="num ns">+0.12</td><td class="num ns">+0.02</td><td class="num ns">+0.03</td></tr>
+    <tr><td>Trainee GPs per 10k</td><td class="num">+0.72</td><td class="num">+0.74</td><td class="num">+0.98</td></tr>
+    <tr><td>Training practice</td><td class="num">+1.67</td><td class="num">+1.41</td><td class="num">+1.64</td></tr>
+    <tr><td>Nurses per 10k</td><td class="num">+0.26</td><td class="num">+0.33</td><td class="num ns">+0.26</td></tr>
+    <tr><td>Other clinical per 10k</td><td class="num ns">&minus;0.03</td><td class="num ns">+0.22</td><td class="num">+0.58</td></tr>
+    <tr><td>Admin per 10k</td><td class="num">&minus;0.45</td><td class="num">&minus;0.45</td><td class="num">&minus;0.75</td></tr>
+    <tr><td>Appointments per 1,000</td><td class="num ns">&minus;0.05</td><td class="num ns">&minus;0.13</td><td class="num ns">+0.31</td></tr>
+    <tr><td>Patients 65+ %</td><td class="num">+0.52</td><td class="num ns">&minus;0.05</td><td class="num">&minus;1.19</td></tr>
+    <tr><td>Ethnic minority background %</td><td class="num">&minus;1.04</td><td class="num">&minus;0.67</td><td class="num">&minus;0.56</td></tr>
+    <tr><td>Admin &times; size</td><td class="num ns">+0.04</td><td class="num ns">&minus;0.11</td><td class="num">&minus;0.26</td></tr>
+    <tr><td>Admin &times; online volume</td><td class="num ns">&minus;0.19</td><td class="num ns">&minus;0.12</td><td class="num ns">+0.02</td></tr>
+    <tr><td>R&sup2; / practices</td><td class="num">0.531</td><td class="num">0.604</td><td class="num">0.594 (n=5,912)</td></tr>
     </table>
     <p>The main conclusions replicate in the full population at almost identical size — deflection,
     continuity, the GP-composition pattern, the training-practice result, the locum null, the admin result
@@ -341,20 +364,20 @@
     at the desk — which no operational dataset records.</p>
     <table>
     <tr><th colspan="2">Told to contact again (Q12) predicted from external data only
-      (single combined model, n=4,722, R&sup2;=0.210; points per standard deviation)</th></tr>
-    <tr><td>Deprivation (IMD)</td><td class="num">+1.10</td></tr>
-    <tr><td>Queue-answer rate</td><td class="num">&minus;0.90</td></tr>
-    <tr><td>Calls ended within the IVR, %</td><td class="num">+0.70</td></tr>
-    <tr><td>Fully-qualified GPs per 10,000</td><td class="num">&minus;0.47</td></tr>
-    <tr><td>Patients from an ethnic minority background, %</td><td class="num">+0.47</td></tr>
-    <tr><td>Appointments per 1,000 per month</td><td class="num">&minus;0.44</td></tr>
-    <tr><td>Calls received per 1,000</td><td class="num">+0.36</td></tr>
-    <tr><td>Online submissions per 1,000</td><td class="num">&minus;0.30</td></tr>
-    <tr><td>Contacts per appointment</td><td class="num">+0.29</td></tr>
-    <tr><td>Same-day share, %</td><td class="num">+0.26</td></tr>
-    <tr><td>Morning-heavy IVR pattern (8&ndash;10am excess)</td><td class="num">&minus;0.25</td></tr>
-    <tr><td>Practice size (log list)</td><td class="num">+0.23</td></tr>
-    <tr><td>Patients 65+, %</td><td class="num ns">&minus;0.04</td></tr>
+      (single combined model, n=4,741, R&sup2;=0.205; points per standard deviation)</th></tr>
+    <tr><td>Deprivation (IMD)</td><td class="num">+1.08</td></tr>
+    <tr><td>Queue-answer rate</td><td class="num">&minus;0.91</td></tr>
+    <tr><td>Calls ended within the IVR, %</td><td class="num">+0.69</td></tr>
+    <tr><td>Fully-qualified GPs per 10,000</td><td class="num">&minus;0.45</td></tr>
+    <tr><td>Patients from an ethnic minority background, %</td><td class="num">+0.46</td></tr>
+    <tr><td>Appointments per 1,000 per month</td><td class="num">&minus;0.31</td></tr>
+    <tr><td>Calls received per 1,000</td><td class="num ns">+0.23</td></tr>
+    <tr><td>Online submissions per 1,000</td><td class="num">&minus;0.31</td></tr>
+    <tr><td>Contacts per appointment</td><td class="num">+0.39</td></tr>
+    <tr><td>Same-day share, %</td><td class="num">+0.30</td></tr>
+    <tr><td>Morning-heavy IVR pattern (8&ndash;10am excess)</td><td class="num">&minus;0.23</td></tr>
+    <tr><td>Practice size (log list)</td><td class="num">+0.20</td></tr>
+    <tr><td>Patients 65+, %</td><td class="num ns">&minus;0.06</td></tr>
     </table>
     <p><b>In summary:</b> the patient-reported measures carry real operational information — they are not
     simply the same respondents restating their overall opinion — but they do share respondents with the
