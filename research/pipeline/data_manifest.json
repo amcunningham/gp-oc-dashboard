@@ -10,6 +10,18 @@
       "last_checked_utc": "",
       "expected_practices_min": 5800,
       "expected_practices_max": 6600
+    },
+    "ncdes": {
+      "name": "Network Contract DES (practice-level cumulative extract)",
+      "publication_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des",
+      "latest_period": "202607",
+      "latest_release_label": "July 2026",
+      "last_resolved_url": "https://files.digital.nhs.uk/F1/A13252/NCDesJuly26.zip",
+      "last_checked_utc": "2026-08-30T17:58:40Z",
+      "expected_practices_min": 5400,
+      "expected_practices_max": 6500,
+      "refresh_script": "research/scripts/fetch_ncdes.py",
+      "scheduled_refresh": false
     }
   }
 }

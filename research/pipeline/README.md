@@ -71,6 +71,25 @@ add a `validate_<name>_release(...)`, and give it a step in the workflow (or gen
 `refresh.py` to loop over `--source all`). CBT, OC submissions, workforce and FFT are the
 next four and all share the GPAD shape.
 
+## Network Contract DES backfill
+
+NCDES has its own ingestion script because each monthly file is cumulative within the financial
+year and its indicator codes change between contract years:
+
+```bash
+python research/scripts/fetch_ncdes.py
+python research/scripts/validate_ncdes.py
+```
+
+The first command discovers all monthly publication pages from April 2023 onward, resolves their
+opaque complete-data ZIPs, hashes raw files, catalogs every data dictionary and builds three
+Parquet layers documented in `research/README.md`. Raw downloads and staging files remain under
+gitignored `data/ncdes/`; compact derived files are written to `research/data/`.
+
+`research/pipeline/ncdes_metric_map.csv` is the explicit cross-year code map. Extend its end period
+only after checking the next contract-year dictionary. The September 2024 FIT unit change is kept
+as a definition-version break. This source is not yet wired into the scheduled PR workflow.
+
 ## Note on secrets and data storage
 
 - **No secrets needed** for the data leg — every source is open data. (The explorer's

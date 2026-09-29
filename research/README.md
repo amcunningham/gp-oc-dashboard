@@ -81,6 +81,32 @@ derived `same_day_pct`, `gp_same_day_pct`.
 Mar 2023 – May 2026: `same_day`, `d1`, `d2_7`, `d8_14`, `d15_21`, `d22_28`, `d28plus`, `unk`,
 plus GP-specific `gp`, `gp_d8_14`, `gp_d15plus`.
 
+### Network Contract DES practice panels — Apr 2023 to Jul 2026
+
+The NCDES source is cumulative within each financial year. These files therefore describe the
+practice's year-to-date position at each month end; adjacent months are **not** monthly activity
+flows.
+
+| File | Grain and purpose |
+|---|---|
+| `data/ncdes_practice_month.parquet` | Wide practice × month panel: 236,057 rows, eight mapped metrics, raw numerator/denominator/PCA totals, net rates, intervention coverage and PCA rates |
+| `data/ncdes_practice_metric_panel.parquet` | Tidy practice × month × metric panel: 1,876,542 rows; retains source code, definition version and suppression flags |
+| `data/ncdes_practice_measure_panel.parquet` | Source-faithful practice × month × indicator measure: 7,070,142 rows; retains individual named PCA components |
+| `data/ncdes_indicator_catalog.csv` / `ncdes_measure_catalog.csv` | Versioned data-dictionary catalogues for every source release |
+| `data/ncdes_source_manifest.json` | Exact publication pages, raw ZIP and dictionary URLs, local source hashes and metric-map hash |
+
+The mapped metrics are structured medication review coverage for medication-error risk, severe
+frailty, potentially addictive medicines and care-home residents; DOAC monitoring; learning-
+disability health check/action plan/ethnicity coverage; autism diagnosis count; and pre-referral
+FIT coverage for lower-GI urgent suspected-cancer referrals. Source codes are renamed at April
+2024. Published descriptions remain stable for the non-FIT metrics, but code-set changes remain
+possible. FIT changes unit from referral events to patients in September 2024 and the two versions
+must not be combined as one uninterrupted outcome.
+
+For fractional indicators, `net_rate_pct = 100 × numerator / denominator`. Because the published
+denominator excludes personalised care adjustments, `intervention_coverage_pct = 100 × numerator /
+(denominator + pca_total)`. Coverage and PCA rates are null where a PCA component is suppressed.
+
 ### Supporting tables
 `panel_oc.csv` (OC submissions panel Apr 23–Mar 26) · `change_2024_2025.csv` (GPPS change
 models) · `event_study_main.csv` / `event_study_supplier.csv` (OC adoption event-study
@@ -92,14 +118,16 @@ coefficients) · `gp_vs_other_waits_trend.csv` (national monthly GP vs other-sta
 
 `scripts/` contains the full build pipeline: GPAD release aggregation (`agg_duck2.py`,
 `agg_waits.py`, `fetch_all_gpad.sh`), panel/cross-section assembly (`build_xsec.py`),
-and the analysis models (`models_xsec.py`, `event_study*.py`, `change_model.py`,
-`cancer_mode.py`). All use DuckDB + pandas/statsmodels.
+NCDES resolution and ingestion (`fetch_ncdes.py`, with `validate_ncdes.py` for latest-source
+reconciliation), and the analysis models (`models_xsec.py`, `event_study*.py`,
+`change_model.py`, `cancer_mode.py`). All use DuckDB + pandas/statsmodels.
 
 ## Sources and licences
 
 All inputs are open data published under the [Open Government Licence v3](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/):
 NHS England (Appointments in General Practice; Submissions via Online Consultation Systems;
-Cloud Based Telephony; General Practice Workforce; NHS Payments to General Practice; QOF; ODS),
+Cloud Based Telephony; General Practice Workforce; NHS Payments to General Practice; Network
+Contract DES; QOF; ODS),
 GP Patient Survey (NHS England/Ipsos), OHID Fingertips (NDRS cancer indicators, QOF prevalence),
 NHSBSA English Prescribing Data, MHCLG IMD.
 

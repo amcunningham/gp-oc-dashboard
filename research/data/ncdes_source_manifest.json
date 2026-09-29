@@ -1,0 +1,413 @@
+{
+  "series_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des",
+  "retrieved_utc": "2026-08-30T18:03:20+00:00",
+  "from_period": "202304",
+  "to_period": "202607",
+  "release_count": 40,
+  "indicator_catalog_rows": 536,
+  "measure_catalog_rows": 391,
+  "metric_map": "research/pipeline/ncdes_metric_map.csv",
+  "metric_map_sha256": "1f6ab01ea3de8f56a5c73a418525352f653f699caeb30f6b4a61d11384f24d4f",
+  "releases": [
+    {
+      "period": "202304",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-april-2023",
+      "data_url": "https://files.digital.nhs.uk/EE/504212/NCDesApril23%20v3.0.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/28/BA6DA6/NCDes_Data_Dictionary_23_24_v2.0.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/389117c8c2__NCDes_Data_Dictionary_23_24_v2.0.xlsx",
+      "dictionary_sha256": "1d5ea89c5654049c06682b26b110275f34591cca2d79242ccd0319b8a7adbb70",
+      "data_file": "data/ncdes/releases/202304__NCDesApril23 v3.0.zip",
+      "data_sha256": "2e5932974adc5848e712f39191f93a92c1fdbccfcc572662d4494fd76ca7f8ea"
+    },
+    {
+      "period": "202305",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-may-2023",
+      "data_url": "https://files.digital.nhs.uk/DA/B28F06/NCDesMay23.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/28/BA6DA6/NCDes_Data_Dictionary_23_24_v2.0.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/389117c8c2__NCDes_Data_Dictionary_23_24_v2.0.xlsx",
+      "dictionary_sha256": "1d5ea89c5654049c06682b26b110275f34591cca2d79242ccd0319b8a7adbb70",
+      "data_file": "data/ncdes/releases/202305__NCDesMay23.zip",
+      "data_sha256": "07cc473eee5c901db1f3858ab2cb4971b7ec51428734e0120fc896400b59bc7d"
+    },
+    {
+      "period": "202306",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-june-2023",
+      "data_url": "https://files.digital.nhs.uk/78/DC971B/NCDesJune23.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/A3/AED51A/NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/31bea1e4b0__NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_sha256": "961872f067d3491195a13402942a0c2d65054005593f70cd547a1ce6aa5a33af",
+      "data_file": "data/ncdes/releases/202306__NCDesJune23.zip",
+      "data_sha256": "43e85cc8b6d2e537ab4deb6db26e6b89a5e2e5c84b62e67413b112d2910e37b5"
+    },
+    {
+      "period": "202307",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-july-2023",
+      "data_url": "https://files.digital.nhs.uk/F9/E8C8ED/NCDesJuly23.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/03/49DC1C/NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/2ea73027fe__NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_sha256": "437a621d39b9ffdc884153308514af8d2f57d23e8873849c4ad270df427a2a5a",
+      "data_file": "data/ncdes/releases/202307__NCDesJuly23.zip",
+      "data_sha256": "753b92f2d5379c49eb8e0595af6ac846f9a075432f1234371c03772c8efd2439"
+    },
+    {
+      "period": "202308",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-august-2023",
+      "data_url": "https://files.digital.nhs.uk/32/4F0A91/NCDesAugust23.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/03/49DC1C/NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/2ea73027fe__NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_sha256": "437a621d39b9ffdc884153308514af8d2f57d23e8873849c4ad270df427a2a5a",
+      "data_file": "data/ncdes/releases/202308__NCDesAugust23.zip",
+      "data_sha256": "e25a98f9cc5c03a254fd4c5c180c76c95630d7702b1758000fa5fc3704dbfb70"
+    },
+    {
+      "period": "202309",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-september-2023",
+      "data_url": "https://files.digital.nhs.uk/F9/93EAB7/NCDesSeptember23.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/03/49DC1C/NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/2ea73027fe__NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_sha256": "437a621d39b9ffdc884153308514af8d2f57d23e8873849c4ad270df427a2a5a",
+      "data_file": "data/ncdes/releases/202309__NCDesSeptember23.zip",
+      "data_sha256": "f3024b3b70eeaae0fc1083371e6261b2d826ea9943182fe1bac3ae3c030d6450"
+    },
+    {
+      "period": "202310",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-october-2023",
+      "data_url": "https://files.digital.nhs.uk/25/12F202/NCDesOctober23.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/03/49DC1C/NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/2ea73027fe__NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_sha256": "437a621d39b9ffdc884153308514af8d2f57d23e8873849c4ad270df427a2a5a",
+      "data_file": "data/ncdes/releases/202310__NCDesOctober23.zip",
+      "data_sha256": "1e5bbb594cc887bd99cbdf0b65748caa2b3fe9a4e87808b22e71d26a7ceea25f"
+    },
+    {
+      "period": "202311",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-november-2023",
+      "data_url": "https://files.digital.nhs.uk/A6/5F1DF0/NCDesNovember23.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/03/49DC1C/NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/2ea73027fe__NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_sha256": "437a621d39b9ffdc884153308514af8d2f57d23e8873849c4ad270df427a2a5a",
+      "data_file": "data/ncdes/releases/202311__NCDesNovember23.zip",
+      "data_sha256": "27b4ab4f1a5446bef6ac97073befc7bd7f05398e41e015b10e648ae3ecb28ef7"
+    },
+    {
+      "period": "202312",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-december-2023",
+      "data_url": "https://files.digital.nhs.uk/7C/201F23/NCDesDecember23.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/03/49DC1C/NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/2ea73027fe__NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_sha256": "437a621d39b9ffdc884153308514af8d2f57d23e8873849c4ad270df427a2a5a",
+      "data_file": "data/ncdes/releases/202312__NCDesDecember23.zip",
+      "data_sha256": "0bd7fb7c805d034b3302b94745d22411227f9f3d0881672dead848c4ce413819"
+    },
+    {
+      "period": "202401",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-january-2024",
+      "data_url": "https://files.digital.nhs.uk/03/6C3CA0/NCDesJanuary24.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/03/49DC1C/NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/2ea73027fe__NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_sha256": "437a621d39b9ffdc884153308514af8d2f57d23e8873849c4ad270df427a2a5a",
+      "data_file": "data/ncdes/releases/202401__NCDesJanuary24.zip",
+      "data_sha256": "6d75d7a721d1fac8c472d1ad8a0f3528ce7ff803943df9d9a93b1c3484dd17db"
+    },
+    {
+      "period": "202402",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-february-2024",
+      "data_url": "https://files.digital.nhs.uk/39/867795/NCDesFebruary24.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/03/49DC1C/NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/2ea73027fe__NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_sha256": "437a621d39b9ffdc884153308514af8d2f57d23e8873849c4ad270df427a2a5a",
+      "data_file": "data/ncdes/releases/202402__NCDesFebruary24.zip",
+      "data_sha256": "160abf583b4031bf119dfd8b65e76903ae7d2abe493ca31774fdb27afe679615"
+    },
+    {
+      "period": "202403",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-march-2024",
+      "data_url": "https://files.digital.nhs.uk/F0/BDCEBC/NCDesMarch24.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/03/49DC1C/NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/2ea73027fe__NCDes_Data_Dictionary_23_24_phase_2_v1.0.xlsx",
+      "dictionary_sha256": "437a621d39b9ffdc884153308514af8d2f57d23e8873849c4ad270df427a2a5a",
+      "data_file": "data/ncdes/releases/202403__NCDesMarch24.zip",
+      "data_sha256": "f1efb11199ba155b4203d8442455066a17a26cc390984fbe6bcbee75b5d85b72"
+    },
+    {
+      "period": "202404",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-april-2024",
+      "data_url": "https://files.digital.nhs.uk/A9/7FCECD/NCDesApril24.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/9C/F32D29/NCDes_v6.0_Data_Dictionary_24_25.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/99ae18064c__NCDes_v6.0_Data_Dictionary_24_25.xlsx",
+      "dictionary_sha256": "435142f87550cd66d78586ed77440f5681e8ed49ae68d712eb1f151d0dbc1455",
+      "data_file": "data/ncdes/releases/202404__NCDesApril24.zip",
+      "data_sha256": "d8ec1bead7fc4729921f007c5c852abfaf0874f3d0f63762b44307fcf5a5a74b"
+    },
+    {
+      "period": "202405",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-may-2024",
+      "data_url": "https://files.digital.nhs.uk/FD/52A06A/NCDesMay24_v2.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/9C/F32D29/NCDes_v6.0_Data_Dictionary_24_25.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/99ae18064c__NCDes_v6.0_Data_Dictionary_24_25.xlsx",
+      "dictionary_sha256": "435142f87550cd66d78586ed77440f5681e8ed49ae68d712eb1f151d0dbc1455",
+      "data_file": "data/ncdes/releases/202405__NCDesMay24_v2.zip",
+      "data_sha256": "579c2458e36ccf0b044f1eb5861759b54a5079c6c21c21934bc6089c7e9527e2"
+    },
+    {
+      "period": "202406",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-june-2024",
+      "data_url": "https://files.digital.nhs.uk/D8/DF9112/NCDesJune24.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/9C/F32D29/NCDes_v6.0_Data_Dictionary_24_25.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/99ae18064c__NCDes_v6.0_Data_Dictionary_24_25.xlsx",
+      "dictionary_sha256": "435142f87550cd66d78586ed77440f5681e8ed49ae68d712eb1f151d0dbc1455",
+      "data_file": "data/ncdes/releases/202406__NCDesJune24.zip",
+      "data_sha256": "721556b3f25424005d0683e8ad90884a1b4b6b80b320581415bcb606fda6e217"
+    },
+    {
+      "period": "202407",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-july-2024",
+      "data_url": "https://files.digital.nhs.uk/A2/88D3A3/NCDesJuly24.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/9C/F32D29/NCDes_v6.0_Data_Dictionary_24_25.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/99ae18064c__NCDes_v6.0_Data_Dictionary_24_25.xlsx",
+      "dictionary_sha256": "435142f87550cd66d78586ed77440f5681e8ed49ae68d712eb1f151d0dbc1455",
+      "data_file": "data/ncdes/releases/202407__NCDesJuly24.zip",
+      "data_sha256": "36c2970894510ff60858f6702c6000b4965d591c069e726355e1dc1e3013fefe"
+    },
+    {
+      "period": "202408",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-august-2024",
+      "data_url": "https://files.digital.nhs.uk/7A/FDADD9/NCDesAugust24.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/9C/F32D29/NCDes_v6.0_Data_Dictionary_24_25.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/99ae18064c__NCDes_v6.0_Data_Dictionary_24_25.xlsx",
+      "dictionary_sha256": "435142f87550cd66d78586ed77440f5681e8ed49ae68d712eb1f151d0dbc1455",
+      "data_file": "data/ncdes/releases/202408__NCDesAugust24.zip",
+      "data_sha256": "c27f9f2e27913529d0acc5819cc437a754ca0aa320db5e632317c3230eabea73"
+    },
+    {
+      "period": "202409",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-september-2024",
+      "data_url": "https://files.digital.nhs.uk/BF/BD113A/NCDesSeptember24.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/19/1E8D7F/NCDes_v6.1_Data_Dictionary_24_25.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/fc7edacfd7__NCDes_v6.1_Data_Dictionary_24_25.xlsx",
+      "dictionary_sha256": "cc75bdfe4831a50fcc8a6f67ed8279a4b80e2edb67853b09e9d29df138f2fe8d",
+      "data_file": "data/ncdes/releases/202409__NCDesSeptember24.zip",
+      "data_sha256": "ea516c6ecffc3ad0f8da82682d0f3f1dccc0f52e97f10cca47299bc64e1e9030"
+    },
+    {
+      "period": "202410",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-october-2024",
+      "data_url": "https://files.digital.nhs.uk/5E/5D412E/NCDesOctober24.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/19/1E8D7F/NCDes_v6.1_Data_Dictionary_24_25.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/fc7edacfd7__NCDes_v6.1_Data_Dictionary_24_25.xlsx",
+      "dictionary_sha256": "cc75bdfe4831a50fcc8a6f67ed8279a4b80e2edb67853b09e9d29df138f2fe8d",
+      "data_file": "data/ncdes/releases/202410__NCDesOctober24.zip",
+      "data_sha256": "d1f96801c6756c582ac2bdae7fe81c6c0e46afd5cd7b67e4135f15bb6e722391"
+    },
+    {
+      "period": "202411",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-november-2024",
+      "data_url": "https://files.digital.nhs.uk/E2/54CDC5/NCDesNovember24.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/19/1E8D7F/NCDes_v6.1_Data_Dictionary_24_25.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/fc7edacfd7__NCDes_v6.1_Data_Dictionary_24_25.xlsx",
+      "dictionary_sha256": "cc75bdfe4831a50fcc8a6f67ed8279a4b80e2edb67853b09e9d29df138f2fe8d",
+      "data_file": "data/ncdes/releases/202411__NCDesNovember24.zip",
+      "data_sha256": "75d709f59c625f1377e71317d28927cd8deab1b15c01e377fee96a7a24a51640"
+    },
+    {
+      "period": "202412",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-december-2024",
+      "data_url": "https://files.digital.nhs.uk/68/58E742/NCDesDecember24.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/19/1E8D7F/NCDes_v6.1_Data_Dictionary_24_25.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/fc7edacfd7__NCDes_v6.1_Data_Dictionary_24_25.xlsx",
+      "dictionary_sha256": "cc75bdfe4831a50fcc8a6f67ed8279a4b80e2edb67853b09e9d29df138f2fe8d",
+      "data_file": "data/ncdes/releases/202412__NCDesDecember24.zip",
+      "data_sha256": "238a3dff36f2cada188c6f670e456bb954914742c0c70b7f24858826dc133c14"
+    },
+    {
+      "period": "202501",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-january-2025",
+      "data_url": "https://files.digital.nhs.uk/57/1A0DA5/NCDesJanuary25.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/19/1E8D7F/NCDes_v6.1_Data_Dictionary_24_25.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/fc7edacfd7__NCDes_v6.1_Data_Dictionary_24_25.xlsx",
+      "dictionary_sha256": "cc75bdfe4831a50fcc8a6f67ed8279a4b80e2edb67853b09e9d29df138f2fe8d",
+      "data_file": "data/ncdes/releases/202501__NCDesJanuary25.zip",
+      "data_sha256": "5bc2007ec3be4109a85c628f5b12740b55d5e6f2fc0c6f4e0306ccab0d72d53a"
+    },
+    {
+      "period": "202502",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-february-2025",
+      "data_url": "https://files.digital.nhs.uk/AA/32F2F2/NCDesFebruary25.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/19/1E8D7F/NCDes_v6.1_Data_Dictionary_24_25.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/fc7edacfd7__NCDes_v6.1_Data_Dictionary_24_25.xlsx",
+      "dictionary_sha256": "cc75bdfe4831a50fcc8a6f67ed8279a4b80e2edb67853b09e9d29df138f2fe8d",
+      "data_file": "data/ncdes/releases/202502__NCDesFebruary25.zip",
+      "data_sha256": "d49645baf6738e0577ed28b8db6a1d433ed73950dbf71d3c0aca9d9cb498ed77"
+    },
+    {
+      "period": "202503",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-march-2025",
+      "data_url": "https://files.digital.nhs.uk/FA/80E2B9/NCDesMarch25.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/19/1E8D7F/NCDes_v6.1_Data_Dictionary_24_25.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/fc7edacfd7__NCDes_v6.1_Data_Dictionary_24_25.xlsx",
+      "dictionary_sha256": "cc75bdfe4831a50fcc8a6f67ed8279a4b80e2edb67853b09e9d29df138f2fe8d",
+      "data_file": "data/ncdes/releases/202503__NCDesMarch25.zip",
+      "data_sha256": "4ce6d4ee38ba1362ecfeec687786aac9ad9de51dc5fd035020abdf0272f89b73"
+    },
+    {
+      "period": "202504",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-april-2025",
+      "data_url": "https://files.digital.nhs.uk/FB/9AC141/NCDesApril25.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/75/314B00/NCDes_v7.0_Data_Dictionary_25_26%20%282%29.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/83e82be45b__NCDes_v7.0_Data_Dictionary_25_26 (2).xlsx",
+      "dictionary_sha256": "c5f1bbd53060cfff86ecb62607f66353bb799409acae3378a9493f247c62dbff",
+      "data_file": "data/ncdes/releases/202504__NCDesApril25.zip",
+      "data_sha256": "abc277b8a1999e1c7181595a3ab88ef737f69573431a3d4ad663fb178356b761"
+    },
+    {
+      "period": "202505",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-may-2025/content-copy",
+      "data_url": "https://files.digital.nhs.uk/2E/1320B3/NCDesMay25.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/74/72698E/NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/1bf76b2e4d__NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_sha256": "c5f1bbd53060cfff86ecb62607f66353bb799409acae3378a9493f247c62dbff",
+      "data_file": "data/ncdes/releases/202505__NCDesMay25.zip",
+      "data_sha256": "9df8eb638f754e220dfde71f25da0db08cf65311c7a6f408542f2838ea6eade6"
+    },
+    {
+      "period": "202506",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-june-2025",
+      "data_url": "https://files.digital.nhs.uk/A8/CE2BCD/NCDesJune25.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/74/72698E/NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/1bf76b2e4d__NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_sha256": "c5f1bbd53060cfff86ecb62607f66353bb799409acae3378a9493f247c62dbff",
+      "data_file": "data/ncdes/releases/202506__NCDesJune25.zip",
+      "data_sha256": "28d6d3407d7f828fe1b8ac1898c4f4a2152d19624612805c807eaba259e5fc5a"
+    },
+    {
+      "period": "202507",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-july-2025",
+      "data_url": "https://files.digital.nhs.uk/B7/86CBAE/NCDesJuly25.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/74/72698E/NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/1bf76b2e4d__NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_sha256": "c5f1bbd53060cfff86ecb62607f66353bb799409acae3378a9493f247c62dbff",
+      "data_file": "data/ncdes/releases/202507__NCDesJuly25.zip",
+      "data_sha256": "b94491e107e358a46841ceed2408997c6ff3ea727ed2e52edeec91d7b22ad278"
+    },
+    {
+      "period": "202508",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-august-2025",
+      "data_url": "https://files.digital.nhs.uk/E9/F0E4D7/NCDesAugust25.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/35/F10F2D/NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/de4f2e52df__NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_sha256": "c5f1bbd53060cfff86ecb62607f66353bb799409acae3378a9493f247c62dbff",
+      "data_file": "data/ncdes/releases/202508__NCDesAugust25.zip",
+      "data_sha256": "f9ee1d14b658c790145b6d36502582004a2783e1916c8aa361cc31a7b5228506"
+    },
+    {
+      "period": "202509",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-september-2025",
+      "data_url": "https://files.digital.nhs.uk/C5/8518A4/NCDesSeptember25.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/74/72698E/NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/1bf76b2e4d__NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_sha256": "c5f1bbd53060cfff86ecb62607f66353bb799409acae3378a9493f247c62dbff",
+      "data_file": "data/ncdes/releases/202509__NCDesSeptember25.zip",
+      "data_sha256": "4837295017faf977c919273c7f75271e2dd7e9a2dd7eb8d8a5763c0659ba10a5"
+    },
+    {
+      "period": "202510",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-october-2025",
+      "data_url": "https://files.digital.nhs.uk/90/5EF5D1/NCDesOctober25.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/74/72698E/NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/1bf76b2e4d__NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_sha256": "c5f1bbd53060cfff86ecb62607f66353bb799409acae3378a9493f247c62dbff",
+      "data_file": "data/ncdes/releases/202510__NCDesOctober25.zip",
+      "data_sha256": "e2fb95cab2c79bf043e7f56763683c4191a4ade53e5041c9ea4c906c8d7d553f"
+    },
+    {
+      "period": "202511",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-november-2025/content-copy",
+      "data_url": "https://files.digital.nhs.uk/1C/3C3890/NCDesNovember25.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/40/3D06B8/NCDes_v7.0_Data_Dictionary_25_26%20%285%29.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/58851672a0__NCDes_v7.0_Data_Dictionary_25_26 (5).xlsx",
+      "dictionary_sha256": "c5f1bbd53060cfff86ecb62607f66353bb799409acae3378a9493f247c62dbff",
+      "data_file": "data/ncdes/releases/202511__NCDesNovember25.zip",
+      "data_sha256": "3d7d0126e5974a45ffaead8e20381ee18cba9e6e4863e0b7d1307fb6a34233fd"
+    },
+    {
+      "period": "202512",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-december-2025",
+      "data_url": "https://files.digital.nhs.uk/70/284C51/NCDesDecember25.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/32/A775F7/NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/0dfb3808f7__NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_sha256": "c5f1bbd53060cfff86ecb62607f66353bb799409acae3378a9493f247c62dbff",
+      "data_file": "data/ncdes/releases/202512__NCDesDecember25.zip",
+      "data_sha256": "f060298e7e3673e8b415ac3e1fa101731a7d79f02e20912baa3938f0045329a0"
+    },
+    {
+      "period": "202601",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-january-2026",
+      "data_url": "https://files.digital.nhs.uk/23/4FC879/NCDesJanuary26.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/74/72698E/NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/1bf76b2e4d__NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_sha256": "c5f1bbd53060cfff86ecb62607f66353bb799409acae3378a9493f247c62dbff",
+      "data_file": "data/ncdes/releases/202601__NCDesJanuary26.zip",
+      "data_sha256": "2d9c6f91ab21e0a13fdf5c6b38cee1f148955993713e6e0f8f65400712fc82db"
+    },
+    {
+      "period": "202602",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-february-2026",
+      "data_url": "https://files.digital.nhs.uk/A5/BDEA8B/NCDesFebruary26.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/74/72698E/NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/1bf76b2e4d__NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_sha256": "c5f1bbd53060cfff86ecb62607f66353bb799409acae3378a9493f247c62dbff",
+      "data_file": "data/ncdes/releases/202602__NCDesFebruary26.zip",
+      "data_sha256": "ee5c745435eaa849a5c6dd0fd0c15d4b9b3c2f1113afe01db68e73a790e12a2d"
+    },
+    {
+      "period": "202603",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-march-2026",
+      "data_url": "https://files.digital.nhs.uk/E1/C4B067/NCDesMarch26.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/74/72698E/NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/1bf76b2e4d__NCDes_v7.0_Data_Dictionary_25_26.xlsx",
+      "dictionary_sha256": "c5f1bbd53060cfff86ecb62607f66353bb799409acae3378a9493f247c62dbff",
+      "data_file": "data/ncdes/releases/202603__NCDesMarch26.zip",
+      "data_sha256": "6793e51469dcb3d1301cc3c4993f63f36de6b1b2714d4e0665bcccf47a213681"
+    },
+    {
+      "period": "202604",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-april-2026",
+      "data_url": "https://files.digital.nhs.uk/57/984764/NCDesApril26.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/0D/D3F2FC/NCDes_v8.0_Data_Dictionary_26_27.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/f88f10350a__NCDes_v8.0_Data_Dictionary_26_27.xlsx",
+      "dictionary_sha256": "24c9c0587e486420536f165c73a69da0b5452476adfa113782deebc2e6673820",
+      "data_file": "data/ncdes/releases/202604__NCDesApril26.zip",
+      "data_sha256": "d9afbfae51235616d49d833ea679c1796b551feee2bedc6127be96c03e013335"
+    },
+    {
+      "period": "202605",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-may-2026",
+      "data_url": "https://files.digital.nhs.uk/A9/F411F6/NCDesMay26.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/0D/D3F2FC/NCDes_v8.0_Data_Dictionary_26_27.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/f88f10350a__NCDes_v8.0_Data_Dictionary_26_27.xlsx",
+      "dictionary_sha256": "24c9c0587e486420536f165c73a69da0b5452476adfa113782deebc2e6673820",
+      "data_file": "data/ncdes/releases/202605__NCDesMay26.zip",
+      "data_sha256": "d6ec2b97bc07b32fc5758221d0bf6f09d2b09ce87dccc1e6c06342e2d8bd6a8b"
+    },
+    {
+      "period": "202606",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-june-2026",
+      "data_url": "https://files.digital.nhs.uk/13/807381/NCDesJune26.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/0D/D3F2FC/NCDes_v8.0_Data_Dictionary_26_27.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/f88f10350a__NCDes_v8.0_Data_Dictionary_26_27.xlsx",
+      "dictionary_sha256": "24c9c0587e486420536f165c73a69da0b5452476adfa113782deebc2e6673820",
+      "data_file": "data/ncdes/releases/202606__NCDesJune26.zip",
+      "data_sha256": "a85289609109ae9118148cbdef59378814efeafc749260136928455d760c6925"
+    },
+    {
+      "period": "202607",
+      "page_url": "https://digital.nhs.uk/data-and-information/publications/statistical/mi-network-contract-des/england-july-2026",
+      "data_url": "https://files.digital.nhs.uk/F1/A13252/NCDesJuly26.zip",
+      "dictionary_url": "https://files.digital.nhs.uk/0D/D3F2FC/NCDes_v8.0_Data_Dictionary_26_27.xlsx",
+      "dictionary_file": "data/ncdes/dictionaries/f88f10350a__NCDes_v8.0_Data_Dictionary_26_27.xlsx",
+      "dictionary_sha256": "24c9c0587e486420536f165c73a69da0b5452476adfa113782deebc2e6673820",
+      "data_file": "data/ncdes/releases/202607__NCDesJuly26.zip",
+      "data_sha256": "4555975e2b28462207582d25bd7a5073c34f8983296d5f4085df7fc4eb53d005"
+    }
+  ]
+}

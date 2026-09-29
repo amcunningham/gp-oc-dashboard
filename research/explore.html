@@ -196,11 +196,12 @@ const TABLES = {
   history: "gpps_long.parquet",
   lists: "practice_list_history.parquet",
   fft:   "fft_gp_panel.parquet",
+  ncdes: "ncdes_practice_metric_panel.parquet",
 };
 
 const SCHEMA_DOC = `
 You translate questions about English general practice access into DuckDB SQL.
-Seven views exist (practice identifier: gp_code):
+Eight views exist (practice identifier: gp_code):
 
 xsec — one row per practice (n=6007), exposure year Apr 2024–Mar 2025 unless noted:
   gp_name, pcn_name, sub_icb_name, icb_name (e.g. 'NHS SUSSEX ICB'), postcode (e.g. 'BN14 7JL'),
@@ -297,8 +298,27 @@ fft — practice x month, Jul 2022-May 2026 (296k rows): gp_code, date (month-en
   interpolate); correlates only ~0.4 with GPPS satisfaction. Starts Jul 2022 (GP FFT recommenced
   then). JOIN xsec USING (gp_code) for place/name filters.
 
-Rules: DuckDB syntax. SELECT statements only. The seven views are named exactly xsec, panel,
-waits, rush, history, lists, fft — use these bare names in FROM; never invent file paths like
+ncdes — practice x month x Network Contract DES metric, Apr 2023-Jul 2026 (1,876,542 rows):
+  gp_code, practice_name, month ('YYYY-MM'), release_period, canonical_metric,
+  source_indicator_code, definition_version, numerator, denominator, pca_total, count,
+  net_rate_pct, intervention_coverage_pct, pca_rate_pct, pca_suppressed, any_suppressed.
+  canonical_metric values: smr_med_error, smr_severe_frailty, smr_addictive_medicines,
+  smr_care_home, doac_monitoring, ld_check_action_plan_ethnicity, fit_pre_referral,
+  autism_diagnosis_count.
+  CRITICAL: each monthly extract is cumulative from 1 April, not activity delivered during that
+  month. Never difference adjacent months or average all monthly cumulative rates. Compare the
+  same financial-year month across years, year-end positions, or trajectories within a year and
+  describe them as cumulative coverage. For reach questions prefer intervention_coverage_pct,
+  which keeps PCA patients in the eligible population; net_rate_pct excludes them. If
+  pca_suppressed is true, intervention coverage and PCA rate are null. Use denominator and raw
+  counts to expose small cohorts.
+  FIT BREAK: fit_pre_referral definition_version='referral_event' through Aug 2024 and 'patient'
+  from Sep 2024. Never calculate a continuous change across that boundary. autism_diagnosis_count
+  is recorded case ascertainment/context, not quality or performance. JOIN xsec USING (gp_code)
+  for geography, list size or workforce; practice codes can change through mergers.
+
+Rules: DuckDB syntax. SELECT statements only. The eight views are named exactly xsec, panel,
+waits, rush, history, lists, fft, ncdes — use these bare names in FROM; never invent file paths like
 'xsec.parquet'. Joining history or lists to xsec: JOIN ON gp_code; xsec only contains
 practices open in 2026, so closed practices appear in history/lists but not xsec.
 Always aggregate or LIMIT (max 500 rows).
@@ -601,7 +621,7 @@ let conn, viewsReady = false;
     }
     if (failed.length === 0) {
       viewsReady = true;
-      $("dbstatus").textContent = "DuckDB ready — four views loaded: xsec, panel, waits, rush.";
+      $("dbstatus").textContent = "DuckDB ready — eight views loaded.";
     } else {
       $("dbstatus").textContent = ok.length ? "Partial load: " + ok.join(", ") : "";
       $("error").textContent =
@@ -699,7 +719,8 @@ async function llmChat(sys, user, tier) {
 
 function normaliseSql(sql) {
   // models sometimes invent file paths for the views — map them back to view names
-  return sql.replace(/['"`]?(?:[\w./-]*\/)?(xsec|panel|waits|rush)(?:_master|_merged|_panel|_both_sameday)?\.(?:parquet|csv)['"`]?/gi,
+  return sql.replace(/['"`]?(?:[\w./-]*\/)?ncdes(?:_practice)?(?:_metric)?(?:_panel)?\.(?:parquet|csv)['"`]?/gi, "ncdes")
+            .replace(/['"`]?(?:[\w./-]*\/)?(xsec|panel|waits|rush)(?:_master|_merged|_panel|_both_sameday)?\.(?:parquet|csv)['"`]?/gi,
                      (_, name) => name.toLowerCase());
 }
 function buildPortraitSql(name, place) {
@@ -834,6 +855,7 @@ const VIEW_SOURCES = {
   history: "GP Patient Survey, 2012 onward",
   lists: "registered list sizes, 2013 onward (NHS England)",
   fft: "Friends and Family Test for GP practices, monthly",
+  ncdes: "Network Contract DES — cumulative practice-level clinical-process indicators, Apr 2023 onward",
 };
 function sqlSources(sql) {
   const seen = [];
