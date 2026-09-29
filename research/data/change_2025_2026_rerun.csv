@@ -1,0 +1,234 @@
+sample,outcome,predictor,label,coef,se,p
+CBT,d_satisfaction,adopt,Adopted triage-first intake (event),-1.638888706047536,0.754501452471506,0.02984451292744658
+CBT,d_satisfaction,d_oc_rate,Change in online intake volume,0.3802854022024476,0.3075404711835706,0.21625874273143775
+CBT,d_satisfaction,d_admin,Change in admin FTE per 10k,0.1910276166489253,0.13989417993985703,0.172091206979879
+CBT,d_satisfaction,d_gp_fq,Change in FULLY-QUALIFIED GP per 10k,0.19612926663193023,0.13528812439924529,0.14713792163525025
+CBT,d_satisfaction,d_trainee,Change in trainee-grade GP per 10k,0.07098430842452351,0.14062361615936564,0.6137117688237939
+CBT,d_satisfaction,d_nurse,Change in nurse FTE per 10k,-0.04802858697560095,0.12913890986340917,0.7099567747652803
+CBT,d_satisfaction,d_dpc,Change in other clinical FTE per 10k,0.029973241504646652,0.13633139863712243,0.8259835017054502
+CBT,d_satisfaction,d_queue_answer,Change in queue-answer rate,0.11781155118325924,0.1552766042759286,0.4480197389637003
+CBT,d_satisfaction,d_ivr_share,Change in IVR-ended share,-0.0927839995489877,0.14749323676984114,0.5293013252322651
+CBT,d_satisfaction,base_outcome,Baseline level of the outcome,-4.366360866361531,0.18906186231605773,5.212452922684926e-118
+CBT,d_satisfaction,base_deflection,Baseline deflection (Q12),-1.2061973021958594,0.2001989585365981,1.6911705589106969e-09
+CBT,d_satisfaction,imd_score,Deprivation (IMD 2025),-0.5013664514970496,0.15920365242020137,0.0016370998108841553
+CBT,d_satisfaction,log_list,Practice size (log list),-0.5713217592991381,0.14629173658056877,9.408558013891705e-05
+CBT,d_satisfaction,base_gp_fq,Baseline fully-qualified GP per 10k,0.7241448390871748,0.15652698883185243,3.7220973324595242e-06
+CBT,d_satisfaction,adopt_x_defl,Adoption x baseline deflection,0.6104566233569706,0.3487218629211334,0.08002268009129668
+CBT,d_satisfaction,_R2,R-squared,0.21148349022220825,,
+CBT,d_satisfaction,_n,n practices,2762.0,,
+CBT,d_access,adopt,Adopted triage-first intake (event),-2.067928133772893,0.8254795032347205,0.012240863026166426
+CBT,d_access,d_oc_rate,Change in online intake volume,0.0802445095696429,0.34744593430035103,0.817349462519441
+CBT,d_access,d_admin,Change in admin FTE per 10k,0.2508131638533751,0.14815131383444524,0.09046447463840905
+CBT,d_access,d_gp_fq,Change in FULLY-QUALIFIED GP per 10k,0.3910881520769765,0.1519359412973409,0.010052063678016915
+CBT,d_access,d_trainee,Change in trainee-grade GP per 10k,0.05811272422614438,0.14927013763723618,0.6970450214979438
+CBT,d_access,d_nurse,Change in nurse FTE per 10k,-0.08693826682959513,0.13795861977092114,0.5285791758856566
+CBT,d_access,d_dpc,Change in other clinical FTE per 10k,0.08163501318113031,0.1417604229542758,0.5647057324598781
+CBT,d_access,d_queue_answer,Change in queue-answer rate,0.2164998081820762,0.16249419834250603,0.182743863927599
+CBT,d_access,d_ivr_share,Change in IVR-ended share,-0.02638904507235876,0.1683431597762931,0.8754360052481178
+CBT,d_access,base_outcome,Baseline level of the outcome,-4.835629293924429,0.23095835877835139,2.452905158076607e-97
+CBT,d_access,base_deflection,Baseline deflection (Q12),-1.0488841326841227,0.23554435666565487,8.467019174645369e-06
+CBT,d_access,imd_score,Deprivation (IMD 2025),-0.4556679303697079,0.17106115422291393,0.007726989150744515
+CBT,d_access,log_list,Practice size (log list),-0.5086310844136827,0.15855370052637008,0.0013368842949178542
+CBT,d_access,base_gp_fq,Baseline fully-qualified GP per 10k,0.7621614193754797,0.16190878725396976,2.5095713528142345e-06
+CBT,d_access,adopt_x_defl,Adoption x baseline deflection,0.8669323614216935,0.368517813919208,0.018648478368265782
+CBT,d_access,_R2,R-squared,0.22992504258700242,,
+CBT,d_access,_n,n practices,2762.0,,
+CBT,d_phone,adopt,Adopted triage-first intake (event),-2.6937945386029494,0.90230006652976,0.002831380269940327
+CBT,d_phone,d_oc_rate,Change in online intake volume,-0.7323392362049554,0.39298859125057783,0.0623901654757093
+CBT,d_phone,d_admin,Change in admin FTE per 10k,0.5065747753105597,0.17463786747517124,0.0037231169343915015
+CBT,d_phone,d_gp_fq,Change in FULLY-QUALIFIED GP per 10k,0.20560855087703006,0.18190168908284793,0.25833809025026977
+CBT,d_phone,d_trainee,Change in trainee-grade GP per 10k,0.09443994672482249,0.16402137627039537,0.5647650529750916
+CBT,d_phone,d_nurse,Change in nurse FTE per 10k,-0.2643420885979394,0.15862186537432338,0.09561543653871124
+CBT,d_phone,d_dpc,Change in other clinical FTE per 10k,0.27453754032845584,0.16545595182474185,0.09705964084584544
+CBT,d_phone,d_queue_answer,Change in queue-answer rate,-0.1349984180281967,0.1745556692849862,0.4392956432778373
+CBT,d_phone,d_ivr_share,Change in IVR-ended share,-0.38842736272366357,0.18285233837892534,0.0336477437913504
+CBT,d_phone,base_outcome,Baseline level of the outcome,-5.6071776534911,0.23331133441468713,1.2562907909770464e-127
+CBT,d_phone,base_deflection,Baseline deflection (Q12),-1.4790433102989775,0.25925545277973827,1.1636692856253387e-08
+CBT,d_phone,imd_score,Deprivation (IMD 2025),-0.3686868855320784,0.19372804004424085,0.057025442359953764
+CBT,d_phone,log_list,Practice size (log list),-1.257113416710286,0.1899485914661871,3.6365522726764996e-11
+CBT,d_phone,base_gp_fq,Baseline fully-qualified GP per 10k,0.47545234883170695,0.19839679841020846,0.01655376353138401
+CBT,d_phone,adopt_x_defl,Adoption x baseline deflection,0.9762355629666875,0.37153124695355855,0.008598952355888947
+CBT,d_phone,_R2,R-squared,0.22944097288471355,,
+CBT,d_phone,_n,n practices,2762.0,,
+CBT,d_deflection,adopt,Adopted triage-first intake (event),0.08934342853642065,0.43223672314190226,0.8362439805689326
+CBT,d_deflection,d_oc_rate,Change in online intake volume,-0.2943340327168058,0.17250133344081708,0.08795762406689259
+CBT,d_deflection,d_admin,Change in admin FTE per 10k,-0.10801050193045705,0.09069256104108495,0.2336723641224947
+CBT,d_deflection,d_gp_fq,Change in FULLY-QUALIFIED GP per 10k,-0.02679012966007869,0.08620082021954799,0.7559622413883305
+CBT,d_deflection,d_trainee,Change in trainee-grade GP per 10k,-0.12412135356967409,0.07997767449952739,0.12067418292595326
+CBT,d_deflection,d_nurse,Change in nurse FTE per 10k,0.16152564585179463,0.08678137946426857,0.06270269450329406
+CBT,d_deflection,d_dpc,Change in other clinical FTE per 10k,0.053818266617013784,0.0785159753710504,0.4930640889577089
+CBT,d_deflection,d_queue_answer,Change in queue-answer rate,-0.13364686636370562,0.08498478705647793,0.11581203956723256
+CBT,d_deflection,d_ivr_share,Change in IVR-ended share,-0.018765002220974877,0.09165409304938418,0.83777745594888
+CBT,d_deflection,base_outcome,Baseline level of the outcome,-1.618829990249689,0.06210282021935368,8.648339875405849e-150
+CBT,d_deflection,base_deflection,Baseline deflection (Q12),-1.6188299902496879,0.06210282021935362,8.648339875403385e-150
+CBT,d_deflection,imd_score,Deprivation (IMD 2025),0.7581912851078518,0.09556520642112855,2.1261105184093216e-15
+CBT,d_deflection,log_list,Practice size (log list),0.06059181280726261,0.08498290969679169,0.4758530517656864
+CBT,d_deflection,base_gp_fq,Baseline fully-qualified GP per 10k,-0.3106539999523187,0.09286200187774736,0.0008218485335675623
+CBT,d_deflection,adopt_x_defl,Adoption x baseline deflection,-0.6237704735482776,0.22422716203663326,0.0054046938276560265
+CBT,d_deflection,_R2,R-squared,0.40006407924456455,,
+CBT,d_deflection,_n,n practices,2726.0,,
+CBT,d_continuity,adopt,Adopted triage-first intake (event),-2.260347006640409,1.2707573305295787,0.07528238352491144
+CBT,d_continuity,d_oc_rate,Change in online intake volume,-0.4198997323653163,0.537838697236006,0.4349690492848606
+CBT,d_continuity,d_admin,Change in admin FTE per 10k,0.12008674248580486,0.26363576858936183,0.6487477945112068
+CBT,d_continuity,d_gp_fq,Change in FULLY-QUALIFIED GP per 10k,0.011857224343496404,0.28568480691955767,0.9668936516801965
+CBT,d_continuity,d_trainee,Change in trainee-grade GP per 10k,0.845902756428,0.2655669882176988,0.0014461864185217731
+CBT,d_continuity,d_nurse,Change in nurse FTE per 10k,-0.15123565923088172,0.24262766955754064,0.5330716031204061
+CBT,d_continuity,d_dpc,Change in other clinical FTE per 10k,-0.19465208877864087,0.2421313429167778,0.42144828432571335
+CBT,d_continuity,d_queue_answer,Change in queue-answer rate,0.0023187548135028277,0.2482576677200339,0.9925477759313863
+CBT,d_continuity,d_ivr_share,Change in IVR-ended share,0.31082166615289947,0.2358047046291454,0.18745955021763627
+CBT,d_continuity,base_outcome,Baseline level of the outcome,-8.497814084803851,0.3042835892428212,1.2445740496169973e-171
+CBT,d_continuity,base_deflection,Baseline deflection (Q12),-2.204298393067212,0.3421175028697825,1.1705500679581664e-10
+CBT,d_continuity,imd_score,Deprivation (IMD 2025),-0.5111923198447093,0.28001246929844326,0.0679096982308226
+CBT,d_continuity,log_list,Practice size (log list),-2.07708395773804,0.28651204548277764,4.1815256033067583e-13
+CBT,d_continuity,base_gp_fq,Baseline fully-qualified GP per 10k,0.9737235495484853,0.29159682594770747,0.0008399574941006498
+CBT,d_continuity,adopt_x_defl,Adoption x baseline deflection,1.0153858269054739,0.5179633107367297,0.04995569604347848
+CBT,d_continuity,_R2,R-squared,0.24556970708646342,,
+CBT,d_continuity,_n,n practices,2755.0,,
+ALL,d_satisfaction,adopt,Adopted triage-first intake (event),-1.2207003544082322,0.4784908823010459,0.010736917347489374
+ALL,d_satisfaction,d_oc_rate,Change in online intake volume,0.1581952985053203,0.1944857344655115,0.41598698496603603
+ALL,d_satisfaction,d_admin,Change in admin FTE per 10k,0.18851223693108168,0.09906387141879693,0.057048857654380856
+ALL,d_satisfaction,d_gp_fq,Change in FULLY-QUALIFIED GP per 10k,0.3187009601423805,0.10442504503661008,0.002273531229307005
+ALL,d_satisfaction,d_trainee,Change in trainee-grade GP per 10k,0.028645176688624256,0.09516242448121104,0.7634041823214961
+ALL,d_satisfaction,d_nurse,Change in nurse FTE per 10k,-0.0714174880587351,0.09603574173864408,0.4570850402898371
+ALL,d_satisfaction,d_dpc,Change in other clinical FTE per 10k,0.04187576671513094,0.09475588436433513,0.658537579427704
+ALL,d_satisfaction,base_outcome,Baseline level of the outcome,-4.5099815652272675,0.13890385591121113,2.982253793542123e-231
+ALL,d_satisfaction,base_deflection,Baseline deflection (Q12),-1.1484948917388198,0.14946386591454955,1.5407950526789935e-14
+ALL,d_satisfaction,imd_score,Deprivation (IMD 2025),-0.6842834698769519,0.11541487447735999,3.049671831986364e-09
+ALL,d_satisfaction,log_list,Practice size (log list),-0.7759785846362385,0.10316169054055085,5.395919505601167e-14
+ALL,d_satisfaction,base_gp_fq,Baseline fully-qualified GP per 10k,0.8312222870736239,0.10509308951498444,2.5865202667757626e-15
+ALL,d_satisfaction,adopt_x_defl,Adoption x baseline deflection,0.5149294454059413,0.24112505673025914,0.03271785979342339
+ALL,d_satisfaction,_R2,R-squared,0.20637656775379765,,
+ALL,d_satisfaction,_n,n practices,5527.0,,
+ALL,d_access,adopt,Adopted triage-first intake (event),-1.738622409477503,0.5113738149767275,0.0006740925988819206
+ALL,d_access,d_oc_rate,Change in online intake volume,-0.021910051773433536,0.21118218053317583,0.9173681202095103
+ALL,d_access,d_admin,Change in admin FTE per 10k,0.25483935477210967,0.10950151226833874,0.019951010995234157
+ALL,d_access,d_gp_fq,Change in FULLY-QUALIFIED GP per 10k,0.4027252321577488,0.10968827708302457,0.00024109045042213913
+ALL,d_access,d_trainee,Change in trainee-grade GP per 10k,0.14086918248629846,0.10260343995544484,0.16976852865202652
+ALL,d_access,d_nurse,Change in nurse FTE per 10k,-0.11203220993829693,0.10510067614716753,0.2864456246079051
+ALL,d_access,d_dpc,Change in other clinical FTE per 10k,0.041348060983312805,0.10406547218894498,0.691126062346719
+ALL,d_access,base_outcome,Baseline level of the outcome,-4.958511163244157,0.16760660057521218,2.384573534106901e-192
+ALL,d_access,base_deflection,Baseline deflection (Q12),-1.0395024488231528,0.17829335203372154,5.533019905606549e-09
+ALL,d_access,imd_score,Deprivation (IMD 2025),-0.6159413386176363,0.1265675054901814,1.1358932208884581e-06
+ALL,d_access,log_list,Practice size (log list),-0.7704319546170706,0.11405598166032098,1.4297526381307171e-11
+ALL,d_access,base_gp_fq,Baseline fully-qualified GP per 10k,0.6773674277443147,0.10945588914542533,6.074061248571745e-10
+ALL,d_access,adopt_x_defl,Adoption x baseline deflection,0.8574444438750259,0.25751382628901615,0.000869388050483122
+ALL,d_access,_R2,R-squared,0.2195852271112052,,
+ALL,d_access,_n,n practices,5527.0,,
+ALL,d_phone,adopt,Adopted triage-first intake (event),-2.2687784914889377,0.6371630394497015,0.0003697966012646284
+ALL,d_phone,d_oc_rate,Change in online intake volume,-0.6653357054486133,0.28025317813388273,0.017594057626700334
+ALL,d_phone,d_admin,Change in admin FTE per 10k,0.3093482985362811,0.1292559468915235,0.016697567583082083
+ALL,d_phone,d_gp_fq,Change in FULLY-QUALIFIED GP per 10k,0.3609050701481061,0.1306401530632348,0.0057344897986017435
+ALL,d_phone,d_trainee,Change in trainee-grade GP per 10k,0.032625286428088006,0.11711089884606589,0.7805636749113462
+ALL,d_phone,d_nurse,Change in nurse FTE per 10k,-0.172278999390775,0.1269014217505281,0.17459657428709108
+ALL,d_phone,d_dpc,Change in other clinical FTE per 10k,0.09004974414353961,0.11674095770049202,0.4404913490744351
+ALL,d_phone,base_outcome,Baseline level of the outcome,-5.472581706978733,0.1718189423498717,1.2805549524625607e-222
+ALL,d_phone,base_deflection,Baseline deflection (Q12),-1.202893632709926,0.18776392268817305,1.4898099016608662e-10
+ALL,d_phone,imd_score,Deprivation (IMD 2025),-0.427106902236903,0.1430183974279924,0.00282304058255205
+ALL,d_phone,log_list,Practice size (log list),-1.5324925760774222,0.14166215429782214,2.8307058554845156e-27
+ALL,d_phone,base_gp_fq,Baseline fully-qualified GP per 10k,0.4989607360330473,0.13276956637484602,0.00017121140528301952
+ALL,d_phone,adopt_x_defl,Adoption x baseline deflection,0.9724950663890605,0.2695538788319871,0.00030881063849386213
+ALL,d_phone,_R2,R-squared,0.19862449952944183,,
+ALL,d_phone,_n,n practices,5527.0,,
+ALL,d_deflection,adopt,Adopted triage-first intake (event),-0.08185897147065607,0.309620638415432,0.79148347031583
+ALL,d_deflection,d_oc_rate,Change in online intake volume,-0.3007780820140915,0.1306531323041613,0.02132888349394251
+ALL,d_deflection,d_admin,Change in admin FTE per 10k,-0.11508163576915288,0.06319166080990488,0.06858371540672552
+ALL,d_deflection,d_gp_fq,Change in FULLY-QUALIFIED GP per 10k,-0.0174852327248746,0.06319971338259459,0.782036328188048
+ALL,d_deflection,d_trainee,Change in trainee-grade GP per 10k,-0.08592346768351619,0.056272103039414455,0.12677883685015237
+ALL,d_deflection,d_nurse,Change in nurse FTE per 10k,0.05310434425709682,0.06386357280523662,0.4056754588981445
+ALL,d_deflection,d_dpc,Change in other clinical FTE per 10k,-0.009253388881694585,0.06105269703352795,0.8795308561653773
+ALL,d_deflection,base_outcome,Baseline level of the outcome,-1.6188441913726719,0.047476779283217196,8.005961636409841e-255
+ALL,d_deflection,base_deflection,Baseline deflection (Q12),-1.6188441913726717,0.04747677928321715,8.005961636403464e-255
+ALL,d_deflection,imd_score,Deprivation (IMD 2025),0.7207731213842218,0.07236515602022431,2.2755078100142598e-23
+ALL,d_deflection,log_list,Practice size (log list),0.21189072427721703,0.06200823943689394,0.0006328314389555666
+ALL,d_deflection,base_gp_fq,Baseline fully-qualified GP per 10k,-0.3750206179800339,0.06441645566419271,5.8212342871068755e-09
+ALL,d_deflection,adopt_x_defl,Adoption x baseline deflection,-1.1109602064010686,0.1618117217965229,6.613887521565121e-12
+ALL,d_deflection,_R2,R-squared,0.3978657466770832,,
+ALL,d_deflection,_n,n practices,5469.0,,
+ALL,d_continuity,adopt,Adopted triage-first intake (event),-1.5667027521346397,0.8367842171357616,0.06116648849781411
+ALL,d_continuity,d_oc_rate,Change in online intake volume,-0.6192679738488052,0.3416596479693644,0.06990451805960045
+ALL,d_continuity,d_admin,Change in admin FTE per 10k,-0.10138695950315633,0.1906649839566013,0.5948960532585026
+ALL,d_continuity,d_gp_fq,Change in FULLY-QUALIFIED GP per 10k,0.41669270560262517,0.2006854946158559,0.03786187810071328
+ALL,d_continuity,d_trainee,Change in trainee-grade GP per 10k,0.7066698132313209,0.18849585367266766,0.00017754537473281626
+ALL,d_continuity,d_nurse,Change in nurse FTE per 10k,0.08476364654919534,0.18088001525968406,0.6393426472947341
+ALL,d_continuity,d_dpc,Change in other clinical FTE per 10k,-0.3145593963174002,0.17382920726932302,0.07035956937788916
+ALL,d_continuity,base_outcome,Baseline level of the outcome,-8.424476238074606,0.220275221896838,0.0
+ALL,d_continuity,base_deflection,Baseline deflection (Q12),-2.309848139279956,0.24523296449424367,4.554248315231004e-21
+ALL,d_continuity,imd_score,Deprivation (IMD 2025),-0.5716046295094172,0.20586064613726818,0.005492091823390948
+ALL,d_continuity,log_list,Practice size (log list),-2.4490574474600653,0.2076307748165585,4.1295939630767867e-32
+ALL,d_continuity,base_gp_fq,Baseline fully-qualified GP per 10k,0.6305841720134839,0.19444760333985753,0.0011829829335959147
+ALL,d_continuity,adopt_x_defl,Adoption x baseline deflection,0.9199476854893527,0.3839920096069569,0.016586536939064835
+ALL,d_continuity,_R2,R-squared,0.22930190627976166,,
+ALL,d_continuity,_n,n practices,5513.0,,
+7YR,d_satisfaction,adopt,Adopted triage-first intake (event),-1.115559550713324,0.4743448172016627,0.01868330330144697
+7YR,d_satisfaction,d_oc_rate,Change in online intake volume,0.08372583688834705,0.193627150479038,0.6654452499876289
+7YR,d_satisfaction,d_gp_fq_7yr,Change in FQ GP per 10k (7 year),0.21962949498985468,0.1014741398948881,0.030434520320122886
+7YR,d_satisfaction,base_outcome,Baseline level of the outcome,-4.497861496834266,0.13525104124380816,1.6912956160392447e-242
+7YR,d_satisfaction,base_deflection,Baseline deflection (Q12),-1.0638711369504603,0.14698052635999875,4.54754083371199e-13
+7YR,d_satisfaction,imd_score,Deprivation (IMD 2025),-0.6976362190944839,0.11223892814483867,5.111747685070773e-10
+7YR,d_satisfaction,log_list,Practice size (log list),-0.7926326238313173,0.10083676980248216,3.82445787446028e-15
+7YR,d_satisfaction,base_gp_fq,Baseline fully-qualified GP per 10k,0.6382767935887823,0.10586812517533825,1.6499785461737149e-09
+7YR,d_satisfaction,adopt_x_defl,Adoption x baseline deflection,0.4357312255024903,0.2336979763498829,0.06225071195050598
+7YR,d_satisfaction,_R2,R-squared,0.20809782564082002,,
+7YR,d_satisfaction,_n,n practices,5887.0,,
+7YR,d_access,adopt,Adopted triage-first intake (event),-1.6637508323732593,0.49532544593468264,0.0007825212603734416
+7YR,d_access,d_oc_rate,Change in online intake volume,-0.08444223585217814,0.20276355610480026,0.6770758659668932
+7YR,d_access,d_gp_fq_7yr,Change in FQ GP per 10k (7 year),0.2653620298619202,0.10405441236124915,0.010765381435145297
+7YR,d_access,base_outcome,Baseline level of the outcome,-4.994682589714456,0.16174297892266562,2.191937161453701e-209
+7YR,d_access,base_deflection,Baseline deflection (Q12),-1.0055120709577723,0.17166685961248357,4.703246198076703e-09
+7YR,d_access,imd_score,Deprivation (IMD 2025),-0.646723045189336,0.12167165941276914,1.0647370223799567e-07
+7YR,d_access,log_list,Practice size (log list),-0.7912664246889759,0.11118255179926174,1.1044401168254178e-12
+7YR,d_access,base_gp_fq,Baseline fully-qualified GP per 10k,0.45757010217555116,0.10940663511659661,2.8858955299899086e-05
+7YR,d_access,adopt_x_defl,Adoption x baseline deflection,0.7528599607783946,0.24811711041302592,0.0024110030994018874
+7YR,d_access,_R2,R-squared,0.2213628027612351,,
+7YR,d_access,_n,n practices,5887.0,,
+7YR,d_phone,adopt,Adopted triage-first intake (event),-2.207417940822201,0.6287151111934108,0.0004464265742116473
+7YR,d_phone,d_oc_rate,Change in online intake volume,-0.727188689342377,0.2755229242904004,0.008307650601855272
+7YR,d_phone,d_gp_fq_7yr,Change in FQ GP per 10k (7 year),0.34704527047253614,0.12056003738786294,0.003994325715404905
+7YR,d_phone,base_outcome,Baseline level of the outcome,-5.462752129777918,0.1649900286583965,2.1628733240153317e-240
+7YR,d_phone,base_deflection,Baseline deflection (Q12),-1.192915249445176,0.17965751428913518,3.138092796613508e-11
+7YR,d_phone,imd_score,Deprivation (IMD 2025),-0.44825871081805757,0.13806423583847965,0.0011673487827500333
+7YR,d_phone,log_list,Practice size (log list),-1.5760573864101362,0.13612467812152013,5.3247714776777425e-31
+7YR,d_phone,base_gp_fq,Baseline fully-qualified GP per 10k,0.2758806281081269,0.13043970715293687,0.03442952425131336
+7YR,d_phone,adopt_x_defl,Adoption x baseline deflection,0.943701794091688,0.2598192966111845,0.0002810732776123925
+7YR,d_phone,_R2,R-squared,0.19920736145500217,,
+7YR,d_phone,_n,n practices,5887.0,,
+7YR,d_deflection,adopt,Adopted triage-first intake (event),-0.00929993337689863,0.30449214180247247,0.9756344458681203
+7YR,d_deflection,d_oc_rate,Change in online intake volume,-0.3044208040946457,0.1281681566654989,0.017541001593796037
+7YR,d_deflection,d_gp_fq_7yr,Change in FQ GP per 10k (7 year),0.010592525493485251,0.06319651738471023,0.8668881464205799
+7YR,d_deflection,base_outcome,Baseline level of the outcome,-1.6302154127626565,0.045513311201568804,5.705137422142984e-281
+7YR,d_deflection,base_deflection,Baseline deflection (Q12),-1.6302154127626558,0.04551331120156881,5.705137422144931e-281
+7YR,d_deflection,imd_score,Deprivation (IMD 2025),0.6989271165579571,0.07075878967350413,5.2064212265693046e-23
+7YR,d_deflection,log_list,Practice size (log list),0.18984293830291935,0.06148568916913055,0.00201782912536141
+7YR,d_deflection,base_gp_fq,Baseline fully-qualified GP per 10k,-0.34898215585049286,0.064179176840307,5.399613161163264e-08
+7YR,d_deflection,adopt_x_defl,Adoption x baseline deflection,-1.0091642378633108,0.1597086975558238,2.636350568053658e-10
+7YR,d_deflection,_R2,R-squared,0.3902610859672432,,
+7YR,d_deflection,_n,n practices,5825.0,,
+7YR,d_continuity,adopt,Adopted triage-first intake (event),-1.6842614970924998,0.8213299733073163,0.040300902551733894
+7YR,d_continuity,d_oc_rate,Change in online intake volume,-0.5317935768390365,0.33310495756105285,0.1103828903748249
+7YR,d_continuity,d_gp_fq_7yr,Change in FQ GP per 10k (7 year),0.1570767557027233,0.18197950721690795,0.3880515441865575
+7YR,d_continuity,base_outcome,Baseline level of the outcome,-8.44697781614097,0.2134401071073099,0.0
+7YR,d_continuity,base_deflection,Baseline deflection (Q12),-2.3260647370538363,0.2388923197636614,2.0990957086059845e-22
+7YR,d_continuity,imd_score,Deprivation (IMD 2025),-0.5663657399245096,0.2025792784646726,0.00517757028855617
+7YR,d_continuity,log_list,Practice size (log list),-2.4459404915199383,0.20277558462331777,1.6704602659843068e-33
+7YR,d_continuity,base_gp_fq,Baseline fully-qualified GP per 10k,0.3632634164549228,0.1979529657907877,0.06649092713196597
+7YR,d_continuity,adopt_x_defl,Adoption x baseline deflection,0.9913752827182143,0.3803872610549981,0.009154595650687946
+7YR,d_continuity,_R2,R-squared,0.2266515975643062,,
+7YR,d_continuity,_n,n practices,5874.0,,
+SENS:full (headline),d_access,d_queue_answer,Change in queue-answer rate,0.2164998081820762,0.16249419834250603,0.182743863927599
+SENS:full (headline),d_deflection,d_queue_answer,Change in queue-answer rate,-0.13364686636370562,0.08498478705647793,0.11581203956723256
+SENS:full (headline),d_phone,d_ivr_share,Change in IVR-ended share,-0.38842736272366357,0.18285233837892534,0.0336477437913504
+SENS:no baseline outcome,d_access,d_queue_answer,Change in queue-answer rate,0.6062008343471209,0.17214937700395935,0.0004293308051409138
+SENS:no baseline outcome,d_deflection,d_queue_answer,Change in queue-answer rate,-0.13364686636370823,0.084984787056478,0.11581203956722573
+SENS:no baseline outcome,d_phone,d_ivr_share,Change in IVR-ended share,-0.782679379965225,0.20040169249927858,9.401024991445795e-05
+SENS:no baseline deflection,d_access,d_queue_answer,Change in queue-answer rate,0.2819722827853521,0.16088538957714957,0.07966583461467465
+SENS:no baseline deflection,d_deflection,d_queue_answer,Change in queue-answer rate,-0.1546518118941044,0.08424594217955945,0.06639934030877595
+SENS:no baseline deflection,d_phone,d_ivr_share,Change in IVR-ended share,-0.37410834845274105,0.18337783415520242,0.04134078541315812
+SENS:no adoption event,d_access,d_queue_answer,Change in queue-answer rate,0.2234160859468916,0.16211690853512914,0.16816713280450668
+SENS:no adoption event,d_deflection,d_queue_answer,Change in queue-answer rate,-0.15570889006569663,0.08392423702730148,0.06354616573079373
+SENS:no adoption event,d_phone,d_ivr_share,Change in IVR-ended share,-0.40490601545128435,0.18311432415552567,0.02702062133794796
+SENS:phone terms + controls,d_access,d_queue_answer,Change in queue-answer rate,-0.0034318506155233026,0.15713074812544148,0.9825750022017908
+SENS:phone terms + controls,d_deflection,d_queue_answer,Change in queue-answer rate,-0.18393975743915622,0.07852718024714139,0.019161677894167627
+SENS:phone terms + controls,d_phone,d_ivr_share,Change in IVR-ended share,-0.3102999524986484,0.17409261683711325,0.07468657883562907
+SENS:phone terms alone,d_access,d_queue_answer,Change in queue-answer rate,0.44197429251938875,0.20810091199806097,0.033683021875902115
+SENS:phone terms alone,d_deflection,d_queue_answer,Change in queue-answer rate,-0.31877355115297873,0.11037670839749625,0.003876371486801222
+SENS:phone terms alone,d_phone,d_ivr_share,Change in IVR-ended share,-0.8290406542388083,0.18920240244899575,1.1772120519010243e-05

@@ -1,0 +1,33 @@
+# NHSE General Practice Workforce - practice-level CSV zips used by build_workforce_panel.py
+# Downloaded 13 Aug 2026.  Re-fetch with:  xargs -n1 -P4 curl -sSL -O -J < gpw_sources.txt
+# Publication pages:
+#   https://digital.nhs.uk/data-and-information/publications/statistical/general-and-personal-medical-services
+#   https://digital.nhs.uk/data-and-information/publications/statistical/general-practice-workforce-archive
+# NOTE: the Dec 2019 and Dec 2021 editions each ship a cumulative back-series, which is how
+# periods with no surviving standalone edition (e.g. 2018-06, 2019-06) are recovered.
+https://files.digital.nhs.uk/87/D6661E/GPWDec18PracCSV.zip
+https://files.digital.nhs.uk/48/530ACB/GPWPracticeCSV.0319.zip
+https://files.digital.nhs.uk/10/9EED06/GPWPracticeCSV.1219.zip
+https://files.digital.nhs.uk/B5/54B4D3/GPWPracticeCSV.062020.zip
+https://files.digital.nhs.uk/60/151031/GPWPracticeCSV.122020.zip
+https://files.digital.nhs.uk/55/FADA9A/GPWPracticeCSV.032021.zip
+https://files.digital.nhs.uk/FD/912D30/GPWPracticeCSV.062021.zip
+https://files.digital.nhs.uk/B2/111624/GPWPracticeCSV.122021.zip
+https://files.digital.nhs.uk/9C/384584/GPWPracticeCSV.032022.zip
+https://files.digital.nhs.uk/36/D82C65/GPWPracticeCSV.062022.zip
+https://files.digital.nhs.uk/3F/80FBC0/GPWPracticeCSV.092022.zip
+https://files.digital.nhs.uk/CE/567420/GPWPracticeCSV.122022.zip
+https://files.digital.nhs.uk/CE/AF761E/GPWPracticeCSV.032023.zip
+https://files.digital.nhs.uk/47/AA1BAF/GPWPracticeCSV.062023.zip
+https://files.digital.nhs.uk/09/36F385/GPWPracticeCSV.092023.zip
+https://files.digital.nhs.uk/61/273DBF/GPWPracticeCSV.122023.zip
+https://files.digital.nhs.uk/14/AE345C/GPWPracticeCSV.032024.zip
+https://files.digital.nhs.uk/6C/E0EE09/GPWPracticeCSV.062024.zip
+https://files.digital.nhs.uk/3F/1A064F/GPWPracticeCSV.092024.zip
+https://files.digital.nhs.uk/EF/E70610/GPWPracticeCSV.122024.zip
+https://files.digital.nhs.uk/A2/6314BF/GPWPracticeCSV.032025.zip
+https://files.digital.nhs.uk/36/232D13/GPWPracticeCSV.062025.zip
+https://files.digital.nhs.uk/A9/E52327/GPWPracticeCSV.092025.zip
+https://files.digital.nhs.uk/9F/0225CE/GPWPracticeCSV.122025.zip
+https://files.digital.nhs.uk/85/7F0D90/GPWPracticeCSV.032026.zip
+https://files.digital.nhs.uk/67/6F8ADC/General%20Practice%20Final%20Mar%202018%20Practice.zip
