@@ -4,7 +4,7 @@ ingest_gpps2026.py  -- one-command ingest of the GPPS 2026 practice-level file.
 
 Pipeline:  download/locate -> integrity (changelog) check -> sentinel clean
            -> extract our question set -> respondent-weighted national headlines
-           -> merge into xsec -> 3-wave change file.
+           -> merge onto CANDIDATE xsec -> 3-wave change file.
 
 The practice-level weighted CSV carries precomputed `<stem>.pcteval` (positive score,
 a fraction), `<stem>_N.pct` (category-N share), and `<stem>.baseevalw` (survey-weighted
@@ -16,7 +16,25 @@ USAGE
   python3 ingest_gpps2026.py "https://.../gpps_2026_practice.csv"   # downloads
   python3 ingest_gpps2026.py            # auto-finds newest match in ~/Downloads
 
-Non-destructive: writes xsec_master_2026.{csv,parquet} and wave3_gpps.csv into research/data/.
+SAFEGUARDS (Sep 2026 -- see the GPAD-vintage correction for context):
+
+  1. This script NEVER overwrites the canonical xsec_master_2026.{csv,parquet}.
+     It writes to xsec_master_2026_gpps_candidate.{csv,parquet}. A separate,
+     deliberate step is needed to promote a candidate to canonical, after
+     verifying that (a) the GPAD operational block already covers the same
+     window as the GPPS 2026 fieldwork -- April 2025 to March 2026 -- and
+     (b) shape and non-GPAD columns are preserved. See refresh_gpad_2526.py
+     for that promotion path.
+
+  2. The authoritative operational panel is research/data/panel_merged.parquet
+     (and waits_panel.parquet for the wait bands). The historic build_xsec.py
+     reads a legacy CSV whose GPAD block was frozen to Apr 2024-Mar 2025;
+     do NOT use build_xsec.py to regenerate the 2026 exposures.
+
+  3. Before promoting a candidate, the caller must run refresh_gpad_2526.py
+     to ensure the GPAD block matches the GPPS survey window. Mixing survey
+     outcomes with operational data from a different window inflates or
+     invents cross-sectional associations (see research/predictors.html).
 
 CAUTION: a 2025->2026 comparison is only valid if the questionnaire is unchanged. The
 integrity check aborts the merge if a critical stem (Q32/Q7/Q12/practice-code) is missing.
@@ -28,8 +46,12 @@ import duckdb
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.normpath(os.path.join(HERE, "..", "data"))
 XSEC = os.path.join(DATA, "xsec_master.csv")
-OUT_XSEC = os.path.join(DATA, "xsec_master_2026")
+# Explicit candidate name -- NEVER overwrites the canonical xsec_master_2026.
+# Promote to canonical only after refresh_gpad_2526.py has aligned the GPAD
+# block to the GPPS 2026 fieldwork window (April 2025-March 2026).
+OUT_XSEC = os.path.join(DATA, "xsec_master_2026_gpps_candidate")
 OUT_WAVE3 = os.path.join(DATA, "wave3_gpps.csv")
+CANONICAL = os.path.join(DATA, "xsec_master_2026.csv")
 
 QSET = {
     "satisfaction_2026":        ("overallexp.pcteval",            True),   # Q32
@@ -176,7 +198,10 @@ def main():
     total = con.execute("SELECT COUNT(*) FROM merged").fetchone()[0]
     print(f"\n[merge] {matched}/{total} xsec practices matched a 2026 GPPS row "
           f"({with_sat} with a non-suppressed satisfaction score).")
-    print(f"        -> {OUT_XSEC}.csv / .parquet")
+    print(f"        -> {OUT_XSEC}.csv / .parquet  (CANDIDATE -- not canonical)")
+    print(f"\n[!] SAFEGUARD: this candidate inherits the GPAD block from the base xsec CSV.")
+    print(f"    Before promoting to {os.path.basename(CANONICAL)}, run refresh_gpad_2526.py")
+    print(f"    so operational fields cover the same window (Apr 2025 - Mar 2026) as GPPS 2026.")
 
     con.execute(f"""
         COPY (
