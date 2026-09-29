@@ -33,6 +33,29 @@
   <p class="sub">The models behind <a href="mypractice.html">the practice lookup</a>. Practice-level analysis
   of English practices; full analysis notes in <a href="PANEL_NOTES.md">PANEL_NOTES.md</a>.
   Everything here is association across practices, not cause and effect.</p>
+
+  <div class="card" style="border-left:4px solid #b04a2a;">
+    <p><b>Correction (September 2026).</b> The operational (GPAD) fields in
+    <code>xsec_master_2026</code> — appointment volume, same-day activity, telephone/face-to-face mode,
+    DNA rate, waiting-time bands, list size, per-patient appointments and workforce rates per 10,000 —
+    were previously calculated for April 2024–March 2025 while the GPPS 2026 outcomes describe January–April
+    2026. Those GPAD fields have now been recalculated for <b>April 2025–March 2026</b>, aligning the
+    exposure window to the survey. All numbers on this page are from the corrected data.</p>
+    <p><b>Withdrawn claim.</b> The previously reported positive association between appointment volume
+    and patient experience does not survive the correction. In the combined all-practices model
+    (n≈5,912), the coefficients for <i>appointments per 1,000 patients per month</i> move from +0.32,
+    +0.27, +0.70 (old, Apr-24–Mar-25 exposures) to −0.05, −0.13, +0.31 for overall experience (Q32),
+    most recent contact (Q16) and phone ease (Q1) respectively, and none is statistically distinguishable
+    from zero (p = 0.77, 0.43, 0.16). Higher appointment volume does <b>not</b> independently predict
+    better patient experience once the aligned exposures are used. Other coefficients shifted by 0.05–0.20
+    percentage points; the overall pattern (deflection, continuity, size, deprivation, admin-staffing,
+    training-practice) is unchanged.</p>
+    <p>Kept unchanged: raw workforce FTE (still March 2025), <code>oc_rate_12m</code> (separate April
+    2024–March 2025 OC-submissions measure), GPPS outcomes, IMD, clinical and prescribing fields.
+    Thirteen practices with fewer than 12 GPAD months in the aligned window keep their row but have the
+    entire refreshed GPAD block set to missing (n = 5,994 complete of 6,007). See the
+    <code>refresh_gpad_2526.py</code> script and commit history for the exact recalculation.</p>
+  </div>
   <nav class="toc">
     <a href="#q32">Overall experience</a> <a href="#q16">Most recent contact</a>
     <a href="#q1">Phone ease</a> <a href="#reading">Reading the tables</a>
@@ -88,7 +111,7 @@
     <tr><td>Nurses per 10,000</td><td class="num">+1.00</td><td class="num ns">+0.28</td><td class="num ns">+0.22</td></tr>
     <tr><td>Other clinical staff per 10,000</td><td class="num">+0.92</td><td class="num ns">+0.16</td><td class="num ns">&minus;0.03</td></tr>
     <tr><td>Admin staff per 10,000</td><td class="num">+1.00</td><td class="num">&minus;1.11</td><td class="num">&minus;0.45</td></tr>
-    <tr><td>Appointments per 1,000 per month</td><td class="num">+1.52</td><td class="num">+0.53</td><td class="num ns">+0.06</td></tr>
+    <tr><td>Appointments per 1,000 per month</td><td class="num">+1.16</td><td class="num ns">&minus;0.05</td><td class="num ns">&minus;0.22</td></tr>
     <tr><td>Patients 65+, %</td><td class="num">+2.95</td><td class="num ns">+0.36</td><td class="num ns">+0.23</td></tr>
     <tr><td>Patients from an ethnic minority background, %</td><td class="num">&minus;2.75</td><td class="num">&minus;1.26</td><td class="num">&minus;1.02</td></tr>
     <tr><td colspan="4"><b>Interactions</b></td></tr>
