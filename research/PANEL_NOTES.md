@@ -18,6 +18,59 @@ month, gp_code, total, same_day, next_day, book_unknown, gp, gp_same_day, f2f, p
 - GPAD: Appointments in General Practice, practice-level crosstabs, 13 releases May 2023 → May 2026 (each carries 3 months). NHS England Digital.
 - OC: Submissions via Online Consultation Systems in General Practice, Oct 2024 release (Apr 2023–Oct 2024) + Mar 2026 release (Sep 2024–Mar 2026).
 
+## CORRECTION (29 Sep 2026): GPAD exposure window realigned to GPPS 2026; audit 9 Oct 2026
+
+**What was wrong.** `ingest_gpps2026.py` merged the GPPS 2026 outcomes (fieldwork January–April
+2026) onto a base cross-section whose GPAD block had been frozen at April 2024–March 2025. The
+operational exposures in `xsec_master_2026` were therefore a year out of step with the outcomes
+they were modelled against.
+
+**What changed.** `scripts/refresh_gpad_2526.py` recalculated the GPAD-derived fields from
+`panel_merged.parquet` and `waits_panel.parquet` for **April 2025–March 2026**: same-day,
+telephone, face-to-face and DNA shares; appointment volume and appointments per 1,000; GP/other
+same-day and 15+-day shares; wait bands; `list_size`, `log_list`, `size_q`; per-10k workforce
+rates (March 2025 FTEs over the refreshed list); `merged_recent`, `high80`.
+`sd_share_prior_year` is April 2024–March 2025 and `max_jump` spans April 2024–March 2026.
+Unchanged: raw workforce FTEs (March 2025), `oc_rate_12m` (April 2024–March 2025), all GPPS
+fields, IMD, clinical, prescribing, geography and closure/merger flags. Practices with fewer than
+12 GPAD months in the window keep their row with the whole GPAD block missing; partial years are
+not annualised. Coverage: 6,007 practices, 5,994 complete, 13 newly missing (B81042, D81085,
+D82004, G82809, G85020, G85047, G85084, G85711, K82049, M84043, N83045, Y02321, Y02933).
+The refreshed file was promoted over the canonical `xsec_master_2026.{csv,parquet}` in commit
+7511e60 (merged via PR #1); PR #2 removed the intermediate and backup files and added
+safeguards to `ingest_gpps2026.py`, which now writes only a candidate file.
+
+**Consequence.** The positive association between appointment volume and patient experience
+reported before the correction does not survive. In the combined all-practices model (n≈5,912)
+the coefficients for appointments per 1,000 patients per month became −0.05 (overall
+experience, Q32), −0.13 (most recent contact, Q16) and +0.31 (phone ease, Q1), none
+statistically significant (p = 0.77, 0.43, 0.16); previously +0.32, +0.27, +0.70. Other
+coefficients moved by 0.05–0.20 points without changing the overall pattern. Before/after
+estimates: `data/predictors_rerun_{before,after}_refresh.csv`; write-up: `predictors.html`.
+
+**Audit of the practice lookup (9 Oct 2026).**
+- Confirmed correct: `mypractice.html` and `explore.html` load the canonical
+  `xsec_master_2026.parquet`, which is byte-identical to the refresh output. An independent
+  recomputation from `panel_merged.parquet` matched `appts_12m`, `same_day_pct_12m` and
+  `f2f_pct_12m` for all 5,994 complete practices in the April 2025–March 2026 window and for
+  none in the April 2024–March 2025 window. Non-GPAD columns are identical to the
+  pre-correction file; the CSV twin matches the parquet.
+- Confirmed error, fixed: `data/xsec_supplement.csv` (159 practices served on the lookup's
+  reduced page) still carried April 2024–March 2025 `sd_share` and appointment counts, so those
+  practices were compared with peers on the new window. `scripts/refresh_supplement_gpad_2526.py`
+  realigns `list_size`, `appts_percap`, `sd_share` and `gp_per10k` with the same rules. 128
+  practices have 12 months in the window; missing values rise from 18 to 31 (`list_size`), 21 to
+  31 (`appts_percap`, `sd_share`) and 39 to 45 (`gp_per10k`). All other cells are unchanged.
+- Confirmed description errors, fixed: the lookup labelled the fallback list size a "2024/25
+  average" and described appointments per 1,000 as "from May 2026"; both are now the April
+  2025–March 2026 average. `explore.html` schema text and source label and `README.md` described
+  the old window.
+- Not yet re-run (may be affected; not established): analyses run before 29 Sep that take
+  GPAD-derived controls (`list_size`, `log_list`, per-10k workforce rates) from the cross-section:
+  `did_anima.py`, `f2f_increasers.py`, `icl_cascade.py` (results dated 20 Jul) and the
+  13 Aug `change_model_2526.py` rerun. These use the fields as covariates, so shifts are likely
+  small, but their reported estimates predate the correction.
+
 ## CORRECTION (6 Jul 2026, evening build)
 
 An interrupted unzip truncated the Mar-2026 OC north-regions file in the first build, dropping

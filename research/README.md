@@ -53,8 +53,15 @@ GROUP BY 1 ORDER BY 1;
 ## Core tables
 
 ### `data/xsec_master_2026.csv` / `.parquet` — practice cross-section (n=6,007, 90 columns)
-One row per practice. Exposure year Apr 2024–Mar 2025 unless noted. This is the file the
-explorer serves; `xsec_master.*` is the frozen pre-2026-wave version. Key column groups:
+One row per practice. GPAD-derived fields (access model, GP vs other staff, wait bands,
+`list_size`, `log_list`, `size_q`, `appts_12m`, per-10k workforce rates, `merged_recent`, `high80`)
+cover **Apr 2025–Mar 2026**, aligned with the GPPS 2026 fieldwork; `sd_share_prior_year` is
+Apr 2024–Mar 2025 and `max_jump` spans Apr 2024–Mar 2026. Raw workforce FTEs remain March 2025 and
+`oc_rate_12m` remains Apr 2024–Mar 2025. Thirteen practices with fewer than 12 GPAD months in the
+window have the whole GPAD block missing (5,994 complete of 6,007). Before 29 Sep 2026 the GPAD
+block was Apr 2024–Mar 2025; see the September 2026 correction in `PANEL_NOTES.md` and
+`scripts/refresh_gpad_2526.py`. This is the file the explorer and practice lookup serve;
+`xsec_master.*` is the frozen pre-2026-wave version. Key column groups:
 
 | Group | Columns | Source |
 |---|---|---|
