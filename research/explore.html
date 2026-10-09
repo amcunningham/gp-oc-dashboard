@@ -203,10 +203,10 @@ const SCHEMA_DOC = `
 You translate questions about English general practice access into DuckDB SQL.
 Eight views exist (practice identifier: gp_code):
 
-xsec — one row per practice (n=6007), exposure year Apr 2024–Mar 2025 unless noted:
+xsec — one row per practice (n=6007), GPAD exposure year Apr 2025–Mar 2026 unless noted (realigned 29 Sep 2026 to the GPPS 2026 fieldwork; 13 practices with <12 GPAD months have all GPAD fields NULL); workforce FTEs Mar 2025; oc_rate_12m Apr 2024–Mar 2025:
   gp_name, pcn_name, sub_icb_name, icb_name (e.g. 'NHS SUSSEX ICB'), postcode (e.g. 'BN14 7JL'),
   region (e.g. 'LONDON','MIDLANDS'), list_size (12-month average of the monthly panel count,
-  Apr 2024-Mar 2025; NOT the latest registration snapshot, which can differ by up to ~3% -
+  Apr 2025-Mar 2026; NOT the latest registration snapshot, which can differ by up to ~3% -
   do not mix with lists-table counts in one ratio), rural (1=rural), imd_score (higher=more deprived),
   imd_quintile, pct65plus, nonwhite_pct, dispensing_f, gp_per10k, nurse_per10k, dpc_per10k,
   same_day_pct_12m (% appts booked+delivered same day), sd_share (same), sd_percap (same-day appts
@@ -848,7 +848,7 @@ async function interpret(question, sql, rows) {
 // ---------- answer + follow-ups ----------
 // short provenance labels for each view, shown under data answers so readers can check the source
 const VIEW_SOURCES = {
-  xsec: "practice profile snapshot (Appointments in General Practice 2024/25, GP Patient Survey 2025–26, GP Workforce, Fingertips, NHSBSA prescribing, ODS)",
+  xsec: "practice profile snapshot (Appointments in General Practice 2025/26, GP Patient Survey 2025–26, GP Workforce, Fingertips, NHSBSA prescribing, ODS)",
   panel: "monthly panel, Mar 2023–May 2026 (Appointments in General Practice + Online Consultation Submissions)",
   waits: "Appointments in General Practice — booking-to-appointment waits, monthly",
   rush: "Cloud-Based Telephony — 8–10am call rush",
