@@ -375,6 +375,41 @@ async function run() {
      FROM panel WHERE gp_code='${code}'`);
   diag.ocNow = oc && oc.onow != null ? Number(oc.onow) : null;
   const ocRamp = oc && Number(oc.o26||0) - Number(oc.o25||0) >= 100;
+  // Online-consultation supplier change between the two survey windows. A rise in recorded intake
+  // that coincides with a change of supplier (or with a supplier starting to report) may reflect the
+  // new system's counting, or a practice brought onto another practice's system after a merger,
+  // rather than patients newly moving online. Months listing two suppliers are switch months.
+  const supSet = s => new Set(String(s||"").split(/,\s*/).map(x=>x.trim())
+    .filter(x => x && !/^(no data|none\/unknown|nan|null)$/i.test(x)));
+  const supName = s => [...s].map(x => /^tpp$/i.test(x) ? "TPP" : x.toLowerCase()
+    .replace(/\b(limited|ltd|uk)\b/g,"").replace(/\s+/g," ").trim()
+    .replace(/\b\w/g, c => c.toUpperCase())).join(" and ");
+  const monthName = ym => { const [y,m] = String(ym).split("-");
+    return ["January","February","March","April","May","June","July","August","September","October",
+      "November","December"][Number(m)-1] + " " + y; };
+  let ocSwitch = null;
+  try {
+    const sm = await all(`SELECT month, supplier FROM panel WHERE gp_code='${code}'
+      AND month BETWEEN '2025-01' AND '2026-03' ORDER BY month`);
+    const s25 = new Set(sm.filter(r=>r.month<='2025-03').flatMap(r=>[...supSet(r.supplier)]));
+    const s26 = new Set(sm.filter(r=>r.month>='2026-01').flatMap(r=>[...supSet(r.supplier)]));
+    const changed = s26.size && ([...s26].some(x=>!s25.has(x)) || [...s25].some(x=>!s26.has(x)));
+    if (changed) {
+      const first = sm.find(r => r.month > '2025-03' && [...supSet(r.supplier)].some(x=>!s25.has(x)));
+      ocSwitch = { from: s25.size ? supName(s25) : null, to: supName(s26), month: first ? first.month : null };
+    }
+  } catch { /* supplier column missing: no switch note */ }
+  // NHS England flagged May 2026 online-consultation submissions as partial for these suppliers.
+  const PARTIAL_MAY26 = /evergreen|blinx|iplato|silicon|patchs/i;
+  // Q7 (sees preferred clinician) is asked only of those who say they have one (Q6), so its base is
+  // at most has_pref% x responses: often 10–30 patients at small practices even when total responses
+  // clear the 50-response flag. Approximate 95% margin from that upper-bound base.
+  const q7n = (pref, n) => (pref == null || pref === '' || n == null || n === '') ? null
+    : Number(pref) / 100 * Number(n);
+  const q7n26 = q7n(p.has_pref_hcp_2026, p.gpps_n_2026), q7n25 = q7n(p.has_pref_hcp, p.gpps_n);
+  const q7moe = (pct, n) => (n && n > 0 && pct != null && pct !== '')
+    ? 196 * Math.sqrt((Number(pct)/100) * (1 - Number(pct)/100) / n) : null;
+  const q7Small = q7n26 != null && q7n26 < 50;
 
   $("ident").innerHTML = `<span class="big">${p.gp_name}</span> (${code}${p.postcode ? ", " + p.postcode : ""})<br>
     ${f0(p.list_size)} patients ${listIsCurrent
@@ -429,11 +464,27 @@ async function run() {
       ${distLine(cLo, cHi, cd.p10, cd.p90, cd.med, hasCell ? cell.c : null, myCont0,
         "Where your practice sits among all practices on patients seeing their preferred clinician")}
       </details>
-      ${ocRamp && Number(p.continuity_2026) > Number(p.continuity) ? `<p><b>Worth noting:</b> your reported
-      continuity rose (${f1(p.continuity)}% to ${f1(p.continuity_2026)}%) across the same period in which
-      your online intake grew substantially. Nationally, continuity more often falls with that move.
-      Practices that hold or improve it are typically those whose booking tries the usual clinician first —
-      on the national evidence, this part of your model is working.</p>` : ""}
+      ${q7Small ? `<p class="ev">Your Q7 figure comes from at most about ${f0(q7n26)} patients (only those
+      who said they have a preferred clinician are asked it), so on sampling alone it could be around
+      ${f0(q7moe(p.continuity_2026, q7n26))} points higher or lower than shown. Read it, and any change from
+      2025, as indicative.</p>` : ""}
+      ${(() => {
+        if (!(ocRamp && Number(p.continuity_2026) > Number(p.continuity))) return "";
+        const c25 = Number(p.continuity), c26 = Number(p.continuity_2026);
+        const se = (q7n25 && q7n26) ? Math.sqrt((c25/100)*(1-c25/100)/q7n25 + (c26/100)*(1-c26/100)/q7n26) * 100 : null;
+        const clear = se != null && (c26 - c25) > 1.96 * se;
+        const intake = ocSwitch
+          ? "your recorded online intake grew (see the note above on your change of online-consultation supplier)"
+          : "your online intake grew substantially";
+        return clear
+          ? `<p><b>Worth noting:</b> your reported continuity rose (${f1(c25)}% to ${f1(c26)}%) across the
+            same period in which ${intake}. Nationally, continuity more often falls with that move. Practices
+            that hold or improve it are typically those whose booking tries the usual clinician first.</p>`
+          : `<p><b>Worth noting:</b> your reported continuity held steady (${f1(c25)}% to ${f1(c26)}%) across
+            the same period in which ${intake}; a change this size is within what the number of patients
+            answering would produce by chance. Nationally, continuity more often falls with that move, so
+            holding it is of interest, but the survey numbers here are too small to show more than that.</p>`;
+      })()}
       <p class="ev">The reviewable question: when a patient asks for a particular clinician, does your
       booking process — reception, triage, or the online form — try that clinician first, or offer the next
       free slot with anyone?${smallSurvey ? ` With ${f0(p.gpps_n_2026)} survey responses, treat your figures
@@ -701,14 +752,24 @@ async function run() {
   const dd = await one(`
     SELECT b.inb_may*1.0 AS calls, COALESCE(pn.oc_rate_1k,0)*COALESCE(pn.list_size,${Number(p.list_size)||0})/1000 AS oc_subs, pn.total AS appts,
            b.inb_may0*1.0 AS calls0, COALESCE(pn0.oc_rate_1k,0)*COALESCE(pn0.list_size,${Number(p.list_size)||0})/1000 AS oc_subs0,
-           pn0.total AS appts0
+           pn0.total AS appts0, pn.supplier AS sup, pn0.supplier AS sup0,
+           (SELECT AVG(oc_rate_1k) FROM panel q WHERE q.gp_code=pn.gp_code
+              AND q.month IN ('2026-02','2026-03','2026-04'))*${Number(p.list_size)||0}/1000 AS oc_fma
     FROM panel pn
     LEFT JOIN bench b ON b.gp_code=pn.gp_code
     LEFT JOIN panel pn0 ON pn0.gp_code=pn.gp_code AND pn0.month='2025-05' AND pn0.total>100
     WHERE pn.gp_code='${code}' AND pn.month='2026-05' AND pn.total>100`);
   if (dd && dd.appts) {
     const hasCalls = dd.calls != null;
-    const ratio = hasCalls ? (Number(dd.calls)+Number(dd.oc_subs))/Number(dd.appts) : null;
+    // May 2026 online submissions: NHS England flagged five suppliers as partial. Where this practice
+    // uses one of them, or May falls below half its Feb–Apr 2026 average, substitute that average
+    // (the window the models use) and say so, rather than showing an apparent collapse.
+    const fma = dd.oc_fma != null ? Number(dd.oc_fma) : null;
+    const ocPartial = fma != null && fma >= 20
+      && (PARTIAL_MAY26.test(String(dd.sup||"")) || Number(dd.oc_subs) < 0.5 * fma);
+    const ocUsed = ocPartial ? fma : Number(dd.oc_subs);
+    const switch0 = /,/.test(String(dd.sup0||""));
+    const ratio = hasCalls ? (Number(dd.calls)+ocUsed)/Number(dd.appts) : null;
     const has0 = dd.calls0 != null && dd.appts0 != null;
     const ratio0 = has0 ? (Number(dd.calls0)+Number(dd.oc_subs0))/Number(dd.appts0) : null;
     $("demand").innerHTML = `
@@ -723,7 +784,8 @@ async function run() {
       <table>
       <tr><th></th><th class="num">Your practice<br>May 2025</th><th class="num">Your practice<br>May 2026</th></tr>
       <tr><td>Phone calls received</td><td class="num">${f0(dd.calls0)}</td><td class="num">${f0(dd.calls)}</td></tr>
-      <tr><td>Online submissions</td><td class="num">${f0(dd.oc_subs0)}</td><td class="num">${f0(dd.oc_subs)}</td></tr>
+      <tr><td>Online submissions</td><td class="num">${f0(dd.oc_subs0)}${switch0 ? "*" : ""}</td>
+        <td class="num">${ocPartial ? `${f0(fma)}†` : f0(dd.oc_subs)}</td></tr>
       <tr><td>Appointments delivered</td><td class="num">${f0(dd.appts0)}</td><td class="num">${f0(dd.appts)}</td></tr>
       <tr><td>Your contacts per appointment</td><td class="num">${ratio0==null?"–":ratio0.toFixed(2)}</td>
         <td class="num big">${ratio==null?"–":ratio.toFixed(2)}</td></tr>
@@ -731,9 +793,15 @@ async function run() {
       <tr><td>Three-quarters of practices are below</td><td class="num"></td><td class="num">1.81</td></tr>
       <tr><td>Middle 80% of practices, May 2026</td><td class="num"></td><td class="num">0.99 – 2.17</td></tr>
       </table>
+      ${ocPartial ? `<p class="ev">† Your May 2026 online-submission count (${f0(dd.oc_subs)}) is incomplete:
+      ${PARTIAL_MAY26.test(String(dd.sup||"")) ? "NHS England flagged your supplier's May 2026 submission as partial" :
+        "it is less than half your February–April level"}. The figure shown is your February–April 2026
+      monthly average${hasCalls ? ", and the contacts-per-appointment ratio uses it" : ""}.</p>` : ""}
+      ${switch0 ? `<p class="ev">* Your online-consultation supplier changed in May 2025 (both are listed for
+      that month), so the May 2025 count may cover only part of the month.</p>` : ""}
       ${hasCalls ? "" : `<p class="ev">Your phone supplier does not report to the national collection, so
-      calls — and therefore the contacts-per-appointment ratio — cannot be shown; appointments and online
-      submissions are complete.</p>`}
+      calls, and therefore the contacts-per-appointment ratio, cannot be shown; appointments are complete${
+        ocPartial ? "" : " and so are online submissions"}.</p>`}
       <p class="ev">Read this as a description of demand, not a judgement: I built it as a proxy for capacity
       under pressure, but once phone answering and call volume are accounted for it shows no independent
       relationship with what patients report (<a href="predictors.html">the models behind this page</a>).
@@ -819,6 +887,12 @@ async function run() {
       <tr><td>Appointments per 1,000 patients per month</td><td class="num">${f0(p.appts_percap)}</td><td class="num">${f0(capNat.mapp)}</td>
         ${hasCapCell ? `<td class="num">${f0(capCell.cap1k)}</td>` : ""}</tr>
       </table>
+      ${Number(capMe.pt10k) === 0 && Number(capMe.gp10k) > 0 ? `<p class="ev"><b>No GP partners are recorded
+      at this practice code.</b> That is usual where a practice is run under an APMS contract, by an NHS
+      trust or a company, or by another practice's partnership after a merger or caretaking arrangement; in
+      the last case the partners are usually recorded under the other practice's code. If any of these
+      applies, the partner comparison above, and what the models say about partners, may not describe how
+      your practice is led.</p>` : ""}
       <p class="ev">In the combined models: partners' association with experience runs largely through
       continuity; salaried GPs carry a direct association of similar size; regular locums show no
       relationship either way (note: ad-hoc locums are not published at practice level, so sessional cover
@@ -1060,10 +1134,23 @@ async function run() {
   // ---- transition note if online intake rose substantially between fieldworks ----
   if (ocRamp) {
     $("transition").style.display = "block";
-    $("transition").innerHTML = `<p><b>Your practice moved substantially online between the last two survey
-      years: from ${oc.o25 == null ? "no recorded online intake" : f0(oc.o25) + " submissions per 1,000 patients per month"}
-      to ${f0(oc.o26)} per 1,000 per month.</b> A change this size usually shows up in the survey results, so
-      read your year-on-year changes with the move in mind:</p>
+    const pairs = [[p.satisfaction, p.satisfaction_2026], [p.access_satisfaction, p.access_satisfaction_2026],
+      [p.phone_easy, p.phone_easy_2026], [p.continuity, p.continuity_2026]]
+      .filter(([a, b]) => a != null && a !== '' && b != null && b !== '');
+    const anyFall = pairs.some(([a, b]) => Number(b) < Number(a));
+    const intakeTxt = `from ${oc.o25 == null ? "no recorded online intake" : f0(oc.o25) + " submissions per 1,000 patients per month"}
+      to ${f0(oc.o26)} per 1,000 per month`;
+    $("transition").innerHTML = (ocSwitch ? `<p><b>Your recorded online intake rose substantially between the
+      last two survey years, ${intakeTxt}, and your online-consultation supplier changed in the same period</b>
+      (${ocSwitch.from ? `from ${ocSwitch.from} ` : ""}to ${ocSwitch.to}${ocSwitch.month ? `, first reported in
+      ${monthName(ocSwitch.month)}` : ""}). Suppliers count submissions in different ways, and a change of
+      supplier can come with a change in how the practice runs online access, or with the practice joining
+      another practice's system after a merger. Part or all of this rise may therefore reflect the new system
+      rather than patients newly moving online, and the national pattern below may not apply. Your
+      year-on-year survey changes:</p>`
+      : `<p><b>Your practice moved substantially online between the last two survey years: ${intakeTxt}.</b>
+      A change this size usually shows up in the survey results, so read your year-on-year changes with the
+      move in mind:</p>`) + `
       <table>
       <tr><th>What your patients report</th><th class="num">Your practice<br>2025</th><th class="num">Your practice<br>2026</th></tr>
       <tr><td>Overall experience good</td><td class="num">${f1(p.satisfaction)}%</td><td class="num">${f1(p.satisfaction_2026)}%</td></tr>
@@ -1077,8 +1164,8 @@ async function run() {
       practices that share rose, on every software platform, which suggests routing patients to their usual
       clinician is a configuration choice. Each 100 extra submissions per 1,000 patients is associated with
       about 59 fewer phone calls, half of them from the 8–10am rush — and about 40 net additional contacts.
-      If your falls above coincide with the move, the national pattern suggests some recovery in the next
-      survey year.</p>`;
+      ${anyFall ? "If the falls above coincide with the move, the national pattern suggests some recovery in the next survey year."
+        : "None of the measures above fell between the two survey years."}</p>`;
   }
 
   // ---- what stands out: ranked flags built from the evidence above ----
@@ -1123,9 +1210,13 @@ async function run() {
   const contMissing = p.continuity_2026 == null || p.continuity_2026 === '';
   const myCont = contMissing ? NaN : Number(p.continuity_2026);
   if (hasCell && !contMissing && !Number.isNaN(myCont) && cell.c != null) {
-    const contSample = smallSurvey
-      ? ` With ${f0(p.gpps_n_2026)} survey responses this should be read as indicative.` : "";
-    if (myCont < Number(cell.c) - 5) flags.push({ pri:1, grp:"rep", html:`
+    const contSample = q7Small
+      ? ` This figure comes from at most about ${f0(q7n26)} patients, so read it as indicative.`
+      : smallSurvey ? ` With ${f0(p.gpps_n_2026)} survey responses this should be read as indicative.` : "";
+    // NB most practices' Q7 base is under 50 (median margin about ±16 points), so the 5-point
+    // threshold below flags gaps well inside sampling noise; the wording carries the caution.
+    const contGap = 5;
+    if (myCont < Number(cell.c) - contGap) flags.push({ pri:1, grp:"rep", html:`
       <p><b>${f1(myCont)}% of your patients who have a preferred clinician report getting to see them when
       they ask, against ${f1(cell.c)}% in practices like yours.</b> Across England this is the survey measure
       most strongly tied to patients reporting a good overall experience, and it is substantially a matter of
@@ -1134,7 +1225,7 @@ async function run() {
       reception, triage, or the online form — try that clinician first, or offer the next free slot with
       anyone?${contSample}
       ${link("d-cont","See the continuity evidence")}.</p>`});
-    else if (myCont > Number(cell.c) + 5) oks.push(`More of your patients report seeing their preferred
+    else if (myCont > Number(cell.c) + contGap) oks.push(`More of your patients report seeing their preferred
       clinician than at practices like yours (${f1(myCont)}% against ${f1(cell.c)}%) — the survey measure
       most strongly tied to patients reporting a good overall experience.`);
   }
