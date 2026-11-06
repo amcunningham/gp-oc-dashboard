@@ -180,6 +180,22 @@ if os.path.exists(cbt_sep):
                 x = pd.read_csv(io.BytesIO(z.read(n)), usecols=["Date", "PRACTICE_CODE", "Indicator", "Time_Category", "Value"]); fr.append(x[x.Indicator == "CBT001"])
     x = pd.concat(fr); x["Date"] = pd.to_datetime(x.Date); x = x[x.Date.dt.dayofweek < 5]
     T["2026-09"] = pd.DataFrame({"inbound_wd": x.groupby("PRACTICE_CODE").Value.sum(), "inbound_wd_810": x[x.Time_Category.str.replace(" ", "") == "08:00-09:59"].groupby("PRACTICE_CODE").Value.sum()})
+# drop practices whose call times are UTC-shifted in BST months (see oc_timefix.cbt_utc_practices)
+for m in list(T):
+    if not oc_timefix.in_bst(pd.Series([pd.Timestamp(m + "-15")]))[0]:
+        continue
+    f = f"{a.panel}/cbt_daytime_{m}.parquet"
+    if os.path.exists(f):
+        bad = oc_timefix.cbt_utc_practices(pd.read_parquet(f, columns=["gp_code", "date", "band", "inbound"]), label=m)
+    elif m == "2026-09" and os.path.exists(cbt_sep):
+        with zipfile.ZipFile(cbt_sep) as z:
+            xs = [pd.read_csv(io.BytesIO(z.read(n)), usecols=["Date", "PRACTICE_CODE", "Indicator", "Time_Category", "Value"]) for n in z.namelist() if n.lower().endswith(".csv") and "unmapped" not in n.lower()]
+        xs = pd.concat(xs); xs = xs[xs.Indicator == "CBT001"]
+        bad = oc_timefix.cbt_utc_practices(xs, gp="PRACTICE_CODE", date="Date", band="Time_Category", val="Value", label=m)
+    else:
+        print(f"[timefix CBT {m}] no daily file to check; month left as is")
+        continue
+    T[m] = T[m][~T[m].index.isin(bad)]
 Lst = pd.read_csv("research/data/list_jul26.csv").set_index("gp_code").iloc[:, 0]
 
 def outcomes(m):

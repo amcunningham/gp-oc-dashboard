@@ -1,28 +1,28 @@
 analysis,outcome,spec,group,coef,lo,hi,p,n,median_A,median_g
-phone (Sep 2026),answer_rate,unadjusted,B,-0.0055,-0.0203,0.0094,0.4725,2311,0.638,0.6369
-phone (Sep 2026),answer_rate,unadjusted,C,-0.0098,-0.0307,0.0111,0.3573,2311,0.638,0.633
-phone (Sep 2026),answer_rate,unadjusted,D,0.0139,-0.0111,0.0388,0.2766,2311,0.638,0.6581
-phone (Sep 2026),answer_rate,adjusted,B,0.0135,0.0002,0.0267,0.0472,2311,0.638,0.6369
-phone (Sep 2026),answer_rate,adjusted,C,0.0059,-0.0121,0.0239,0.5209,2311,0.638,0.633
-phone (Sep 2026),answer_rate,adjusted,D,0.0148,-0.0094,0.039,0.23,2311,0.638,0.6581
-phone (Sep 2026),answer_rate_810,unadjusted,B,0.0089,-0.0084,0.0261,0.3126,2310,0.621,0.6172
-phone (Sep 2026),answer_rate_810,unadjusted,C,-0.0118,-0.036,0.0125,0.3419,2310,0.621,0.6089
-phone (Sep 2026),answer_rate_810,unadjusted,D,0.0051,-0.0257,0.0358,0.7454,2310,0.621,0.6334
-phone (Sep 2026),answer_rate_810,adjusted,B,0.0222,0.0069,0.0375,0.0044,2310,0.621,0.6172
-phone (Sep 2026),answer_rate_810,adjusted,C,-0.001,-0.0213,0.0193,0.9256,2310,0.621,0.6089
-phone (Sep 2026),answer_rate_810,adjusted,D,0.0329,0.0037,0.0621,0.0271,2310,0.621,0.6334
-phone (Sep 2026),ivr_share,unadjusted,B,0.0031,-0.0062,0.0124,0.5128,2297,0.1986,0.2051
-phone (Sep 2026),ivr_share,unadjusted,C,-0.0012,-0.013,0.0105,0.8379,2297,0.1986,0.2035
-phone (Sep 2026),ivr_share,unadjusted,D,-0.0259,-0.0403,-0.0115,0.0004,2297,0.1986,0.1714
-phone (Sep 2026),ivr_share,adjusted,B,-0.0047,-0.0136,0.0042,0.2984,2297,0.1986,0.2051
-phone (Sep 2026),ivr_share,adjusted,C,-0.0094,-0.02,0.0012,0.0834,2297,0.1986,0.2035
-phone (Sep 2026),ivr_share,adjusted,D,-0.011,-0.026,0.004,0.1504,2297,0.1986,0.1714
-phone (Sep 2026),answer_rate_excl_ivr,unadjusted,B,-0.0022,-0.0177,0.0133,0.7826,2297,0.8148,0.8132
-phone (Sep 2026),answer_rate_excl_ivr,unadjusted,C,-0.0128,-0.0355,0.0098,0.2665,2297,0.8148,0.8132
-phone (Sep 2026),answer_rate_excl_ivr,unadjusted,D,-0.0037,-0.0305,0.0231,0.7882,2297,0.8148,0.8263
-phone (Sep 2026),answer_rate_excl_ivr,adjusted,B,0.0135,-0.0008,0.0279,0.0643,2297,0.8148,0.8132
-phone (Sep 2026),answer_rate_excl_ivr,adjusted,C,-0.0011,-0.0213,0.0192,0.9171,2297,0.8148,0.8132
-phone (Sep 2026),answer_rate_excl_ivr,adjusted,D,0.0115,-0.014,0.037,0.3763,2297,0.8148,0.8263
+phone (Sep 2026),answer_rate,unadjusted,B,-0.0051,-0.0201,0.0098,0.5002,2280,0.6364,0.6367
+phone (Sep 2026),answer_rate,unadjusted,C,-0.0093,-0.0303,0.0116,0.3831,2280,0.6364,0.632
+phone (Sep 2026),answer_rate,unadjusted,D,0.0153,-0.0098,0.0405,0.2322,2280,0.6364,0.6581
+phone (Sep 2026),answer_rate,adjusted,B,0.0131,-0.0003,0.0264,0.0547,2280,0.6364,0.6367
+phone (Sep 2026),answer_rate,adjusted,C,0.0058,-0.0123,0.0239,0.5293,2280,0.6364,0.632
+phone (Sep 2026),answer_rate,adjusted,D,0.0149,-0.0097,0.0395,0.2343,2280,0.6364,0.6581
+phone (Sep 2026),answer_rate_810,unadjusted,B,0.0098,-0.0075,0.0271,0.2651,2279,0.6197,0.6172
+phone (Sep 2026),answer_rate_810,unadjusted,C,-0.0106,-0.0349,0.0137,0.3944,2279,0.6197,0.6063
+phone (Sep 2026),answer_rate_810,unadjusted,D,0.0061,-0.025,0.0372,0.702,2279,0.6197,0.6334
+phone (Sep 2026),answer_rate_810,adjusted,B,0.0224,0.0071,0.0377,0.0041,2279,0.6197,0.6172
+phone (Sep 2026),answer_rate_810,adjusted,C,-0.0004,-0.0208,0.0199,0.9661,2279,0.6197,0.6063
+phone (Sep 2026),answer_rate_810,adjusted,D,0.0334,0.0038,0.0631,0.0268,2279,0.6197,0.6334
+phone (Sep 2026),ivr_share,unadjusted,B,0.0027,-0.0066,0.0119,0.5681,2275,0.2001,0.2054
+phone (Sep 2026),ivr_share,unadjusted,C,-0.0025,-0.0143,0.0093,0.6784,2275,0.2001,0.2035
+phone (Sep 2026),ivr_share,unadjusted,D,-0.0268,-0.0413,-0.0122,0.0003,2275,0.2001,0.1714
+phone (Sep 2026),ivr_share,adjusted,B,-0.0048,-0.0137,0.0041,0.2888,2275,0.2001,0.2054
+phone (Sep 2026),ivr_share,adjusted,C,-0.0101,-0.0207,0.0005,0.0621,2275,0.2001,0.2035
+phone (Sep 2026),ivr_share,adjusted,D,-0.0114,-0.0265,0.0038,0.1419,2275,0.2001,0.1714
+phone (Sep 2026),answer_rate_excl_ivr,unadjusted,B,-0.003,-0.0186,0.0126,0.7082,2275,0.8148,0.8123
+phone (Sep 2026),answer_rate_excl_ivr,unadjusted,C,-0.0131,-0.0358,0.0095,0.2564,2275,0.8148,0.8132
+phone (Sep 2026),answer_rate_excl_ivr,unadjusted,D,-0.0034,-0.0303,0.0235,0.8034,2275,0.8148,0.8263
+phone (Sep 2026),answer_rate_excl_ivr,adjusted,B,0.0126,-0.0018,0.027,0.086,2275,0.8148,0.8123
+phone (Sep 2026),answer_rate_excl_ivr,adjusted,C,-0.0013,-0.0216,0.019,0.8967,2275,0.8148,0.8132
+phone (Sep 2026),answer_rate_excl_ivr,adjusted,D,0.0106,-0.0152,0.0363,0.4206,2275,0.8148,0.8263
 GPPS 2026 (groups from Mar 2026 OC),satisfaction_2026,unadjusted,B,1.6539,0.6053,2.7026,0.002,2736,77.1048,78.9641
 GPPS 2026 (groups from Mar 2026 OC),satisfaction_2026,unadjusted,C,0.4685,-0.69,1.627,0.428,2736,77.1048,76.8923
 GPPS 2026 (groups from Mar 2026 OC),satisfaction_2026,unadjusted,D,1.9465,0.1969,3.696,0.0292,2736,77.1048,80.1837

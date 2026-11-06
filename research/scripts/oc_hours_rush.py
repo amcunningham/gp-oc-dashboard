@@ -97,6 +97,8 @@ if a.cbt.lower().endswith(".zip"):
                 fr.append(d[d.Indicator.isin(["CBT001", "CBT002", "CBT003"])])
     raw = pd.concat(fr, ignore_index=True)
     raw["Date"] = pd.to_datetime(raw.Date)
+    _utc = oc_timefix.cbt_utc_practices(raw[raw.Indicator == "CBT001"], gp="PRACTICE_CODE", date="Date", band="Time_Category", val="Value", label="calls")
+    raw = raw[~raw.PRACTICE_CODE.isin(_utc)]
     hol = pd.to_datetime(a.bank_holidays.split(",")) if a.bank_holidays else pd.DatetimeIndex([])
     raw = raw[~raw.Date.isin(hol)]
     days = pd.Series(pd.date_range(raw.Date.min().replace(day=1), raw.Date.max() + pd.offsets.MonthEnd(0)))
