@@ -221,5 +221,16 @@ try:
             t = f"C(g)[T.{gk}]"; lo, hi = r.conf_int().loc[t]
             R.append(dict(adjusted_for=nm, group=gk, oc_ratio=np.exp(r.params[t]), lo=np.exp(lo), hi=np.exp(hi), n=int(r.nobs)))
     pd.DataFrame(R).round(3).to_csv(f"{a.out}/oc_volume_ratio_stepwise.csv", index=False)
+    # channel mix over 24h: calls vs OC vs total, median practice and adjusted differences
+    d["oc24_pk"] = d.oc_core_pk + d.oc_night_pk
+    mix = d.groupby("g")[["calls_24h_pk", "oc24_pk", "day24_pk"]].median().round(2)
+    mix.to_csv(f"{a.out}/channel_mix_24h.csv")
+    R = []
+    for y in ["calls_24h_pk", "oc24_pk", "day24_pk"]:
+        r = smf.ols(f"{y} ~ C(g) + imd_score + pct65plus + ll + C(region)", d).fit(cov_type="HC3")
+        for gk in "BCD":
+            t = f"C(g)[T.{gk}]"
+            R.append(dict(outcome=y, group=gk, coef=r.params[t], lo=r.conf_int().loc[t, 0], hi=r.conf_int().loc[t, 1], n=int(r.nobs)))
+    pd.DataFrame(R).round(3).to_csv(f"{a.out}/channel_mix_24h_adjusted.csv", index=False)
 except ImportError:
     print("statsmodels not installed; skipping models")
