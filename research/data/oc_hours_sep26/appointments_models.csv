@@ -1,55 +1,55 @@
 outcome,spec,group,coef,lo,hi,n
-sd_pct,unadjusted,B,-2.362,-3.462,-1.262,2555
-sd_pct,unadjusted,C,-0.006,-1.759,1.746,2555
-sd_pct,unadjusted,D,-3.231,-5.308,-1.154,2555
-sd_pct,adjusted,B,-1.614,-2.738,-0.489,2555
-sd_pct,adjusted,C,0.531,-1.232,2.294,2555
-sd_pct,adjusted,D,-2.956,-5.018,-0.894,2555
-sd_pct,adjusted + OC volume,B,-1.139,-2.269,-0.009,2555
-sd_pct,adjusted + OC volume,C,0.403,-1.348,2.154,2555
-sd_pct,adjusted + OC volume,D,-1.818,-3.9,0.263,2555
-gp_sd_pct,unadjusted,B,-1.994,-3.421,-0.567,2555
-gp_sd_pct,unadjusted,C,-0.004,-2.247,2.24,2555
-gp_sd_pct,unadjusted,D,-4.207,-6.76,-1.655,2555
-gp_sd_pct,adjusted,B,-1.166,-2.63,0.297,2555
-gp_sd_pct,adjusted,C,0.467,-1.763,2.697,2555
-gp_sd_pct,adjusted,D,-4.17,-6.72,-1.621,2555
-gp_sd_pct,adjusted + OC volume,B,-0.413,-1.892,1.066,2555
-gp_sd_pct,adjusted + OC volume,C,0.32,-1.903,2.543,2555
-gp_sd_pct,adjusted + OC volume,D,-3.09,-5.695,-0.485,2555
-appts_pk,unadjusted,B,10.681,-3.55,24.912,2555
-appts_pk,unadjusted,C,33.782,10.659,56.906,2555
-appts_pk,unadjusted,D,57.042,27.41,86.674,2555
-appts_pk,adjusted,B,5.256,-8.849,19.361,2555
-appts_pk,adjusted,C,29.034,7.419,50.65,2555
-appts_pk,adjusted,D,38.546,10.046,67.046,2555
-appts_pk,adjusted + OC volume,B,8.902,-5.215,23.02,2555
-appts_pk,adjusted + OC volume,C,27.188,6.036,48.34,2555
-appts_pk,adjusted + OC volume,D,58.288,29.594,86.982,2555
-sd_pk,unadjusted,B,-7.647,-18.761,3.466,2555
-sd_pk,unadjusted,C,18.127,-0.661,36.916,2555
-sd_pk,unadjusted,D,8.944,-13.865,31.753,2555
-sd_pk,adjusted,B,-5.697,-17.163,5.768,2555
-sd_pk,adjusted,C,18.978,0.276,37.679,2555
-sd_pk,adjusted,D,2.43,-20.139,24.999,2555
-sd_pk,adjusted + OC volume,B,-0.659,-12.028,10.709,2555
-sd_pk,adjusted + OC volume,C,17.203,-1.097,35.502,2555
-sd_pk,adjusted + OC volume,D,19.782,-2.717,42.28,2555
-gp_pk,unadjusted,B,-3.257,-12.026,5.511,2555
-gp_pk,unadjusted,C,2.052,-12.134,16.237,2555
-gp_pk,unadjusted,D,-2.006,-18.896,14.884,2555
-gp_pk,adjusted,B,2.024,-6.899,10.946,2555
-gp_pk,adjusted,C,6.593,-7.761,20.946,2555
-gp_pk,adjusted,D,0.171,-16.402,16.744,2555
-gp_pk,adjusted + OC volume,B,3.132,-5.777,12.042,2555
-gp_pk,adjusted + OC volume,C,5.742,-8.46,19.944,2555
-gp_pk,adjusted + OC volume,D,9.88,-6.658,26.418,2555
-f2f_pct,unadjusted,B,0.767,-0.653,2.188,2555
-f2f_pct,unadjusted,C,-1.689,-3.814,0.437,2555
-f2f_pct,unadjusted,D,2.464,-0.492,5.419,2555
-f2f_pct,adjusted,B,0.559,-0.882,2.0,2555
-f2f_pct,adjusted,C,-2.15,-4.293,-0.007,2555
-f2f_pct,adjusted,D,1.303,-1.69,4.296,2555
-f2f_pct,adjusted + OC volume,B,0.125,-1.331,1.581,2555
-f2f_pct,adjusted + OC volume,C,-1.889,-3.963,0.186,2555
-f2f_pct,adjusted + OC volume,D,-1.578,-4.555,1.399,2555
+sd_pct,unadjusted,B,-1.694,-3.013,-0.375,2309
+sd_pct,unadjusted,C,0.091,-1.64,1.821,2309
+sd_pct,unadjusted,D,-3.134,-5.193,-1.075,2309
+sd_pct,adjusted,B,-1.168,-2.506,0.17,2309
+sd_pct,adjusted,C,0.425,-1.313,2.162,2309
+sd_pct,adjusted,D,-2.956,-5.005,-0.907,2309
+sd_pct,adjusted + OC volume,B,-1.547,-2.895,-0.198,2309
+sd_pct,adjusted + OC volume,C,0.093,-1.635,1.822,2309
+sd_pct,adjusted + OC volume,D,-1.805,-3.864,0.254,2309
+gp_sd_pct,unadjusted,B,-0.622,-2.317,1.074,2309
+gp_sd_pct,unadjusted,C,-0.024,-2.241,2.193,2309
+gp_sd_pct,unadjusted,D,-4.228,-6.757,-1.698,2309
+gp_sd_pct,adjusted,B,0.21,-1.5,1.92,2309
+gp_sd_pct,adjusted,C,0.381,-1.817,2.579,2309
+gp_sd_pct,adjusted,D,-4.121,-6.652,-1.591,2309
+gp_sd_pct,adjusted + OC volume,B,0.071,-1.64,1.782,2309
+gp_sd_pct,adjusted + OC volume,C,0.045,-2.151,2.241,2309
+gp_sd_pct,adjusted + OC volume,D,-3.338,-5.907,-0.768,2309
+appts_pk,unadjusted,B,14.078,-2.618,30.773,2309
+appts_pk,unadjusted,C,33.332,10.493,56.171,2309
+appts_pk,unadjusted,D,56.592,27.182,86.002,2309
+appts_pk,adjusted,B,16.165,-0.046,32.376,2309
+appts_pk,adjusted,C,31.554,10.161,52.947,2309
+appts_pk,adjusted,D,41.884,13.629,70.139,2309
+appts_pk,adjusted + OC volume,B,8.22,-8.147,24.587,2309
+appts_pk,adjusted + OC volume,C,26.753,5.886,47.619,2309
+appts_pk,adjusted + OC volume,D,62.408,34.208,90.608,2309
+sd_pk,unadjusted,B,-4.424,-17.235,8.386,2309
+sd_pk,unadjusted,C,18.363,-0.214,36.939,2309
+sd_pk,unadjusted,D,9.18,-13.454,31.815,2309
+sd_pk,adjusted,B,-0.042,-13.113,13.029,2309
+sd_pk,adjusted,C,19.546,1.062,38.031,2309
+sd_pk,adjusted,D,3.833,-18.542,26.208,2309
+sd_pk,adjusted + OC volume,B,-6.403,-19.628,6.822,2309
+sd_pk,adjusted + OC volume,C,14.93,-3.118,32.978,2309
+sd_pk,adjusted + OC volume,D,21.564,-0.566,43.693,2309
+gp_pk,unadjusted,B,0.748,-9.881,11.377,2309
+gp_pk,unadjusted,C,3.262,-10.779,17.303,2309
+gp_pk,unadjusted,D,-0.795,-17.564,15.973,2309
+gp_pk,adjusted,B,5.796,-4.818,16.409,2309
+gp_pk,adjusted,C,7.373,-6.798,21.543,2309
+gp_pk,adjusted,D,1.247,-15.159,17.653,2309
+gp_pk,adjusted + OC volume,B,2.127,-8.603,12.856,2309
+gp_pk,adjusted + OC volume,C,5.175,-8.818,19.167,2309
+gp_pk,adjusted + OC volume,D,10.693,-5.612,26.998,2309
+f2f_pct,unadjusted,B,1.266,-0.44,2.972,2309
+f2f_pct,unadjusted,C,-1.915,-4.012,0.183,2309
+f2f_pct,unadjusted,D,2.238,-0.698,5.174,2309
+f2f_pct,adjusted,B,1.071,-0.65,2.791,2309
+f2f_pct,adjusted,C,-2.31,-4.422,-0.198,2309
+f2f_pct,adjusted,D,1.293,-1.686,4.273,2309
+f2f_pct,adjusted + OC volume,B,2.211,0.485,3.937,2309
+f2f_pct,adjusted + OC volume,C,-1.638,-3.678,0.401,2309
+f2f_pct,adjusted + OC volume,D,-1.623,-4.575,1.33,2309

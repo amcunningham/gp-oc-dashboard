@@ -12,7 +12,7 @@ then compares their time-of-day contact pattern with calls (CBT "By Day and Time
 
 Groups (practices with >=300 OC submissions in the month):
   A core hours only      no weekend submissions, <=3 weekday nights with any out-of-hours submission
-  B weekday early/late   >=18 weekday nights, <=1 weekend day (mostly a 7am opening)
+  B weekday early opening>=18 weekday nights, <=1 weekend day (mostly a 7am opening)
   C 24/7 admin only      >=7 of 8 weekend days and >=18 nights, no clinical at weekends (<=1 day)
                          and >=30% of core-hours submissions coded clinical (excludes non-coding suppliers)
   D 24/7 incl. clinical  >=7 weekend days, >=18 nights, clinical on >=6 weekend days
@@ -24,6 +24,8 @@ and adjusted models (OLS, HC3) of 8-10am rush measures on group, OC volume, list
 """
 import argparse, io, zipfile, os
 import numpy as np, pandas as pd
+import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import oc_timefix
 
 p = argparse.ArgumentParser()
 p.add_argument("--oc", required=True)
@@ -45,6 +47,9 @@ with zipfile.ZipFile(a.oc) as z:
             frames.append(pd.read_csv(io.BytesIO(z.read(n)), usecols=["DATE", "GP_CODE", "SUPPLIER", "SUBMISSION_TIME", "CLINICAL", "ADMIN", "UNKNOWN_OTHER", "TOTAL"]))
 oc = pd.concat(frames, ignore_index=True)
 oc["d"] = pd.to_datetime(oc.DATE)
+# correct suppliers that record times in UTC during British Summer Time (see oc_timefix.py)
+_sup = oc.drop_duplicates("GP_CODE").set_index("GP_CODE").SUPPLIER.fillna("").str.upper()
+oc = oc_timefix.fix(oc, _sup, gp="GP_CODE", date="d", band="SUBMISSION_TIME", vals=("TOTAL", "CLINICAL", "ADMIN", "UNKNOWN_OTHER"), label="OC")
 oc = oc.rename(columns={"GP_CODE": "gp", "SUPPLIER": "sup", "SUBMISSION_TIME": "t", "CLINICAL": "cl", "TOTAL": "tot"})
 wd_dates = oc.loc[oc.d.dt.dayofweek < 5, "d"].nunique()
 we_dates = oc.loc[oc.d.dt.dayofweek >= 5, "d"].nunique()
@@ -78,7 +83,7 @@ def grp(r):
         if r.wkend_cl_days <= 1 and r.cat_share >= 0.3: return "C"
     return None
 P["g"] = P.apply(grp, axis=1)
-NAMES = {"A": "Core hours only", "B": "Weekday early/late", "C": "24/7 admin only", "D": "24/7 incl. clinical"}
+NAMES = {"A": "Core hours only", "B": "Weekday early opening", "C": "24/7 admin only", "D": "24/7 incl. clinical"}
 
 # ---------------- CBT
 WE_CALLS = None

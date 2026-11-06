@@ -12,6 +12,8 @@ Follow-ups to oc_hours_rush.py (OC Hours page):
 import argparse, io, os, zipfile
 import numpy as np, pandas as pd
 import statsmodels.formula.api as smf
+import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import oc_timefix
 
 p = argparse.ArgumentParser()
 p.add_argument("--groups", required=True)
@@ -24,7 +26,7 @@ p.add_argument("--out", required=True)
 p.add_argument("--gpad", default=None, help="GPAD 'Practice Level Crosstab' zip; uses the files for the OC month")
 p.add_argument("--gpad-month", default=None, help="month tag in the crosstab filenames, e.g. Sep_26")
 a = p.parse_args()
-NAMES = {"A": "Core hours only", "B": "Weekday early/late", "C": "24/7 admin only", "D": "24/7 incl. clinical"}
+NAMES = {"A": "Core hours only", "B": "Weekday early opening", "C": "24/7 admin only", "D": "24/7 incl. clinical"}
 DOW = ["Mon", "Tue", "Wed", "Thu", "Fri"]
 
 def zcsv(path, cols):
@@ -39,9 +41,11 @@ M = pd.read_csv(a.groups).set_index("gp_code")
 X = pd.read_parquet(a.xsec).set_index("gp_code")
 
 # ------------------------------------------------ 1. day-of-week 8-10am workload
-oc = zcsv(a.oc, ["DATE", "GP_CODE", "SUBMISSION_TIME", "TOTAL"])
-oc = oc[oc.GP_CODE.isin(M.index)]
+oc = zcsv(a.oc, ["DATE", "GP_CODE", "SUPPLIER", "SUBMISSION_TIME", "TOTAL"])
 oc["d"] = pd.to_datetime(oc.DATE)
+_sup = oc.drop_duplicates("GP_CODE").set_index("GP_CODE").SUPPLIER.fillna("").str.upper()
+oc = oc_timefix.fix(oc, _sup, gp="GP_CODE", date="d", band="SUBMISSION_TIME", label="dow")
+oc = oc[oc.GP_CODE.isin(M.index)]
 month_days = pd.date_range(oc.d.min(), oc.d.max())
 wdays = month_days[month_days.dayofweek < 5]
 # the working day on which each submission is handled, and whether it lands in the 8-10am window
@@ -110,6 +114,7 @@ print("\nphone medians"); print(Q.groupby("g")[["answer_rate", "answer_rate_810"
 
 # ------------------------------------------------ 3. GPPS 2026, groups from the fieldwork period
 g3 = pd.read_parquet(a.oc_gpps)
+g3 = oc_timefix.fix(g3, oc_timefix.supplier_lookup(g3.date.dt.strftime("%Y-%m").iloc[0]), vals=("TOTAL", "CLINICAL", "ADMIN", "UNKNOWN_OTHER"), label="GPPS month")
 g3["wk"] = g3.date.dt.dayofweek >= 5
 nwd = g3.loc[~g3.wk, "date"].nunique(); nwe = g3.loc[g3.wk, "date"].nunique()
 night = (~g3.wk) & g3.band.isin(["18:30 - 23:59", "00:00 - 05:59", "06:00 - 06:59", "07:00 - 07:59"])

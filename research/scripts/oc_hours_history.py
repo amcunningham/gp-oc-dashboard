@@ -15,11 +15,14 @@ Harmonised groups (practices with >=300 submissions):
   other   : everything else (incl. early/late weekday)
 Thresholds are checked against the full new-format rules on January 2026.
 
-    python research/scripts/oc_hours_history.py --old research/data/oc_daytime_apr-jun24.zip \
-        research/data/oc_daytime_jan25.zip --out research/data/oc_hours_sep26
+    python research/scripts/oc_hours_history.py --old research/data/oc_daytime_jan25.zip \
+        --out research/data/oc_hours_sep26
+(Apr-Jun 2024 files record times in UTC for ~95% of practices and cannot be corrected; not used.)
 """
 import argparse, glob, io, os, zipfile
 import numpy as np, pandas as pd
+import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import oc_timefix
 
 p = argparse.ArgumentParser()
 p.add_argument("--old", nargs="+", required=True, help="old-format OC csv/zip files (MONTH, WEEKDAY, SUBMISSION_TIME, VALUE)")
@@ -38,6 +41,13 @@ def read_old(path):
                 if n.lower().endswith(".csv"): fr.append(pd.read_csv(io.BytesIO(z.read(n))))
     else: fr.append(pd.read_csv(path))
     d = pd.concat(fr)
+    # old files can't be shifted by one hour: drop supplier-months that record times in UTC in BST
+    bad, _ = oc_timefix.flag_old(d)
+    if bad:
+        key = list(zip(d.MONTH.astype(str).str[:7], d.SUPPLIER.fillna("").str.upper()))
+        drop = np.array([k in bad for k in key])
+        print(f"[timefix old] dropping {drop.sum()} rows, {d.loc[drop, 'GP_CODE'].nunique()} practices: {sorted(bad)}")
+        d = d[~drop]
     out = {}
     for m, g in d.groupby(d.MONTH.astype(str).str[:7]):
         g = g[g.SUBMISSION_TIME != "Unknown"]
@@ -70,13 +80,17 @@ def read_new(d):
 H = {}
 for f in a.old: H.update(read_old(f))
 for f in sorted(glob.glob(f"{a.panel}/oc_daytime_*.parquet")):
-    d = pd.read_parquet(f, columns=["gp_code", "date", "band", "TOTAL"]).rename(columns={"gp_code": "GP_CODE", "date": "DATE", "band": "SUBMISSION_TIME"})
-    H[d.DATE.dt.strftime("%Y-%m").iloc[0]] = read_new(d)
+    d = pd.read_parquet(f, columns=["gp_code", "date", "band", "TOTAL"])
+    m = d.date.dt.strftime("%Y-%m").iloc[0]
+    d = oc_timefix.fix(d, oc_timefix.supplier_lookup(m), label=m)
+    H[m] = read_new(d.rename(columns={"gp_code": "GP_CODE", "date": "DATE", "band": "SUBMISSION_TIME"}))
 fr = []
 with zipfile.ZipFile(a.oc_sep) as z:
     for n in z.namelist():
         if n.lower().endswith(".csv"): fr.append(pd.read_csv(io.BytesIO(z.read(n)), usecols=["DATE", "GP_CODE", "SUBMISSION_TIME", "TOTAL"]))
-H["2026-09"] = read_new(pd.concat(fr))
+_d = pd.concat(fr); _d["DATE"] = pd.to_datetime(_d.DATE)
+_d = oc_timefix.fix(_d, oc_timefix.supplier_lookup("2026-09"), gp="GP_CODE", date="DATE", band="SUBMISSION_TIME", label="2026-09")
+H["2026-09"] = read_new(_d)
 months = sorted(H)
 print("months:", months)
 
