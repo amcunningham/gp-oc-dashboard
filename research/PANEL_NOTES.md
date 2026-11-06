@@ -1618,3 +1618,19 @@ while FQ GP per patient fell.
 
 REBUILD-LIST ADDITIONS: re-run the §4.35 change/selection/mediation models through repo scripts at
 the 30 Jul rebuild; move the Q7 crosstab verification alongside §4.34.
+
+## Timestamp correction (6 Nov 2026): call and OC times recorded in UTC during British Summer Time
+
+About 80 practices (mostly sub-ICBs 15E Birmingham & Solihull and 15F Leeds, probably one telephony
+provider) record call times in UTC during BST: on the clock-change day their 06:00-07:59 share of weekday
+calls jumps from ~4% to ~27% and 08:00-09:59 falls from ~34% to ~21%. In `cbt_daytime_may.parquet`, 79
+practices are flagged for May 2026 and 2 for May 2025 (new column `utc_shift`). Several OC suppliers do the
+same for submissions (Anima/Continuum, Blinx, Rapid Health every BST month in 2026; eConsult Sep 2026 and
+Apr-Jun 2024; most suppliers in Apr-Jun 2024); see `research/scripts/oc_timefix.py`.
+
+Effect on earlier work: the May 2026 morning-heavy IVR measure (section 4.15, `predictors_models.py`) now
+leaves out flagged practices; model E on predictors.html moves by at most 0.05 (morning IVR -0.23 -> -0.21,
+n 4,741 -> 4,693). The Monday-Wednesday answering gap spans the whole working day and keeps them. The
+my-practice day-of-week card is not shown for flagged practices. February/March-based measures
+(`rush_both_sameday.csv`: phone rush from Feb 2026, OC rush from Mar 2026) are GMT and unaffected, apart
+from 30-31 March 2026 for the affected OC suppliers.
