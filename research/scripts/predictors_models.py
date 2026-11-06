@@ -69,6 +69,10 @@ def build(xsec_path):
 
     # morning IVR tilt uses ALL time chunks as the comparator (incl. out-of-hours),
     # which reproduces the notes' median tilt of -4.1pp and the ~1-in-5 morning-heavy share
+    # the 8-10am measure leaves out practices whose call times are recorded in UTC during BST
+    # (an hour early; see oc_timefix.py). The Mon-Wed gap spans the whole working day and keeps them.
+    if 'utc_shift' in dt:
+        dt = dt[~dt.utc_shift]
     morn = dt[dt.tc == '08:00-09:59'].groupby('gp_code')[['inbound', 'ivr_ended']].sum()
     rest = dt[dt.tc != '08:00-09:59'].groupby('gp_code')[['inbound', 'ivr_ended']].sum()
     ivx = (100 * morn.ivr_ended / morn.inbound - 100 * rest.ivr_ended / rest.inbound)

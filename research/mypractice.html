@@ -629,16 +629,18 @@ async function run() {
   }
 
   // ---- day of week and time of day ----
-  const dt = await all(`SELECT yr, dow, tc, inbound, ivr_ended, answered, ndays FROM daytime WHERE gp_code='${code}'`);
+  const dt = await all(`SELECT yr, dow, tc, inbound, ivr_ended, answered, ndays, utc_shift FROM daytime WHERE gp_code='${code}'`);
+  // practices whose phone system records call times in UTC during British Summer Time (an hour early): see research/scripts/oc_timefix.py
   const dt26 = dt.filter(x=>Number(x.yr)===2026);
-  if (dt26.length) {
+  const shifted26 = dt26.some(x=>x.utc_shift===true||x.utc_shift===1||x.utc_shift==="true");
+  if (dt26.length && !shifted26) {
     const agg = (rows, dw) => { const r = rows.filter(x=>Number(x.dow)===dw);
       const s = k => r.reduce((a,x)=>a+Number(x[k]||0),0);
       const nd = r.length ? Math.max(...r.map(x=>Number(x.ndays||0))) : 0;
       return { inb:s("inbound"), ivr:s("ivr_ended"), ans:s("answered"), nd }; };
     const aq = o => o.inb-o.ivr > 0 ? Math.min(100, 100*o.ans/(o.inb-o.ivr)) : null;
     const mon = agg(dt26,1), wed = agg(dt26,3);
-    const dt25 = dt.filter(x=>Number(x.yr)===2025);
+    const dt25 = dt.filter(x=>Number(x.yr)===2025 && !(x.utc_shift===true||x.utc_shift===1||x.utc_shift==="true"));
     const mon0 = agg(dt25,1), wed0 = agg(dt25,3);
     const has25 = mon0.inb > 0;
     if (mon.inb >= 80) {
@@ -746,7 +748,7 @@ async function run() {
     } else {
       $("daytime").innerHTML = "<p>Too few Monday calls recorded in May 2026 for a reliable day-of-week comparison.</p>";
     }
-  } else { $("daytime").innerHTML = "<p>No day-of-week phone detail available for this practice.</p>"; }
+  } else if (shifted26) { $("daytime").innerHTML = "<p>This practice's phone system records call times in UTC rather than UK clock time, so in May every call appears an hour earlier than it happened. Time-of-day and day-of-week comparisons are not shown because they would be misleading. The monthly totals above are not affected.</p>"; } else { $("daytime").innerHTML = "<p>No day-of-week phone detail available for this practice.</p>"; }
 
   // ---- demand vs delivery: May 2026 with May 2025 comparison ----
   const dd = await one(`
