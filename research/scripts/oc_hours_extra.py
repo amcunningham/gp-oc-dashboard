@@ -9,7 +9,7 @@ Follow-ups to oc_hours_rush.py (OC Hours page):
         --oc research/data/oc_daytime_sep26.zip --cbt research/data/cbt_daytime_sep26.zip \
         --oc-gpps research/data/panel/oc_daytime_2026-03.parquet --out research/data/oc_hours_sep26
 """
-import argparse, io, zipfile
+import argparse, io, os, zipfile
 import numpy as np, pandas as pd
 import statsmodels.formula.api as smf
 
@@ -21,6 +21,8 @@ p.add_argument("--oc-gpps", required=True, help="OC day/time panel parquet for t
 p.add_argument("--xsec", default="research/data/xsec_master_2026.parquet")
 p.add_argument("--list", default="research/data/list_jul26.csv")
 p.add_argument("--out", required=True)
+p.add_argument("--gpad", default=None, help="GPAD 'Practice Level Crosstab' zip; uses the files for the OC month")
+p.add_argument("--gpad-month", default=None, help="month tag in the crosstab filenames, e.g. Sep_26")
 a = p.parse_args()
 NAMES = {"A": "Core hours only", "B": "Weekday early/late", "C": "24/7 admin only", "D": "24/7 incl. clinical"}
 DOW = ["Mon", "Tue", "Wed", "Thu", "Fri"]
@@ -141,3 +143,48 @@ print(S.groupby("g")[ys].median().round(1))
 models(S, ys, "GPPS 2026 (groups from Mar 2026 OC)")
 R = pd.DataFrame(res).round(4); R.to_csv(f"{a.out}/phone_gpps_models.csv", index=False)
 print(R[R.group == "D"][["analysis", "outcome", "spec", "coef", "lo", "hi", "n", "median_A", "median_g"]].to_string())
+
+# ------------------------------------------------ 4. appointments (GPAD), same month as the OC groups
+if a.gpad:
+    import duckdb
+    tmp = os.path.join(a.out, "_gpad_tmp"); os.makedirs(tmp, exist_ok=True)
+    with zipfile.ZipFile(a.gpad) as z:
+        names = [n for n in z.namelist() if a.gpad_month in n and n.lower().endswith(".csv")]
+        for n in names: z.extract(n, tmp)
+    files = [os.path.join(tmp, n) for n in names]
+    print(f"\nGPAD files: {names}")
+    q = f"""
+    SELECT GP_CODE AS gp_code, SUM(n) AS total,
+      SUM(CASE WHEN TIME_BETWEEN_BOOK_AND_APPT='Same Day' THEN n ELSE 0 END) AS same_day,
+      SUM(CASE WHEN HCP_TYPE='GP' THEN n ELSE 0 END) AS gp,
+      SUM(CASE WHEN HCP_TYPE='GP' AND TIME_BETWEEN_BOOK_AND_APPT='Same Day' THEN n ELSE 0 END) AS gp_same_day,
+      SUM(CASE WHEN APPT_MODE='Face-to-Face' THEN n ELSE 0 END) AS f2f
+    FROM (SELECT GP_CODE, HCP_TYPE, APPT_MODE, TIME_BETWEEN_BOOK_AND_APPT, TRY_CAST(COUNT_OF_APPOINTMENTS AS BIGINT) AS n
+          FROM read_csv({files!r}, header=true, all_varchar=true))
+    WHERE n IS NOT NULL GROUP BY 1"""
+    ap = duckdb.sql(q).df().set_index("gp_code")
+    for f in files: os.remove(f)
+    A = M.join(ap, how="inner")
+    A = A[A.total >= 200].copy()
+    A["sd_pct"] = A.same_day / A.total * 100
+    A["gp_sd_pct"] = A.gp_same_day / A.gp.replace(0, np.nan) * 100
+    A["appts_pk"] = A.total / A.list * 1000
+    A["sd_pk"] = A.same_day / A.list * 1000
+    A["gp_pk"] = A.gp / A.list * 1000
+    A["f2f_pct"] = A.f2f / A.total * 100
+    A["loc"] = np.log(A.oc_core_pk.clip(lower=.1)); A["ll"] = np.log(A.list)
+    ys = ["sd_pct", "gp_sd_pct", "appts_pk", "sd_pk", "gp_pk", "f2f_pct"]
+    med = A.groupby("g")[ys].median().round(2); med["n"] = A.g.value_counts()
+    med.to_csv(f"{a.out}/appointments_by_group.csv")
+    print(med)
+    d = A.dropna(subset=["imd_score", "pct65plus", "region"])
+    R = []
+    for y in ys:
+        for spec, rhs in [("unadjusted", ""), ("adjusted", "+ imd_score + pct65plus + ll + C(region)"),
+                          ("adjusted + OC volume", "+ imd_score + pct65plus + ll + C(region) + loc + I(loc**2)")]:
+            dd = d.dropna(subset=[y]); r = smf.ols(f"{y} ~ C(g) {rhs}", dd).fit(cov_type="HC3")
+            for gk in "BCD":
+                t = f"C(g)[T.{gk}]"
+                R.append(dict(outcome=y, spec=spec, group=gk, coef=r.params[t], lo=r.conf_int().loc[t, 0], hi=r.conf_int().loc[t, 1], n=int(r.nobs)))
+    R = pd.DataFrame(R).round(3); R.to_csv(f"{a.out}/appointments_models.csv", index=False)
+    print(R[R.group == "D"].to_string())
