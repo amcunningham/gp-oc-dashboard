@@ -114,3 +114,51 @@ def flag_old(df, thresh=0.15):
     g = g[g.v >= 2000]
     sh = g.early / g.v
     return set(sh[sh > thresh].index), sh.sort_values(ascending=False)
+
+
+# ---------------------------------------------------------------- telephony (CBT)
+# Found Nov 2026: about 110 practices (mostly sub-ICBs 15E Birmingham & Solihull and 15F Leeds, so
+# probably one telephony provider) record call times in UTC during BST: their 06:00-07:59 share of
+# weekday calls jumps from ~4% to ~27% on the clock-change day and 08:00-09:59 falls from ~34% to
+# ~21%. CBT bands are two hours wide, so the shift cannot be undone; affected practices are left out
+# of time-of-day call measures in BST months.
+_CBT_BASE = None
+
+
+def _cbt_shares(df, gp="gp_code", date="date", band="band", val="inbound"):
+    d = df[pd.to_datetime(df[date]).dt.dayofweek < 5]
+    b = d[band].astype(str).str.replace(" ", "")
+    tot = d.groupby(gp)[val].sum()
+    e = d[b == "06:00-07:59"].groupby(gp)[val].sum() / tot
+    r = d[b == "08:00-09:59"].groupby(gp)[val].sum() / tot
+    return pd.DataFrame({"e": e, "r": r, "n": tot}).fillna({"e": 0, "r": 0})
+
+
+def cbt_baseline(panel="research/data/panel"):
+    """Practice-level 6-8am and 8-10am call shares in GMT (Jan, Feb, 1-28 Mar 2026)."""
+    global _CBT_BASE
+    if _CBT_BASE is None:
+        fr = []
+        for m in ["2026-01", "2026-02", "2026-03"]:
+            f = f"{panel}/cbt_daytime_{m}.parquet"
+            if os.path.exists(f):
+                x = pd.read_parquet(f, columns=["gp_code", "date", "band", "inbound"])
+                fr.append(x[~in_bst(x.date)])
+        _CBT_BASE = _cbt_shares(pd.concat(fr))
+    return _CBT_BASE
+
+
+def cbt_utc_practices(df, gp="gp_code", date="date", band="band", val="inbound", verbose=True, label=""):
+    """Practices whose calls on BST dates look UTC-shifted relative to their own GMT baseline:
+    6-8am share up >10 points and 8-10am share down >5 points."""
+    d = df[in_bst(df[date])]
+    if d.empty:
+        return set()
+    s = _cbt_shares(d, gp, date, band, val)
+    base = cbt_baseline()
+    j = s.join(base, rsuffix="_gmt", how="inner")
+    j = j[(j.n >= 500) & (j.n_gmt >= 500)]
+    flag = set(j.index[((j.e - j.e_gmt) > 0.10) & ((j.r - j.r_gmt) < -0.05)])
+    if verbose:
+        print(f"[timefix CBT {label}] {len(flag)} practices with UTC-shifted call times left out of time-of-day call measures")
+    return flag

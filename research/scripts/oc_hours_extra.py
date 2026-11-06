@@ -66,7 +66,8 @@ oc = oc[oc.hday.isin(valid)]
 o = oc.groupby(["GP_CODE", "hday"]).apply(lambda g: pd.Series({"oc_810": g.TOTAL[g.at810].sum(), "oc_day": g.TOTAL.sum()}), include_groups=False)
 
 cb = zcsv(a.cbt, ["Date", "PRACTICE_CODE", "Indicator", "Time_Category", "Value"])
-cb = cb[cb.PRACTICE_CODE.isin(M.index)]
+_utc = oc_timefix.cbt_utc_practices(cb[cb.Indicator == "CBT001"], gp="PRACTICE_CODE", date="Date", band="Time_Category", val="Value", label="calls")
+cb = cb[cb.PRACTICE_CODE.isin(M.index) & ~cb.PRACTICE_CODE.isin(_utc)]
 cb["d"] = pd.to_datetime(cb.Date)
 cb["tc"] = cb.Time_Category.str.replace(" ", "")
 CORE = ["08:00-09:59", "10:00-11:59", "12:00-13:59", "14:00-15:59", "16:00-17:59", "18:00-18:29"]

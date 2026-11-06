@@ -104,6 +104,7 @@ def cbt_month(m):
         f = f"{a.panel}/cbt_daytime_{m}.parquet"
         if not os.path.exists(f): return None
         x = pd.read_parquet(f, columns=["gp_code", "date", "band", "inbound"])
+    x = x[~x.gp_code.isin(oc_timefix.cbt_utc_practices(x, val="inbound", label=m))]
     x = x[(x.date.dt.dayofweek < 5) & x.band.isin(CORE_CBT)]
     return pd.DataFrame({"calls_core": x.groupby("gp_code").inbound.sum(), "calls_810": x[x.band == CORE_CBT[0]].groupby("gp_code").inbound.sum(), "cbt_days": x.groupby("gp_code").date.nunique()})
 rows = []
