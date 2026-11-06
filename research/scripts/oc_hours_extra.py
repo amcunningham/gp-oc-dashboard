@@ -26,7 +26,7 @@ p.add_argument("--out", required=True)
 p.add_argument("--gpad", default=None, help="GPAD 'Practice Level Crosstab' zip; uses the files for the OC month")
 p.add_argument("--gpad-month", default=None, help="month tag in the crosstab filenames, e.g. Sep_26")
 a = p.parse_args()
-NAMES = {"A": "Core hours only", "B": "Weekday early/late", "C": "24/7 admin only", "D": "24/7 incl. clinical"}
+NAMES = {"A": "Core hours only", "B": "Weekday early opening", "C": "24/7 admin only", "D": "24/7 incl. clinical"}
 DOW = ["Mon", "Tue", "Wed", "Thu", "Fri"]
 
 def zcsv(path, cols):

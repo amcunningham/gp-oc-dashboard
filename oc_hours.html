@@ -109,7 +109,7 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
     <thead><tr><th>Group</th><th>Practices</th><th>OC / 1k / weekday</th><th>Median list</th><th>Rule used</th></tr></thead>
     <tbody>
       <tr><td><span class="sw" style="background:var(--s-a)"></span> Core hours only</td><td class="num">1,427</td><td class="num">7.8</td><td class="num">9,853</td><td>No weekend submissions; ≤3 weekday nights with any</td></tr>
-      <tr><td><span class="sw" style="background:var(--s-b)"></span> Weekday early/late</td><td class="num">494</td><td class="num">8.6</td><td class="num">11,237</td><td>Submissions on ≥18 of 22 weekday nights, ≤1 weekend day. Mostly a 7am opening</td></tr>
+      <tr><td><span class="sw" style="background:var(--s-b)"></span> Weekday early opening</td><td class="num">494</td><td class="num">8.6</td><td class="num">11,237</td><td>Submissions on ≥18 of 22 weekday nights, ≤1 weekend day. Almost all before 8am, very few after 18:30</td></tr>
       <tr><td><span class="sw" style="background:var(--s-c)"></span> 24/7, admin only</td><td class="num">253</td><td class="num">10.4</td><td class="num">10,598</td><td>≥7 of 8 weekend days and ≥18 nights, but no clinical requests at weekends</td></tr>
       <tr><td><span class="sw" style="background:var(--s-d)"></span> 24/7 incl. clinical</td><td class="num">148</td><td class="num">3.0</td><td class="num">9,953</td><td>As above, with clinical requests on ≥6 of 8 weekend days</td></tr>
     </tbody>
@@ -132,13 +132,13 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
   <h3 class="sub">All contacts</h3>
   <div class="legend" id="lg2"></div>
   <div class="chart" id="c2"></div>
-  <p class="note">Core-hours-only practices peak at 10.1 contacts per 1,000 at 8–10am, and 24/7 clinical and weekday early/late practices at 8.8. In the early/late group part of the peak moves to 6–8am. Bands are unequal: 0–6 is 00:00–05:59, 18 is 18:00–18:29, eve is 18:30–23:59. Weekdays only, pooled across practices. Hover or tap for values.</p>
+  <p class="note">Core-hours-only practices peak at 10.1 contacts per 1,000 at 8–10am, and 24/7 clinical and weekday early-opening practices at 8.8. In the early-opening group part of the peak moves to 6–8am. Bands are unequal: 0–6 is 00:00–05:59, 18 is 18:00–18:29, eve is 18:30–23:59. Weekdays only, pooled across practices. Hover or tap for values.</p>
 </section>
 
 <section>
   <h2>Total contacts by phone and OC</h2>
   <div class="tbl"><table>
-    <thead><tr><th>Per 1,000 patients per weekday, all 24 hours</th><th>Core hours only</th><th>Weekday early/late</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
+    <thead><tr><th>Per 1,000 patients per weekday, all 24 hours</th><th>Core hours only</th><th>Weekday early opening</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
     <tbody>
       <tr><td>Phone calls</td><td class="num">25.9</td><td class="num">23.5</td><td class="num">25.4</td><td class="num">29.0</td></tr>
       <tr><td>OC submissions</td><td class="num">7.8</td><td class="num">9.9</td><td class="num">11.0</td><td class="num">3.9</td></tr>
@@ -153,7 +153,7 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
   <h2>Comparing practices with similar OC use</h2>
   <p>The size of the 8am peak depends partly on how much OC a practice gets, and 24/7 clinical practices get little. To compare like with like, practices are split into three equal bands by OC use. Each cell is the share of weekday calls + OC arriving 8–10am (median practice).</p>
   <div class="tbl"><table>
-    <thead><tr><th>OC volume</th><th>Core hours only</th><th>Weekday early/late</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
+    <thead><tr><th>OC volume</th><th>Core hours only</th><th>Weekday early opening</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
     <tbody>
       <tr><td>Low (&lt;4.6/1k/wd)</td><td class="num">30.2% <small>(506)</small></td><td class="num">26.7% <small>(106)</small></td><td class="num">29.1% <small>(63)</small></td><td class="num">28.1% <small>(99)</small></td></tr>
       <tr><td>Mid (4.6–11.0)</td><td class="num">28.6% <small>(424)</small></td><td class="num">27.2% <small>(238)</small></td><td class="num">28.4% <small>(79)</small></td><td class="num">25.7% <small>(33)</small></td></tr>
@@ -161,7 +161,7 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
     </tbody>
   </table></div>
   <p class="note">Practice counts in brackets.</p>
-  <p>In every band, 24/7 clinical and weekday early/late practices have a smaller morning share than core-hours-only practices, by about 1.5 to 3.5 percentage points.</p>
+  <p>In every band, 24/7 clinical and weekday early-opening practices have a smaller morning share than core-hours-only practices, by about 1.5 to 3.5 percentage points.</p>
 </section>
 
 <section>
@@ -193,7 +193,7 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
   <h2>What the team handles at 8am</h2>
   <p>Here each OC request is assigned to the morning it would be dealt with: requests from a weekday evening or before 8am to that morning, weekend requests to Monday. The 8–10am workload is the calls arriving then plus all OC sent since the practice closed.</p>
   <div class="tbl"><table>
-    <thead><tr><th>Day</th><th>Core hours only</th><th>Weekday early/late</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
+    <thead><tr><th>Day</th><th>Core hours only</th><th>Weekday early opening</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
     <tbody>
       <tr><td>Monday</td><td class="num">13.8 · 32.8%</td><td class="num">13.7 · 32.6%</td><td class="num">16.2 · 36.4%</td><td class="num">15.5 · 35.8%</td></tr>
       <tr><td>Tuesday</td><td class="num">9.0 · 28.0%</td><td class="num">9.1 · 28.2%</td><td class="num">10.2 · 30.0%</td><td class="num">9.4 · 28.6%</td></tr>
@@ -211,7 +211,7 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
   <h2>Appointments</h2>
   <p>Appointments in General Practice, September 2026. "Booked same day" means the appointment took place on the day it was booked.</p>
   <div class="tbl"><table>
-    <thead><tr><th>Median practice</th><th>Core hours only</th><th>Weekday early/late</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
+    <thead><tr><th>Median practice</th><th>Core hours only</th><th>Weekday early opening</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
     <tbody>
       <tr><td>Appointments booked same day</td><td class="num">44.2%</td><td class="num">43.8%</td><td class="num">46.2%</td><td class="num">40.8%</td></tr>
       <tr><td>GP appointments booked same day</td><td class="num">56.1%</td><td class="num">55.3%</td><td class="num">56.1%</td><td class="num">51.9%</td></tr>
@@ -230,7 +230,7 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
 <section>
   <h2>Phones and patient experience</h2>
   <div class="tbl"><table>
-    <thead><tr><th>Median practice</th><th>Core hours only</th><th>Weekday early/late</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
+    <thead><tr><th>Median practice</th><th>Core hours only</th><th>Weekday early opening</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
     <tbody>
       <tr><td>Calls answered</td><td class="num">63.8%</td><td class="num">63.7%</td><td class="num">63.3%</td><td class="num">65.8%</td></tr>
       <tr><td>Calls answered, 8–10am</td><td class="num">62.1%</td><td class="num">61.7%</td><td class="num">60.9%</td><td class="num">63.3%</td></tr>
@@ -273,7 +273,7 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
 </div>
 
 <script>
-const G=[{k:'A',n:'Core hours only',c:'--s-a'},{k:'B',n:'Weekday early/late',c:'--s-b'},{k:'C',n:'24/7 admin only',c:'--s-c'},{k:'D',n:'24/7 incl. clinical',c:'--s-d'}];
+const G=[{k:'A',n:'Core hours only',c:'--s-a'},{k:'B',n:'Weekday early opening',c:'--s-b'},{k:'C',n:'24/7 admin only',c:'--s-c'},{k:'D',n:'24/7 incl. clinical',c:'--s-d'}];
 const CB=['00:00-05:59','06:00-07:59','08:00-09:59','10:00-11:59','12:00-13:59','14:00-15:59','16:00-17:59','18:00-18:29','18:30-23:59'];
 const CS=['0–6','6–8','8–10','10–12','12–14','14–16','16–18','18','eve'];
 // per 1,000 patients per weekday, September 2026, in CB order
@@ -307,13 +307,13 @@ function lineChart(id,label,top,ticks,val,labels,tipHead,tipVal){
 function draw(){
   ['lg1','lg2','lg3'].forEach(legend);
   lineChart('c1','OC submissions per 1,000 patients per weekday by time band for four groups',4,[0,1,2,3,4],(k,i)=>OCB[k][i],
-    [{i:2,v:3.22,dy:-8,text:'Core hours only 3.2'},{i:2,v:1.46,dy:16,text:'24/7 clinical 1.5'},{i:1,v:0.89,dy:-8,text:'Early/late 0.9',anchor:'end'}],
+    [{i:2,v:3.22,dy:-8,text:'Core hours only 3.2'},{i:2,v:1.46,dy:16,text:'24/7 clinical 1.5'},{i:1,v:0.89,dy:-8,text:'Early opening 0.9',anchor:'end'}],
     'OC per 1,000',(k,i)=>OCB[k][i].toFixed(2));
   lineChart('c3','Inbound calls per 1,000 patients per weekday by time band for four groups',8,[0,2,4,6,8],(k,i)=>CALLS[k][i],
-    [{i:2,v:7.34,dy:-4,text:'24/7 clinical 7.3'},{i:2,v:5.64,dy:14,text:'Weekday early/late 5.6'}],
+    [{i:2,v:7.34,dy:-4,text:'24/7 clinical 7.3'},{i:2,v:5.64,dy:14,text:'Weekday early opening 5.6'}],
     'calls per 1,000',(k,i)=>CALLS[k][i].toFixed(2));
   lineChart('c2','Calls plus OC submissions per 1,000 patients per weekday by time band for four groups',12,[0,3,6,9,12],(k,i)=>CALLS[k][i]+OCB[k][i],
-    [{i:2,v:10.15,dy:-4,text:'Core hours only 10.1'},{i:2,v:8.8,dy:16,text:'24/7 clinical and early/late 8.8'}],
+    [{i:2,v:10.15,dy:-4,text:'Core hours only 10.1'},{i:2,v:8.8,dy:16,text:'24/7 clinical and early opening 8.8'}],
     'calls + OC = total',(k,i)=>`${CALLS[k][i].toFixed(1)} + ${OCB[k][i].toFixed(1)} = ${(CALLS[k][i]+OCB[k][i]).toFixed(1)}`);
 }
 draw();
