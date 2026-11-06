@@ -1,0 +1,49 @@
+analysis,outcome,spec,group,coef,lo,hi,p,n,median_A,median_g
+phone (Sep 2026),answer_rate,unadjusted,B,-0.028,-0.0409,-0.015,0.0,2557,0.6418,0.6199
+phone (Sep 2026),answer_rate,unadjusted,C,-0.0132,-0.0343,0.0079,0.2194,2557,0.6418,0.633
+phone (Sep 2026),answer_rate,unadjusted,D,0.0105,-0.0147,0.0356,0.4149,2557,0.6418,0.6581
+phone (Sep 2026),answer_rate,adjusted,B,-0.0029,-0.0148,0.0091,0.6376,2557,0.6418,0.6199
+phone (Sep 2026),answer_rate,adjusted,C,0.0062,-0.012,0.0244,0.5033,2557,0.6418,0.633
+phone (Sep 2026),answer_rate,adjusted,D,0.0189,-0.0054,0.0431,0.1281,2557,0.6418,0.6581
+phone (Sep 2026),answer_rate_810,unadjusted,B,-0.0155,-0.0303,-0.0007,0.04,2556,0.6253,0.604
+phone (Sep 2026),answer_rate_810,unadjusted,C,-0.0161,-0.0406,0.0084,0.198,2556,0.6253,0.6089
+phone (Sep 2026),answer_rate_810,unadjusted,D,0.0008,-0.0302,0.0317,0.9614,2556,0.6253,0.6334
+phone (Sep 2026),answer_rate_810,adjusted,B,0.0164,0.0028,0.03,0.0179,2556,0.6253,0.604
+phone (Sep 2026),answer_rate_810,adjusted,C,0.0017,-0.0188,0.0222,0.872,2556,0.6253,0.6089
+phone (Sep 2026),answer_rate_810,adjusted,D,0.0387,0.0093,0.068,0.0098,2556,0.6253,0.6334
+phone (Sep 2026),ivr_share,unadjusted,B,0.0062,-0.002,0.0144,0.1365,2543,0.2004,0.2052
+phone (Sep 2026),ivr_share,unadjusted,C,-0.0011,-0.013,0.0108,0.8564,2543,0.2004,0.2035
+phone (Sep 2026),ivr_share,unadjusted,D,-0.0258,-0.0403,-0.0113,0.0005,2543,0.2004,0.1714
+phone (Sep 2026),ivr_share,adjusted,B,0.001,-0.0069,0.009,0.7995,2543,0.2004,0.2052
+phone (Sep 2026),ivr_share,adjusted,C,-0.0094,-0.0202,0.0013,0.0846,2543,0.2004,0.2035
+phone (Sep 2026),ivr_share,adjusted,D,-0.0132,-0.0284,0.0019,0.086,2543,0.2004,0.1714
+phone (Sep 2026),answer_rate_excl_ivr,unadjusted,B,-0.0292,-0.0428,-0.0156,0.0,2543,0.8178,0.7978
+phone (Sep 2026),answer_rate_excl_ivr,unadjusted,C,-0.017,-0.0398,0.0058,0.1441,2543,0.8178,0.8132
+phone (Sep 2026),answer_rate_excl_ivr,unadjusted,D,-0.0079,-0.0348,0.0191,0.5681,2543,0.8178,0.8263
+phone (Sep 2026),answer_rate_excl_ivr,adjusted,B,-0.0021,-0.015,0.0109,0.7548,2543,0.8178,0.7978
+phone (Sep 2026),answer_rate_excl_ivr,adjusted,C,-0.0005,-0.0209,0.02,0.9642,2543,0.8178,0.8132
+phone (Sep 2026),answer_rate_excl_ivr,adjusted,D,0.015,-0.0105,0.0406,0.2488,2543,0.8178,0.8263
+GPPS 2026 (groups from Mar 2026 OC),satisfaction_2026,unadjusted,B,1.6594,0.6088,2.7101,0.002,2720,77.1048,78.9641
+GPPS 2026 (groups from Mar 2026 OC),satisfaction_2026,unadjusted,C,0.474,-0.6864,1.6343,0.4234,2720,77.1048,76.8923
+GPPS 2026 (groups from Mar 2026 OC),satisfaction_2026,unadjusted,D,1.9519,0.2011,3.7027,0.0289,2720,77.1048,80.1837
+GPPS 2026 (groups from Mar 2026 OC),satisfaction_2026,adjusted,B,1.772,0.7454,2.7985,0.0007,2720,77.1048,78.9641
+GPPS 2026 (groups from Mar 2026 OC),satisfaction_2026,adjusted,C,0.8688,-0.2522,1.9897,0.1288,2720,77.1048,76.8923
+GPPS 2026 (groups from Mar 2026 OC),satisfaction_2026,adjusted,D,0.8165,-1.0159,2.6488,0.3825,2720,77.1048,80.1837
+GPPS 2026 (groups from Mar 2026 OC),access_satisfaction_2026,unadjusted,B,1.9036,0.7431,3.0641,0.0013,2720,72.7734,74.809
+GPPS 2026 (groups from Mar 2026 OC),access_satisfaction_2026,unadjusted,C,0.6801,-0.6479,2.0082,0.3155,2720,72.7734,73.473
+GPPS 2026 (groups from Mar 2026 OC),access_satisfaction_2026,unadjusted,D,3.0958,1.0288,5.1628,0.0033,2720,72.7734,76.872
+GPPS 2026 (groups from Mar 2026 OC),access_satisfaction_2026,adjusted,B,2.1682,1.0325,3.3039,0.0002,2720,72.7734,74.809
+GPPS 2026 (groups from Mar 2026 OC),access_satisfaction_2026,adjusted,C,1.0912,-0.1894,2.3718,0.0949,2720,72.7734,73.473
+GPPS 2026 (groups from Mar 2026 OC),access_satisfaction_2026,adjusted,D,1.8825,-0.1995,3.9646,0.0764,2720,72.7734,76.872
+GPPS 2026 (groups from Mar 2026 OC),phone_easy_2026,unadjusted,B,1.3005,-0.3622,2.9633,0.1253,2720,56.3249,58.3214
+GPPS 2026 (groups from Mar 2026 OC),phone_easy_2026,unadjusted,C,1.018,-0.8663,2.9022,0.2897,2720,56.3249,57.1088
+GPPS 2026 (groups from Mar 2026 OC),phone_easy_2026,unadjusted,D,6.7879,3.9353,9.6406,0.0,2720,56.3249,64.4831
+GPPS 2026 (groups from Mar 2026 OC),phone_easy_2026,adjusted,B,3.5161,1.9725,5.0596,0.0,2720,56.3249,58.3214
+GPPS 2026 (groups from Mar 2026 OC),phone_easy_2026,adjusted,C,2.6634,0.9469,4.3799,0.0024,2720,56.3249,57.1088
+GPPS 2026 (groups from Mar 2026 OC),phone_easy_2026,adjusted,D,3.6025,0.9834,6.2215,0.007,2720,56.3249,64.4831
+GPPS 2026 (groups from Mar 2026 OC),couldnt_contact_2026,unadjusted,B,0.0294,-0.162,0.2207,0.7635,2590,0.6182,0.6425
+GPPS 2026 (groups from Mar 2026 OC),couldnt_contact_2026,unadjusted,C,-0.1625,-0.3548,0.0298,0.0976,2590,0.6182,0.5016
+GPPS 2026 (groups from Mar 2026 OC),couldnt_contact_2026,unadjusted,D,-0.2417,-0.492,0.0086,0.0585,2590,0.6182,0.0
+GPPS 2026 (groups from Mar 2026 OC),couldnt_contact_2026,adjusted,B,-0.0131,-0.2022,0.176,0.8919,2590,0.6182,0.6425
+GPPS 2026 (groups from Mar 2026 OC),couldnt_contact_2026,adjusted,C,-0.1822,-0.3749,0.0105,0.0639,2590,0.6182,0.5016
+GPPS 2026 (groups from Mar 2026 OC),couldnt_contact_2026,adjusted,D,0.025,-0.2213,0.2713,0.8423,2590,0.6182,0.0
