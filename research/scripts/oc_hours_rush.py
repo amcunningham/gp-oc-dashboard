@@ -209,5 +209,17 @@ try:
     pd.DataFrame(R).round(3).to_csv(f"{a.out}/day24_stepwise.csv", index=False)
     d["imdq"] = pd.qcut(d.imd_score, 5, labels=[1, 2, 3, 4, 5])
     d.groupby(["imdq", "g"], observed=True).day24_pk.agg(["median", "size"]).unstack().round(2).to_csv(f"{a.out}/day24_by_imd_quintile.csv")
+    # OC volume by group: is the lower OC use of 24/7 practices a deprivation effect?
+    d.groupby(["imdq", "g"], observed=True).oc_core_pk.median().unstack().round(2).to_csv(f"{a.out}/oc_volume_by_imd_quintile.csv")
+    d["sup1"] = d.sup.str.split(",").str[0]
+    top = d.sup1.value_counts().index[:7]; d["sup1"] = np.where(d.sup1.isin(top), d.sup1, "OTHER")
+    R = []
+    for nm, rhs in [("none", ""), ("+imd", "+ imd_score"), ("+imd+age+list+region", "+ imd_score + pct65plus + ll + C(region)"),
+                    ("+supplier", "+ imd_score + pct65plus + ll + C(region) + C(sup1)")]:
+        r = smf.ols(f"loc ~ C(g) {rhs}", d).fit(cov_type="HC3")
+        for gk in "BCD":
+            t = f"C(g)[T.{gk}]"; lo, hi = r.conf_int().loc[t]
+            R.append(dict(adjusted_for=nm, group=gk, oc_ratio=np.exp(r.params[t]), lo=np.exp(lo), hi=np.exp(hi), n=int(r.nobs)))
+    pd.DataFrame(R).round(3).to_csv(f"{a.out}/oc_volume_ratio_stepwise.csv", index=False)
 except ImportError:
     print("statsmodels not installed; skipping models")
