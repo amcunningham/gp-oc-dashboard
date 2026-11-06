@@ -27,12 +27,13 @@ import numpy as np, pandas as pd
 
 p = argparse.ArgumentParser()
 p.add_argument("--oc", required=True)
-p.add_argument("--cbt", required=True, help="cbt daytime parquet (gp_code,dow,tc,inbound,ivr_ended,answered,ndays[,yr])")
+p.add_argument("--cbt", required=True, help="CBT 'By Day and Time' zip as published, or a pre-aggregated parquet (gp_code,dow,tc,inbound,ivr_ended,answered,ndays[,yr])")
 p.add_argument("--cbt-year", type=int, default=None)
 p.add_argument("--list", default="research/data/list_jul26.csv")
 p.add_argument("--xsec", default="research/data/xsec_master.parquet")
 p.add_argument("--out", default="research/data/oc_hours")
 p.add_argument("--min-oc", type=int, default=300)
+p.add_argument("--bank-holidays", default="", help="comma-separated YYYY-MM-DD dates to drop from the CBT month")
 a = p.parse_args()
 os.makedirs(a.out, exist_ok=True)
 
@@ -80,9 +81,36 @@ P["g"] = P.apply(grp, axis=1)
 NAMES = {"A": "Core hours only", "B": "Weekday early/late", "C": "24/7 admin only", "D": "24/7 incl. clinical"}
 
 # ---------------- CBT
-c = pd.read_parquet(a.cbt)
-if a.cbt_year is not None and "yr" in c:
-    c = c[c.yr == a.cbt_year]
+WE_CALLS = None
+if a.cbt.lower().endswith(".zip"):
+    # raw publication: Date, PRACTICE_CODE, Indicator, Time_Category, Value (one csv per region)
+    fr = []
+    with zipfile.ZipFile(a.cbt) as z:
+        for n in z.namelist():
+            if n.lower().endswith(".csv") and "unmapped" not in n.lower():
+                d = pd.read_csv(io.BytesIO(z.read(n)), usecols=["Date", "PRACTICE_CODE", "Indicator", "Time_Category", "Value"])
+                fr.append(d[d.Indicator.isin(["CBT001", "CBT002", "CBT003"])])
+    raw = pd.concat(fr, ignore_index=True)
+    raw["Date"] = pd.to_datetime(raw.Date)
+    hol = pd.to_datetime(a.bank_holidays.split(",")) if a.bank_holidays else pd.DatetimeIndex([])
+    raw = raw[~raw.Date.isin(hol)]
+    days = pd.Series(pd.date_range(raw.Date.min().replace(day=1), raw.Date.max() + pd.offsets.MonthEnd(0)))
+    days = days[~days.isin(hol)]
+    nd = days.dt.dayofweek.value_counts()          # weekday dates per dow (0=Mon)
+    print(f"CBT month: {days.min():%Y-%m}; weekday dates by dow (0=Mon): {nd.sort_index().to_dict()}")
+    raw["dow0"] = raw.Date.dt.dayofweek
+    wk = raw[(raw.dow0 >= 5) & (raw.Indicator == "CBT001")]
+    WE_CALLS = wk.groupby("PRACTICE_CODE").Value.sum() / nd.reindex([5, 6]).fillna(0).sum()   # per weekend day
+    raw = raw[raw.dow0 < 5]
+    c = raw.pivot_table(index=["PRACTICE_CODE", "dow0", "Time_Category"], columns="Indicator", values="Value", aggfunc="sum").reset_index()
+    c = c.rename(columns={"PRACTICE_CODE": "gp_code", "Time_Category": "tc", "CBT001": "inbound", "CBT002": "ivr_ended", "CBT003": "answered"})
+    c["ndays"] = c.dow0.map(nd)
+    c["dow"] = c.dow0 + 1
+    c["tc"] = c.tc.str.replace(" ", "")
+else:
+    c = pd.read_parquet(a.cbt)
+    if a.cbt_year is not None and "yr" in c:
+        c = c[c.yr == a.cbt_year]
 c["pd"] = c.inbound / c.ndays
 c["apd"] = c.answered / c.ndays
 BANDS = sorted(c.tc.unique())
@@ -101,6 +129,8 @@ M["calls_810_pk"] = calls.loc[M.index, "08:00-09:59"] * k
 M["calls_core_pk"] = calls.loc[M.index, CBT_CORE].sum(axis=1) * k
 M["calls_24h_pk"] = calls.loc[M.index].sum(axis=1) * k
 M["ans_810_pk"] = ans.loc[M.index, "08:00-09:59"] * k
+if WE_CALLS is not None:
+    M["calls_wkend_pk_day"] = WE_CALLS.reindex(M.index).fillna(0) * k
 M = M[M.calls_core_pk.between(0.01, 200)]
 k = 1000 / M.list
 M["oc_core_pk"] = M.core / wd_dates * k
@@ -138,6 +168,7 @@ for gk in "ABCD":
     core_calls = cl[CBT_CORE].sum(); core_oc = oc_c[CBT_CORE].sum()
     ooh_oc = oc_c[["00:00-05:59", "06:00-07:59", "18:30-23:59"]].sum()
     wk_oc = M[M.g == gk].wkend.sum() / LG[gk] * 1000 / (we_dates / 2)   # per weekend (2 days)
+    wk_calls = (2 * (M[M.g == gk].calls_wkend_pk_day * M[M.g == gk].list).sum() / LG[gk]) if "calls_wkend_pk_day" in M else np.nan
     num = 5 * (cl["08:00-09:59"] + oc_c["08:00-09:59"] + ooh_oc) + wk_oc
     den = 5 * (core_calls + core_oc + ooh_oc) + wk_oc
     S.append(dict(group=gk, name=NAMES[gk], practices=int((M.g == gk).sum()),
@@ -146,6 +177,7 @@ for gk in "ABCD":
                   share_arriving_810=(cl["08:00-09:59"] + oc_c["08:00-09:59"]) / (core_calls + core_oc),
                   contacts_24h_pk_weekday=cl.sum() + oc_c.sum(),
                   contacts_per_week_pk=5 * (cl.sum() + oc_c.sum()) + wk_oc,
+                  weekend_calls_per_week_pk=wk_calls, weekend_oc_per_week_pk=wk_oc,
                   share_facing_team_810=num / den,
                   oc_share_facing_team_810=(5 * (oc_c["08:00-09:59"] + ooh_oc) + wk_oc) / (5 * (core_oc + ooh_oc) + wk_oc)))
 S = pd.DataFrame(S).round(4)
