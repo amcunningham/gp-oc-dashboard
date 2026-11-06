@@ -9,6 +9,8 @@ practices that stayed core-hours-only over the same months (difference in differ
 """
 import argparse, glob, io, zipfile, os
 import numpy as np, pandas as pd
+import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import oc_timefix
 
 p = argparse.ArgumentParser()
 p.add_argument("--panel", default="research/data/panel")
@@ -25,7 +27,8 @@ def load_oc():
     out = {}
     for f in sorted(glob.glob(f"{a.panel}/oc_daytime_*.parquet")):
         d = pd.read_parquet(f, columns=["gp_code", "date", "band", "CLINICAL", "TOTAL"])
-        out[d.date.dt.strftime("%Y-%m").iloc[0]] = d
+        m = d.date.dt.strftime("%Y-%m").iloc[0]
+        out[m] = oc_timefix.fix(d, oc_timefix.supplier_lookup(m), vals=("TOTAL", "CLINICAL"), label=m)
     fr = []
     with zipfile.ZipFile(a.oc_sep) as z:
         for n in z.namelist():
@@ -33,7 +36,7 @@ def load_oc():
                 fr.append(pd.read_csv(io.BytesIO(z.read(n)), usecols=["DATE", "GP_CODE", "SUBMISSION_TIME", "CLINICAL", "TOTAL"]))
     d = pd.concat(fr).rename(columns={"DATE": "date", "GP_CODE": "gp_code", "SUBMISSION_TIME": "band"})
     d["date"] = pd.to_datetime(d.date)
-    out["2026-09"] = d
+    out["2026-09"] = oc_timefix.fix(d, oc_timefix.supplier_lookup("2026-09"), vals=("TOTAL", "CLINICAL"), label="2026-09")
     return out
 
 def classify(d):

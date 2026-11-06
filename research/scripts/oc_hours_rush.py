@@ -24,6 +24,8 @@ and adjusted models (OLS, HC3) of 8-10am rush measures on group, OC volume, list
 """
 import argparse, io, zipfile, os
 import numpy as np, pandas as pd
+import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import oc_timefix
 
 p = argparse.ArgumentParser()
 p.add_argument("--oc", required=True)
@@ -45,6 +47,9 @@ with zipfile.ZipFile(a.oc) as z:
             frames.append(pd.read_csv(io.BytesIO(z.read(n)), usecols=["DATE", "GP_CODE", "SUPPLIER", "SUBMISSION_TIME", "CLINICAL", "ADMIN", "UNKNOWN_OTHER", "TOTAL"]))
 oc = pd.concat(frames, ignore_index=True)
 oc["d"] = pd.to_datetime(oc.DATE)
+# correct suppliers that record times in UTC during British Summer Time (see oc_timefix.py)
+_sup = oc.drop_duplicates("GP_CODE").set_index("GP_CODE").SUPPLIER.fillna("").str.upper()
+oc = oc_timefix.fix(oc, _sup, gp="GP_CODE", date="d", band="SUBMISSION_TIME", vals=("TOTAL", "CLINICAL", "ADMIN", "UNKNOWN_OTHER"), label="OC")
 oc = oc.rename(columns={"GP_CODE": "gp", "SUPPLIER": "sup", "SUBMISSION_TIME": "t", "CLINICAL": "cl", "TOTAL": "tot"})
 wd_dates = oc.loc[oc.d.dt.dayofweek < 5, "d"].nunique()
 we_dates = oc.loc[oc.d.dt.dayofweek >= 5, "d"].nunique()
