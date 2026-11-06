@@ -26,6 +26,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15.
 .wrap{max-width:760px;margin:0 auto;padding-block:40px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:28px}
 .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
 h1{font-family:var(--display);font-weight:600;font-size:clamp(28px,5vw,40px);line-height:1.15;margin:6px 0 10px;text-wrap:balance}
+h3.sub{font-family:var(--body);font-size:15px;font-weight:600;margin:10px 0 0}
 h2{font-family:var(--display);font-weight:600;font-size:22px;line-height:1.25;margin:0 0 6px;text-wrap:balance}
 p{margin:0 0 10px;max-width:68ch}
 .lede{font-size:17px;color:var(--ink-2)}
@@ -88,19 +89,19 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
 </header>
 
 <div class="answer">
-  <p><strong>Slightly less, but the morning peak remains.</strong> Practices open 24/7 for clinical requests have a smaller share of their weekday calls and OC submissions arriving between 8 and 10am: 29.0%, against 30.9% in practices open in core hours only. The difference holds when practices with similar OC use are compared. Most of the difference is in OC, not phone calls. Opening OC at 7am on weekdays does slightly better (28.0%). Being open 24/7 for admin requests only makes little difference (29.7%).</p>
-  <p>For the practice team, the 8am peak doesn't go away. Requests sent overnight or at the weekend are waiting in the queue when triage starts at 8am. What changes is when patients send them. If everything queued overnight is handled between 8 and 10am, every group faces about a third of its week's contacts in those two hours (31.9% for 24/7 clinical, 30.9% for core hours only).</p>
+  <p><strong>Slightly less, but the morning peak remains.</strong> In practices open 24/7 for clinical requests, 29.0% of weekday calls and OC submissions arrive between 8 and 10am, against 30.9% in practices open in core hours only. The difference is mostly in OC, and holds when practices with similar OC use are compared. Opening OC at 7am does about as well (28.0%); 24/7 opening for admin requests only makes little difference (29.7%).</p>
+  <p>The team's morning is no lighter. Requests sent overnight or at the weekend are waiting at 8am, so every group handles about a third of its week's contacts between 8 and 10am.</p>
 </div>
 
 <div class="stats">
-  <div class="stat"><div class="n">29.0% <small>vs 30.9%</small></div><div class="l">share of weekday core-hours calls + OC arriving 8–10am: 24/7 clinical vs core hours only</div></div>
-  <div class="stat"><div class="n">31.9% <small>vs 30.9%</small></div><div class="l">share of the week's contacts the team handles 8–10am, once overnight and weekend OC is counted</div></div>
-  <div class="stat"><div class="n">34.1 <small>vs 34.1</small></div><div class="l">calls + OC per 1,000 patients over the full 24 hours, per weekday (median practice)</div></div>
+  <div class="stat"><div class="n">29.0% <small>vs 30.9%</small></div><div class="l">share of weekday calls + OC arriving 8–10am: 24/7 clinical vs core hours only</div></div>
+  <div class="stat"><div class="n">31.9% <small>vs 30.9%</small></div><div class="l">share of the week's contacts the team handles 8–10am, counting overnight and weekend OC</div></div>
+  <div class="stat"><div class="n">34.1 <small>vs 34.1</small></div><div class="l">calls + OC per 1,000 patients per weekday, all 24 hours (median practice)</div></div>
 </div>
 
 <section>
   <h2>Four ways practices run their OC hours</h2>
-  <p>Practices with 300+ OC submissions in September 2026, grouped by when submissions arrived. Practices that fit none of the four patterns were left out.</p>
+  <p>Practices with 300+ OC submissions in September 2026, grouped by when submissions arrived.</p>
   <div class="tbl"><table class="rules">
     <thead><tr><th>Group</th><th>Practices</th><th>OC / 1k / weekday</th><th>Median list</th><th>Rule used</th></tr></thead>
     <tbody>
@@ -110,45 +111,28 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
       <tr><td><span class="sw" style="background:var(--s-d)"></span> 24/7 incl. clinical</td><td class="num">148</td><td class="num">3.0</td><td class="num">9,953</td><td>As above, with clinical requests on ≥6 of 8 weekend days</td></tr>
     </tbody>
   </table></div>
-  <p class="note">"Nights" are weekday dates with any submission between 18:30 and 08:00. Most practices in the 24/7 clinical group rely mainly on the phone, with about a third of the usual OC volume. Their figures are compared with practices of similar OC use further down.</p>
+  <p class="note">"Nights" are weekday dates with any submission between 18:30 and 08:00. Practices fitting none of the four patterns are left out. Most 24/7 clinical practices rely mainly on the phone, with about a third of the usual OC volume.</p>
 </section>
 
 <section>
-  <h2>When OC submissions arrive</h2>
-  <p>OC submissions per 1,000 patients per weekday, in the same two-hour bands as the call and combined charts, so the three can be read together: calls plus OC equals all contacts. The 24/7 clinical group gets fewer OC submissions at 8–10am (1.5 vs 3.5 per 1,000), mainly because they get less OC overall. Their timing differs too. Only 14% of their OC arrives in the 8–9am hour, against 26% in core-hours-only practices, and 8% arrives on weekday evenings. At weekends they get 1.1 per 1,000 per day, against none in core-hours-only practices.</p>
+  <h2>When contacts arrive</h2>
+  <p>Per 1,000 patients per weekday, in two-hour bands. The three charts add up: calls plus OC equals all contacts.</p>
+  <h3 class="sub">OC submissions</h3>
   <div class="legend" id="lg1"></div>
   <div class="chart" id="c1"></div>
-  <p class="note">Weekdays only, pooled across practices in each group. Bands are unequal: 0–6 is 00:00–05:59, 18 is 18:00–18:29 and eve is 18:30–23:59. Hover or tap for values.</p>
-</section>
-
-<section>
-  <h2>When patients phone</h2>
-  <p>Inbound calls per 1,000 registered patients per weekday, by two-hour band. Without adjustment, the 24/7 clinical group gets the most 8–10am calls (7.3 vs 6.6 per 1,000 in core-hours-only practices), and slightly more of their calls land then (28.7% vs 27.5%). This is because most of these practices rely mainly on the phone, and such practices have larger morning call peaks. Compared with practices of similar OC volume, a slightly smaller share of their calls lands at 8–10am.</p>
+  <p class="note">24/7 clinical practices get less OC at 8–10am (1.5 vs 3.5 per 1,000), mainly because they get less OC overall. 14% of their OC arrives 8–9am, against 26% in core-hours-only practices; 8% arrives on weekday evenings and they get 1.1 per 1,000 per weekend day.</p>
+  <h3 class="sub">Phone calls</h3>
   <div class="legend" id="lg3"></div>
   <div class="chart" id="c3"></div>
-  <p class="note">Unadjusted rates pooled across practices in each group. Hover or tap for values.</p>
+  <p class="note">24/7 clinical practices get the most 8–10am calls (7.3 vs 6.6 per 1,000), because most rely mainly on the phone.</p>
+  <h3 class="sub">All contacts</h3>
+  <div class="legend" id="lg2"></div>
+  <div class="chart" id="c2"></div>
+  <p class="note">Core-hours-only practices peak at 10.1 contacts per 1,000 at 8–10am, 24/7 clinical practices at 8.8, and weekday early/late practices at 8.4, where part of the peak moves to 6–8am. Bands are unequal: 0–6 is 00:00–05:59, 18 is 18:00–18:29, eve is 18:30–23:59. Weekdays only, pooled across practices. Hover or tap for values.</p>
 </section>
 
 <section>
-  <h2>All contacts: calls plus OC</h2>
-  <p>Inbound calls and OC submissions added together, per 1,000 patients per weekday, in the same two-hour bands. Core-hours-only practices peak at 10.1 contacts per 1,000 between 8 and 10am. The 24/7 clinical group peaks at 8.8 and the weekday early/late group at 8.4, where part of the peak moves into 6–8am.</p>
-  <div class="legend" id="lg2"></div>
-  <div class="chart" id="c2"></div>
-  <div class="tbl"><table>
-    <thead><tr><th>Per 1,000 patients</th><th>Core hours only</th><th>Weekday early/late</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
-    <tbody>
-      <tr><td>Calls + OC, 8–10am, per weekday</td><td class="num">10.1</td><td class="num">8.4</td><td class="num">9.7</td><td class="num">8.8</td></tr>
-      <tr><td>Calls + OC, 08:00–18:29, per weekday</td><td class="num">32.8</td><td class="num">30.1</td><td class="num">32.5</td><td class="num">30.4</td></tr>
-      <tr><td>Share arriving 8–10am</td><td class="num">30.9%</td><td class="num">28.0%</td><td class="num">29.7%</td><td class="num">29.0%</td></tr>
-      <tr><td>Calls + OC, all 24 hours, per weekday (median practice)</td><td class="num">34.1</td><td class="num">32.1</td><td class="num">35.1</td><td class="num">34.1</td></tr>
-      <tr><td>Calls + OC per week, incl. weekends (median practice)</td><td class="num">172</td><td class="num">162</td><td class="num">180</td><td class="num">174</td></tr>
-      <tr class="key"><td>Share of the week's contacts handled 8–10am</td><td class="num">30.9%</td><td class="num">31.1%</td><td class="num">32.6%</td><td class="num">31.9%</td></tr>
-      <tr><td>OC only: share handled 8–10am</td><td class="num">40%</td><td class="num">47%</td><td class="num">46%</td><td class="num">45%</td></tr>
-    </tbody>
-  </table></div>
-  <p class="note">Rows are pooled across practices in each group, except the two 24-hour and weekly rows. Those show the median practice, because pooling weights large practices, which have lower contact rates per patient. The weekly row is five weekdays plus weekend calls and OC. Hover or tap the chart to see calls and OC separately.</p>
-  <p><strong>Opening all day brings in about the same number of contacts.</strong> Across the full 24 hours, the median practice in both the 24/7 clinical and core-hours-only groups gets 34.1 contacts per 1,000 per weekday. Over a week it is 174 and 172 per 1,000. Evening and weekend submissions seem to replace contacts that would otherwise come in core hours, rather than add to them.</p>
-  <p><strong>Less OC, more phone calls, the same total.</strong> Patients contact practices open 24/7 for clinical requests about as often as other practices, but more of them phone.</p>
+  <h2>Total contacts: same total, different channel</h2>
   <div class="tbl"><table>
     <thead><tr><th>Per 1,000 patients per weekday, all 24 hours</th><th>Core hours only</th><th>Weekday early/late</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
     <tbody>
@@ -157,17 +141,14 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
       <tr class="key"><td>Total contacts</td><td class="num">34.1</td><td class="num">32.1</td><td class="num">35.1</td><td class="num">34.1</td></tr>
     </tbody>
   </table></div>
-  <p class="note">Median practice in each row, so the rows need not add up exactly. Adjusted for deprivation, age, list size and region, practices open 24/7 for clinical requests get 2.4 more calls per 1,000 per weekday (95% CI +0.6 to +4.3) and 2.9 fewer OC submissions (−3.7 to −2.1) than core-hours-only practices, with no difference in total contacts. "24/7 clinical" means the practice received clinical OC requests at weekends and overnight; most of these practices still rely mainly on the phone, with OC as a second route.</p>
-  <p><strong>Their lower OC use is not explained by deprivation.</strong> Practices open 24/7 for clinical requests receive much less OC than practices open in core hours only (median 3.0 vs 9.5 submissions per 1,000 per weekday). The two groups have a similar deprivation mix (median IMD score 19.1 vs 20.6). In every deprivation fifth, the 24/7 clinical group receives about a third as much OC: 2.3–3.8 per 1,000 per weekday against 7.6–10.2. After adjusting for deprivation, age, list size, region and OC supplier, it still receives about half as much (ratio 0.50, 95% CI 0.43 to 0.58). Their patients use the phone instead, so total contacts end up much the same.</p>
-  <p><strong>Deprivation does not change the comparison of total contacts.</strong> Contact rates rise steeply with deprivation: core-hours-only practices go from 32.4 contacts per 1,000 per weekday in the least deprived fifth to 37.5 in the most deprived. Because the groups have a similar deprivation mix, this does not affect the comparison. Adjusting step by step, the difference in total contacts for 24/7 clinical practices is +0.7 per 1,000 per weekday unadjusted, +0.8 after deprivation, −0.1 after adding age, and −0.1 (95% CI −1.9 to +1.6) after also adjusting for list size, region and OC volume. None of these is distinguishable from zero.</p>
-  <p>One possible exception: the 19 high-OC practices open 24/7 for clinical requests have a median of 38.4 contacts per 1,000 per weekday, against 34.8 for high-OC core-hours-only practices. That group is too small to draw conclusions from.</p>
-  <p><strong>What the team handles at 8am.</strong> The last two rows assume OC that arrives out of hours (weekday evenings, overnight, before 8am and at weekends) is dealt with between 8 and 10am the next working morning, along with calls and OC arriving in that window. The denominator is everything the practice has to respond to in a week: calls in core hours plus all OC. Calls outside core hours are left out because nobody answers them. On this basis, every group handles about a third of its week's contacts between 8 and 10am. The 24/7 clinical group is at 31.9%, against 30.9% for core-hours-only practices. Out-of-hours opening spreads out when patients send requests, but the requests are still dealt with in the same morning window. For OC alone, nearly half of all requests in practices with longer opening hours are waiting at 8–10am, against 40% where OC opens at 8am.</p>
+  <p class="note">Median practice in each row, so rows need not add up exactly.</p>
+  <p>Patients contact 24/7 clinical practices as often as other practices, but more of them phone. Adjusted for deprivation, age, list size and region, these practices get 2.4 more calls per 1,000 per weekday (95% CI +0.6 to +4.3), 2.9 fewer OC submissions (−3.7 to −2.1), and no difference in total. Evening and weekend submissions replace contacts that would otherwise come in core hours, rather than adding to them.</p>
+  <p><strong>Deprivation does not explain this.</strong> Contact rates rise with deprivation (32.4 to 37.5 per 1,000 per weekday across fifths in core-hours-only practices), but the groups have a similar deprivation mix (median IMD 19.1 vs 20.6). In every deprivation fifth, 24/7 clinical practices get about a third as much OC (2.3–3.8 vs 7.6–10.2 per 1,000); adjusted for deprivation, age, list size, region and supplier, about half (ratio 0.50, 95% CI 0.43 to 0.58). The adjusted difference in total contacts stays close to zero at every step (−0.1, 95% CI −1.9 to +1.6, fully adjusted).</p>
 </section>
 
 <section>
   <h2>Comparing practices with similar OC use</h2>
-  <p>The groups differ in how much OC their patients use. Most practices open 24/7 for clinical requests get little OC and rely mainly on the phone, and the size of a practice's 8am peak depends partly on how much OC it gets. So a straight comparison between groups could reflect OC use rather than opening hours. This table compares like with like: practices are split into three equal bands by OC submissions per 1,000 patients per weekday, and the groups are compared within each band.</p>
-  <p>Each cell is the share of weekday core-hours contacts (calls + OC) arriving between 8 and 10am, for the median practice.</p>
+  <p>The size of the 8am peak depends partly on how much OC a practice gets, and 24/7 clinical practices get little. To compare like with like, practices are split into three equal bands by OC use. Each cell is the share of weekday calls + OC arriving 8–10am (median practice).</p>
   <div class="tbl"><table>
     <thead><tr><th>OC volume</th><th>Core hours only</th><th>Weekday early/late</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
     <tbody>
@@ -176,13 +157,13 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
       <tr><td>High (&gt;10.4)</td><td class="num">29.2% <small>(549)</small></td><td class="num">27.1% <small>(165)</small></td><td class="num">27.7% <small>(124)</small></td><td class="num">25.3% <small>(19)</small></td></tr>
     </tbody>
   </table></div>
-  <p class="note">Practice counts in brackets. Only 19 high-OC practices are open 24/7 for clinical requests.</p>
-  <p>In every band, practices open 24/7 for clinical requests and those opening early or late on weekdays have a smaller share of contacts arriving at 8–10am than practices open in core hours only. The difference is about 2 percentage points among low-OC practices and 3–4 points among mid- and high-OC practices. So the lower morning share in these groups is not explained by differences in OC use.</p>
+  <p class="note">Practice counts in brackets.</p>
+  <p>In every band, 24/7 clinical and weekday early/late practices have a smaller morning share than core-hours-only practices: about 2 points lower among low-OC practices and 3–4 points among mid- and high-OC practices.</p>
 </section>
 
 <section>
-  <h2>The 8–10am workload by day of the week</h2>
-  <p>Each OC request is assigned to the morning it would be dealt with. Requests from a weekday evening or before 8am go to that working morning, and weekend requests go to Monday. The team's 8–10am workload is then the calls arriving 8–10am plus all OC waiting for that morning. Figures are for the median practice.</p>
+  <h2>What the team handles at 8am</h2>
+  <p>Here each OC request is assigned to the morning it would be dealt with: requests from a weekday evening or before 8am to that morning, weekend requests to Monday. The 8–10am workload is the calls arriving then plus all OC waiting.</p>
   <div class="tbl"><table>
     <thead><tr><th>Day</th><th>Core hours only</th><th>Weekday early/late</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
     <tbody>
@@ -191,15 +172,16 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
       <tr><td>Wednesday</td><td class="num">8.5 · 27.8%</td><td class="num">8.2 · 28.4%</td><td class="num">9.3 · 29.6%</td><td class="num">8.7 · 27.6%</td></tr>
       <tr><td>Thursday</td><td class="num">8.0 · 27.6%</td><td class="num">7.7 · 28.0%</td><td class="num">8.6 · 29.1%</td><td class="num">8.2 · 28.8%</td></tr>
       <tr><td>Friday</td><td class="num">7.9 · 28.1%</td><td class="num">7.6 · 28.3%</td><td class="num">8.7 · 29.6%</td><td class="num">8.1 · 28.7%</td></tr>
+      <tr class="key"><td>Whole week</td><td class="num">30.9%</td><td class="num">31.1%</td><td class="num">32.6%</td><td class="num">31.9%</td></tr>
     </tbody>
   </table></div>
-  <p class="note">Each cell: contacts to handle 8–10am per 1,000 patients · share of that day's contacts. September 2026, 21 working days. 1 September is left out because part of its queue arrived in August.</p>
-  <p><strong>Monday is the busiest morning in every group, and busiest where OC is open 24/7.</strong> In a core-hours-only practice the team handles 13.9 contacts per 1,000 between 8 and 10am on a Monday, a third of the day's work. In a practice open 24/7 for clinical requests it is 15.5, 36% of the day, because the weekend's requests are all waiting at 8am. From Tuesday to Friday the groups are similar, at 8–10 per 1,000 and 28–30% of the day.</p>
+  <p class="note">Each cell: contacts to handle 8–10am per 1,000 patients · share of that day's contacts (median practice). Whole week: share of the week's contacts, pooled. September 2026; 1 September left out because part of its queue arrived in August. Calls outside core hours are not counted, as they are not answered.</p>
+  <p>Every group handles about a third of its contacts between 8 and 10am. Monday is the busiest morning everywhere, and busiest where OC is open 24/7 (36% of the day vs 33%), because the weekend's requests are waiting.</p>
 </section>
 
 <section>
   <h2>Appointments</h2>
-  <p>Appointments in General Practice, September 2026, the same month as the OC and telephony data. Practices with at least 200 appointments. "Booked same day" means the appointment took place on the day it was booked.</p>
+  <p>Appointments in General Practice, September 2026. "Booked same day" means the appointment took place on the day it was booked.</p>
   <div class="tbl"><table>
     <thead><tr><th>Median practice</th><th>Core hours only</th><th>Weekday early/late</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
     <tbody>
@@ -213,55 +195,39 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
       <tr class="key"><td>Adjusted difference, appointments per 1,000</td><td class="num">—</td><td class="num">+5</td><td class="num">+29</td><td class="num">+39 <small>(+10 to +67)</small></td></tr>
     </tbody>
   </table></div>
-  <p class="note">Monthly totals. Adjusted for deprivation, age, list size and region; 95% confidence intervals shown for the 24/7 clinical group. Same-day and GP appointments per 1,000 do not differ significantly between groups. The same pattern was seen in May 2026 data.</p>
-  <p><strong>A smaller share of same-day appointments, but not fewer.</strong> Practices open 24/7 for clinical requests book fewer of their appointments on the day (40.8% vs 44.3%; for GP appointments 51.9% vs 56.1%). They do not provide fewer same-day or GP appointments per patient. They provide more appointments overall, about 39 more per 1,000 patients a month after adjustment, and the extra appointments are booked for later days and are not with GPs. When less of the day's care depends on making contact at 8am, there is less reason to send a request first thing. This may help explain their smaller morning share and higher phone-ease scores. Most of these practices rely mainly on the phone, so it reflects how they organise access generally, not an effect of keeping OC open.</p>
+  <p class="note">Monthly totals; practices with 200+ appointments. Adjusted for deprivation, age, list size and region. May 2026 data showed the same pattern.</p>
+  <p>24/7 clinical practices provide as many same-day and GP appointments per patient as other practices, plus extra appointments booked for later days with other staff. With less of the day's care depending on contact at 8am, there is less reason to send requests first thing.</p>
 </section>
 
 <section>
-  <h2>Answering the phone</h2>
-  <p>Weekday core-hours calls, September 2026, for practices with at least 200 calls. Adjusted differences take account of deprivation, age, list size, region, OC volume and call volume.</p>
+  <h2>Phones and patient experience</h2>
   <div class="tbl"><table>
     <thead><tr><th>Median practice</th><th>Core hours only</th><th>Weekday early/late</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
     <tbody>
       <tr><td>Calls answered</td><td class="num">64.2%</td><td class="num">62.0%</td><td class="num">63.3%</td><td class="num">65.8%</td></tr>
       <tr><td>Calls answered, 8–10am</td><td class="num">62.5%</td><td class="num">60.4%</td><td class="num">60.9%</td><td class="num">63.3%</td></tr>
       <tr><td>Calls ended in the phone menu</td><td class="num">20.0%</td><td class="num">20.5%</td><td class="num">20.4%</td><td class="num">17.1%</td></tr>
-      <tr><td>Answered, of calls not ended in the menu</td><td class="num">81.8%</td><td class="num">79.8%</td><td class="num">81.3%</td><td class="num">82.6%</td></tr>
       <tr class="key"><td>Adjusted difference, calls answered</td><td class="num">—</td><td class="num">−0.3pp</td><td class="num">+0.6pp</td><td class="num">+1.9pp <small>(−0.5 to +4.3)</small></td></tr>
       <tr class="key"><td>Adjusted difference, answered 8–10am</td><td class="num">—</td><td class="num">+1.6pp</td><td class="num">+0.2pp</td><td class="num">+3.9pp <small>(+0.9 to +6.8)</small></td></tr>
-    </tbody>
-  </table></div>
-  <p><strong>Answering rates are similar.</strong> Practices open 24/7 for clinical requests answer slightly more calls, but over the whole day the difference could be due to chance. The clearest difference is between 8 and 10am, where they answer about 4 percentage points more once practice mix is taken into account. Fewer of their calls end in the phone menu (17% vs 20%), though that gap mostly disappears after adjustment.</p>
-</section>
-
-<section>
-  <h2>Patient survey</h2>
-  <p>GP Patient Survey 2026, fieldwork January to April 2026. Because practices change their settings, they are grouped here by their OC hours in March 2026, during fieldwork, using the same rules. 196 practices were open 24/7 for clinical requests; 118 of them were still in that group in September.</p>
-  <div class="tbl"><table>
-    <thead><tr><th>Median practice</th><th>Core hours only</th><th>Weekday early/late</th><th>24/7 admin</th><th>24/7 clinical</th></tr></thead>
-    <tbody>
-      <tr><td>Good overall experience</td><td class="num">77.1%</td><td class="num">79.0%</td><td class="num">76.9%</td><td class="num">80.2%</td></tr>
-      <tr><td>Good experience of contacting the practice</td><td class="num">72.8%</td><td class="num">74.8%</td><td class="num">73.5%</td><td class="num">76.9%</td></tr>
-      <tr><td>Easy to get through on the phone</td><td class="num">56.3%</td><td class="num">58.3%</td><td class="num">57.1%</td><td class="num">64.5%</td></tr>
+      <tr><td>Good overall experience (GPPS)</td><td class="num">77.1%</td><td class="num">79.0%</td><td class="num">76.9%</td><td class="num">80.2%</td></tr>
+      <tr><td>Good experience of contacting the practice (GPPS)</td><td class="num">72.8%</td><td class="num">74.8%</td><td class="num">73.5%</td><td class="num">76.9%</td></tr>
+      <tr><td>Easy to get through on the phone (GPPS)</td><td class="num">56.3%</td><td class="num">58.3%</td><td class="num">57.1%</td><td class="num">64.5%</td></tr>
       <tr class="key"><td>Adjusted difference, overall experience</td><td class="num">—</td><td class="num">+1.8pp</td><td class="num">+0.9pp</td><td class="num">+0.8pp <small>(−1.0 to +2.6)</small></td></tr>
       <tr class="key"><td>Adjusted difference, contacting the practice</td><td class="num">—</td><td class="num">+2.2pp</td><td class="num">+1.1pp</td><td class="num">+1.9pp <small>(−0.2 to +4.0)</small></td></tr>
       <tr class="key"><td>Adjusted difference, easy by phone</td><td class="num">—</td><td class="num">+3.5pp</td><td class="num">+2.7pp</td><td class="num">+3.6pp <small>(+1.0 to +6.2)</small></td></tr>
     </tbody>
   </table></div>
-  <p class="note">Practice counts (March 2026 groups): core hours only 1,634; weekday early/late 537; 24/7 admin 355; 24/7 clinical 196. Adjusted for deprivation, age, list size, region and OC volume. 95% confidence intervals shown for the 24/7 clinical group.</p>
-  <p><strong>Higher satisfaction, mostly explained by differences in practice population.</strong> Practices open 24/7 for clinical requests score 3 points higher for overall experience and 4 points higher for contacting the practice. After adjustment, both differences fall to 1–2 points and could be due to chance. The difference that remains is ease of getting through by phone: 3.6 points higher after adjustment. The other extended-hours groups show similar phone-ease gains. That fits the slightly better 8–10am answering, but practices that choose to open longer may differ in other ways too, so this cannot show that opening hours caused it.</p>
+  <p class="note">Calls: weekday core hours, September 2026, practices with 200+ calls; adjusted for deprivation, age, list size, region, OC and call volume. GP Patient Survey 2026 (fieldwork January–April), with practices grouped by their March 2026 OC hours (24/7 clinical n = 196); adjusted for deprivation, age, list size, region and OC volume.</p>
+  <p>24/7 clinical practices answer slightly more calls, clearest at 8–10am (+3.9 points adjusted). Their patients report higher satisfaction, but after adjustment only ease of getting through by phone remains clearly higher (+3.6 points); the other extended-hours groups show similar gains.</p>
 </section>
 
 <section>
   <h2>What this means</h2>
   <ul>
-    <li><strong>Patients still send requests early.</strong> Clinical requests can arrive in the evening and at weekends. Weekday 18:30–midnight takes 8% of submissions and weekends 6%. Patients still send more requests between 8 and 9am than in any other hour, which fits the idea that early requests are a rational response when same-day care is allocated each morning.</li>
-    <li><strong>The phone peak changes little.</strong> Out-of-hours OC changes when OC users send requests, but has little effect on when people phone.</li>
-    <li><strong>Opening at 7am does about as well</strong> (28.0% of contacts arriving 8–10am), by moving some of the morning demand an hour earlier.</li>
-    <li><strong>Admin-only 24/7 opening has little effect</strong> (29.7%). Clinical requests are concentrated first thing in the morning and admin requests are not. Admin requests can be dealt with without an appointment, so there is no advantage in sending them early. Clinical requests are competing for a limited number of same-day appointments, so patients send them as soon as they can. The morning peak reflects limited clinical capacity.</li>
-    <li><strong>The team's morning workload is unchanged.</strong> Counting the requests that queue overnight, every group handles about a third of its week's contacts between 8 and 10am. Monday mornings are busier where OC is open 24/7, because the weekend's requests are waiting.</li>
-    <li><strong>Appointments.</strong> Practices open 24/7 for clinical requests offer more appointments overall and book a smaller share on the day, while offering a similar number of same-day and GP appointments per patient.</li>
-    <li><strong>Phones and satisfaction.</strong> Practices open 24/7 for clinical requests answer slightly more calls at 8–10am and their patients find it easier to get through by phone. Overall satisfaction is no different once practice population is taken into account.</li>
+    <li><strong>Patients still send requests early.</strong> Even when OC is open around the clock, 8–9am is the busiest hour, and the phone peak changes little.</li>
+    <li><strong>The morning peak reflects limited clinical capacity.</strong> Clinical requests concentrate first thing and admin requests do not. Admin can be dealt with without an appointment; clinical requests compete for limited same-day appointments. This is why admin-only 24/7 opening makes little difference.</li>
+    <li><strong>The team's morning workload is unchanged</strong>, and Monday is heavier where OC is open 24/7.</li>
+    <li><strong>The practices with the smallest morning peak offer more booked-ahead appointments</strong>, and their patients find it easier to get through by phone. This reflects how they organise access generally; it cannot be attributed to OC opening hours alone.</li>
   </ul>
 </section>
 
