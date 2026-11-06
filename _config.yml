@@ -1,0 +1,61 @@
+# GitHub Pages (Jekyll) build settings.
+# The site stopped deploying in Nov 2026: the published bundle had grown to ~420MB
+# and GitHub's file sync timed out. The files below stay in the repo but are not
+# published to the website, because no page loads them. If a page starts loading
+# one of them (e.g. explore.html / mypractice.html via DATA_BASE), remove it here.
+exclude:
+  - "*.zip"
+  - "**/*.zip"
+  - "*.docx"
+  - "*.pptx"
+  - continuity-analysis-working-files
+  - research/scripts
+  - research/pipeline
+  - research/worker
+  - start_explorer.bat
+  # research/data files over 1MB that no page references
+  - "research/data/cbt_daytime_mar26.parquet"
+  - "research/data/cbt_rush_panel.csv"
+  - "research/data/cbt_volumes_panel.csv"
+  - "research/data/change_2024_2025.csv"
+  - "research/data/change_2025_2026_rerun_practice.csv"
+  - "research/data/cvdprevent_practice.csv"
+  - "research/data/fft_gp_panel.csv"
+  - "research/data/gpps_long.csv"
+  - "research/data/ncdes_practice_measure_panel.parquet"
+  - "research/data/ncdes_practice_month.parquet"
+  - "research/data/nhs_app_mi.csv"
+  - "research/data/oc_hours_sep26/practice_groups.csv"
+  - "research/data/panel/cbt_daytime_2025-10.parquet"
+  - "research/data/panel/cbt_daytime_2025-11.parquet"
+  - "research/data/panel/cbt_daytime_2025-12.parquet"
+  - "research/data/panel/cbt_daytime_2026-01.parquet"
+  - "research/data/panel/cbt_daytime_2026-02.parquet"
+  - "research/data/panel/cbt_daytime_2026-03.parquet"
+  - "research/data/panel/cbt_daytime_2026-04.parquet"
+  - "research/data/panel/cbt_daytime_2026-05.parquet"
+  - "research/data/panel/cbt_daytime_2026-06.parquet"
+  - "research/data/panel/oc_daytime_2025-12.parquet"
+  - "research/data/panel/oc_daytime_2026-01.parquet"
+  - "research/data/panel/oc_daytime_2026-02.parquet"
+  - "research/data/panel/oc_daytime_2026-03.parquet"
+  - "research/data/panel/oc_daytime_2026-04.parquet"
+  - "research/data/panel/oc_daytime_2026-05.parquet"
+  - "research/data/panel/oc_daytime_2026-06.parquet"
+  - "research/data/panel_merged.csv"
+  - "research/data/panel_oc.csv"
+  - "research/data/pomi_online_services_practice.csv"
+  - "research/data/pomi_online_services_practice.parquet"
+  - "research/data/practice_list_history.csv"
+  - "research/data/qof_prevalence_2425.csv"
+  - "research/data/qof_prevalence_2425.parquet"
+  - "research/data/rebuild_20260730/panel_oc_to_jun26.parquet"
+  - "research/data/wave3_gpps.csv"
+  - "research/data/workforce_dec24_dec25.csv"
+  - "research/data/workforce_panel.csv"
+  - "research/data/workforce_panel.parquet"
+  - "research/data/workforce_panel_rebuilt.parquet"
+  - "research/data/xsec_master.csv"
+  - "research/data/xsec_master.parquet"
+  - "research/data/xsec_master_2026.csv"
+  - "research/data/xsec_master_rebuilt.csv"
