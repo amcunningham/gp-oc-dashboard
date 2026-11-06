@@ -196,5 +196,18 @@ try:
             t = f"C(g)[T.{gk}]"
             R.append(dict(outcome=y, group=gk, coef=r.params[t], lo=r.conf_int().loc[t, 0], hi=r.conf_int().loc[t, 1], p=r.pvalues[t], n=int(r.nobs)))
     pd.DataFrame(R).round(4).to_csv(f"{a.out}/adjusted_models.csv", index=False)
+    # 24h contacts: add adjustments one at a time, to see what deprivation and age explain
+    steps = [("none", ""), ("+imd", "+ imd_score"), ("+imd+age", "+ imd_score + pct65plus"),
+             ("+imd+age+list+region", "+ imd_score + pct65plus + ll + C(region)"),
+             ("+all incl OC volume", "+ imd_score + pct65plus + ll + C(region) + loc + I(loc**2)")]
+    R = []
+    for nm, rhs in steps:
+        r = smf.ols(f"day24_pk ~ C(g) {rhs}", d).fit(cov_type="HC3")
+        for gk in "BCD":
+            t = f"C(g)[T.{gk}]"
+            R.append(dict(adjusted_for=nm, group=gk, coef=r.params[t], lo=r.conf_int().loc[t, 0], hi=r.conf_int().loc[t, 1], n=int(r.nobs)))
+    pd.DataFrame(R).round(3).to_csv(f"{a.out}/day24_stepwise.csv", index=False)
+    d["imdq"] = pd.qcut(d.imd_score, 5, labels=[1, 2, 3, 4, 5])
+    d.groupby(["imdq", "g"], observed=True).day24_pk.agg(["median", "size"]).unstack().round(2).to_csv(f"{a.out}/day24_by_imd_quintile.csv")
 except ImportError:
     print("statsmodels not installed; skipping models")
