@@ -142,3 +142,69 @@ if len(Sw):
         r = sm.OLS(g.did.values, np.ones(len(g))).fit(cov_type="HC3")
         print(f"  {f} -> {t}: n={len(g)}  median {g.did.median():+.3f}  mean {r.params[0]:+.3f} (95% CI {r.conf_int()[0][0]:+.3f} to {r.conf_int()[0][1]:+.3f})")
     print("  by period:"); print(Dd.groupby(["frm", "to", Dd.from_m.str[:4] + "->" + Dd.to_m.str[:4]]).did.agg(["size", "median"]).round(3).to_string())
+
+# ---------------------------------------------------------------- telephony for the switchers
+# monthly calls: cbt_rush_panel.csv (Oct 2024 - May 2026) + daily panel (Jun 2026) + Sep 2026 zip
+def wd_count(m):
+    d = pd.date_range(m + "-01", periods=1, freq="MS")[0]
+    days = pd.date_range(d, d + pd.offsets.MonthEnd(0))
+    return int((days.dayofweek < 5).sum())
+T = {}
+rp = pd.read_csv("research/data/cbt_rush_panel.csv")
+for m, g in rp.groupby("month"):
+    T[m] = g.set_index("gp_code")[["inbound_wd", "inbound_wd_810"]]
+f = f"{a.panel}/cbt_daytime_2026-06.parquet"
+if os.path.exists(f) and "2026-06" not in T:
+    x = pd.read_parquet(f, columns=["gp_code", "date", "band", "inbound"]); x = x[x.date.dt.dayofweek < 5]
+    T["2026-06"] = pd.DataFrame({"inbound_wd": x.groupby("gp_code").inbound.sum(), "inbound_wd_810": x[x.band == "08:00-09:59"].groupby("gp_code").inbound.sum()})
+cbt_sep = "research/data/cbt_daytime_sep26.zip"
+if os.path.exists(cbt_sep):
+    fr = []
+    with zipfile.ZipFile(cbt_sep) as z:
+        for n in z.namelist():
+            if n.lower().endswith(".csv") and "unmapped" not in n.lower():
+                x = pd.read_csv(io.BytesIO(z.read(n)), usecols=["Date", "PRACTICE_CODE", "Indicator", "Time_Category", "Value"]); fr.append(x[x.Indicator == "CBT001"])
+    x = pd.concat(fr); x["Date"] = pd.to_datetime(x.Date); x = x[x.Date.dt.dayofweek < 5]
+    T["2026-09"] = pd.DataFrame({"inbound_wd": x.groupby("PRACTICE_CODE").Value.sum(), "inbound_wd_810": x[x.Time_Category.str.replace(" ", "") == "08:00-09:59"].groupby("PRACTICE_CODE").Value.sum()})
+Lst = pd.read_csv("research/data/list_jul26.csv").set_index("gp_code").iloc[:, 0]
+
+def outcomes(m):
+    if m not in T: return None
+    O = H[m][["tot", "wk", "r810"]].join(T[m], how="inner")
+    O = O[O.inbound_wd >= 500]
+    O["oc_wd"] = O.tot - O.wk
+    nwd = wd_count(m); L = Lst.reindex(O.index)
+    O["ph_rush"] = O.inbound_wd_810 / O.inbound_wd
+    O["comb_rush"] = (O.inbound_wd_810 + O.r810) / (O.inbound_wd + O.oc_wd)
+    O["calls_pk"] = O.inbound_wd / nwd / L * 1000
+    O["oc_pk"] = O.tot / nwd / L * 1000          # all OC (incl. weekend) per weekday, per 1,000
+    O["contacts_pk"] = (O.inbound_wd + O.tot) / nwd / L * 1000
+    O["oc_share"] = O.tot / (O.tot + O.inbound_wd)
+    return O
+OUT = {m: outcomes(m) for m in months}
+ys = ["ph_rush", "comb_rush", "calls_pk", "oc_pk", "contacts_pk", "oc_share"]
+res = []
+if len(Sw):
+    for _, s in Sw.iterrows():
+        A_, B_ = OUT.get(s.from_m), OUT.get(s.to_m)
+        if A_ is None or B_ is None or s.gp not in A_.index or s.gp not in B_.index: continue
+        st = hg.index[(hg[s.from_m] == s.frm) & (hg[s.to_m] == s.frm)]
+        st = st[st.isin(A_.index) & st.isin(B_.index)]
+        row = dict(gp=s.gp, frm=s.frm, to=s.to, from_m=s.from_m, to_m=s.to_m, n_stayers=len(st))
+        for y in ys:
+            row[y + "_before"] = A_.at[s.gp, y]; row[y + "_after"] = B_.at[s.gp, y]
+            row[y + "_did"] = (B_.at[s.gp, y] - A_.at[s.gp, y]) - (B_.loc[st, y] - A_.loc[st, y]).median()
+        res.append(row)
+P = pd.DataFrame(res); P.to_csv(f"{a.out}/history_switches_phone.csv", index=False)
+print("\nswitchers with telephony in both months:", P.groupby(["frm", "to"]).size().to_dict())
+import statsmodels.api as sm
+summ = []
+for (f_, t_), g in P.groupby(["frm", "to"]):
+    for y in ys:
+        v = g[y + "_did"].dropna()
+        if len(v) < 5: continue
+        r = sm.OLS(v.values, np.ones(len(v))).fit(cov_type="HC3")
+        summ.append(dict(change=f"{f_} -> {t_}", outcome=y, n=len(v), before=g[y + "_before"].median(), after=g[y + "_after"].median(),
+                         effect_median=v.median(), effect_mean=r.params[0], lo=r.conf_int()[0][0], hi=r.conf_int()[0][1]))
+S2 = pd.DataFrame(summ).round(4); S2.to_csv(f"{a.out}/history_switches_phone_summary.csv", index=False)
+print(S2.to_string())
