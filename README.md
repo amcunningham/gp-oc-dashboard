@@ -8,7 +8,13 @@ Interactive dashboard analysing the online consultation (OC) platform market in 
 
 - **[Dashboard](https://amcunningham.github.io/gp-oc-dashboard/)** — Interactive overview of the OC platform market: practice lookup, supplier shares, volume trends, deprivation patterns (~6,100 practices)
 - **[8am Rush](https://amcunningham.github.io/gp-oc-dashboard/rush_analysis.html)** — Does OC end the morning phone rush? Cloud-based telephony and OC submission patterns (4,306 practices)
-- **[OC Hours](https://amcunningham.github.io/gp-oc-dashboard/oc_hours.html)** — Do practices that keep OC open 24/7 have less of an 8am rush? Practices grouped by when OC submissions arrive (OC and telephony by day and time, September 2026). Script: `research/scripts/oc_hours_rush.py`; outputs in `research/data/oc_hours_sep26/` (earlier June 2026 run in `oc_hours_jun26/`)
+- **[OC Hours](https://amcunningham.github.io/gp-oc-dashboard/oc_hours.html)** — Do practices that keep OC open 24/7 have less of an 8am rush? Practices grouped by when OC submissions arrive (OC, telephony and appointments, September 2026), with a before-and-after comparison for practices that changed their hours. To reproduce, run from the repo root in this order (outputs go to ):
+  1.  — groups, timing, total contacts, adjusted comparisons
+  2.  — day of week, phone answering, GP Patient Survey, appointments
+  3.  — monthly groups and practices that switched
+  4.  — trend since January 2025 and before-and-after with calls
+  
+  All four use , which corrects OC submission times recorded in UTC during British Summer Time and leaves out practices whose call times are recorded in UTC.
 - **[Workforce & Appointments](https://amcunningham.github.io/gp-oc-dashboard/workforce_appts.html)** — Staffing, appointment modes, GP workload per session, lead times, DNA rates (6,018 practices)
 - **[Satisfaction](https://amcunningham.github.io/gp-oc-dashboard/satisfaction.html)** — Patient experience by OC intensity, with deprivation stratification and regression (6,018 practices)
 
