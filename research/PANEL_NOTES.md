@@ -1634,3 +1634,12 @@ n 4,741 -> 4,693). The Monday-Wednesday answering gap spans the whole working da
 my-practice day-of-week card is not shown for flagged practices. February/March-based measures
 (`rush_both_sameday.csv`: phone rush from Feb 2026, OC rush from Mar 2026) are GMT and unaffected, apart
 from 30-31 March 2026 for the affected OC suppliers.
+
+Update (7 Nov 2026): about 20 Black Country practices (codes M87/M88/M91/M92, plus a few nearby) first
+appear in the call data in April 2026, so they have no GMT months to compare against and were missed. In
+September 2026 their 06:00-07:59 share is 30-64% of weekday calls against 11-20% at 08:00-09:59; in GMT
+months only 8 of 4,915 practices have more 6-8am than 8-10am calls. `cbt_utc_practices` now also flags
+practices with no GMT baseline when their 6-8am share exceeds both their 8-10am share and 25%. May 2026
+`utc_shift` now covers 99 practices. Model E: n 4,682, R2 0.199, coefficients move by at most 0.01
+(practice size becomes non-significant at +0.17). OC Hours page (Sep 2026): 4 practices leave the groups
+(24/7 clinical 146 -> 145); no headline figure changes.
