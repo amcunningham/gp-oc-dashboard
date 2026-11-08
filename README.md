@@ -13,8 +13,9 @@ Interactive dashboard analysing the online consultation (OC) platform market in 
   2. `python research/scripts/oc_hours_extra.py --groups research/data/oc_hours_sep26/practice_groups.csv --oc research/data/oc_daytime_sep26.zip --cbt research/data/cbt_daytime_sep26.zip --oc-gpps research/data/panel/oc_daytime_2026-03.parquet --gpad research/data/gpad_crosstab_sep26.zip --gpad-month Sep_26 --out research/data/oc_hours_sep26` — day of week, phone answering, GP Patient Survey, appointments
   3. `python research/scripts/oc_hours_switchers.py --out research/data/oc_hours_sep26` — monthly groups and practices that switched
   4. `python research/scripts/oc_hours_history.py --old research/data/oc_daytime_jan25.zip --out research/data/oc_hours_sep26` — trend since January 2025 and before-and-after with calls
+  5. `python research/scripts/oc_hours_capacity.py --oc research/data/oc_daytime_sep26.zip --cbt research/data/cbt_daytime_sep26.zip --gpad research/data/gpad_crosstab_sep26.zip --gpad-month Sep_26 --out research/data/oc_hours_sep26` — morning peak against booked-ahead appointments, total appointments and GPs, all practices
 
-  All four use `research/scripts/oc_timefix.py`, which corrects OC submission times recorded in UTC during British Summer Time and leaves out practices whose call times are recorded in UTC.
+  All five use `research/scripts/oc_timefix.py`, which corrects OC submission times recorded in UTC during British Summer Time and leaves out practices whose call times are recorded in UTC.
 - **[Workforce & Appointments](https://amcunningham.github.io/gp-oc-dashboard/workforce_appts.html)** — Staffing, appointment modes, GP workload per session, lead times, DNA rates (6,018 practices)
 - **[Satisfaction](https://amcunningham.github.io/gp-oc-dashboard/satisfaction.html)** — Patient experience by OC intensity, with deprivation stratification and regression (6,018 practices)
 
