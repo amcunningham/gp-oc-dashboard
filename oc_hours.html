@@ -266,6 +266,27 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
 </section>
 
 <section>
+  <h2>Check: broader groups</h2>
+  <p>The four groups leave out many practices whose pattern is less clear-cut. As a check, the analysis was repeated with broader groups: practices with only a trickle of out-of-hours requests (under 2% at night and under 1% at weekends) join core hours; early openers with a weekend trickle join early opening; and all practices open 24/7 form one group, whether or not their supplier records clinical and admin requests. This brings 3,039 practices into the comparison instead of 2,287.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Broader groups, September 2026</th><th>Core hours</th><th>Weekday early opening</th><th>24/7</th></tr></thead>
+    <tbody>
+      <tr><td>Practices</td><td class="num">1,981</td><td class="num">584</td><td class="num">474</td></tr>
+      <tr class="key"><td>Weekday calls + OC arriving 8–10am</td><td class="num">30.5%</td><td class="num">28.2%</td><td class="num">29.5%</td></tr>
+      <tr><td>Adjusted difference, calls + OC at 8–10am</td><td class="num">—</td><td class="num">−1.8 points</td><td class="num">−1.3 points <small>(−1.9 to −0.7)</small></td></tr>
+      <tr><td>Adjusted difference, calls at 8–10am</td><td class="num">—</td><td class="num">−1.0 points</td><td class="num">0.0 points <small>(−0.6 to +0.6)</small></td></tr>
+      <tr class="key"><td>Share of the week's contacts the team handles 8–10am</td><td class="num">30.6%</td><td class="num">30.5%</td><td class="num">32.3%</td></tr>
+      <tr><td>Monday: share of the day's contacts handled 8–10am</td><td class="num">32.6%</td><td class="num">33.0%</td><td class="num">36.2%</td></tr>
+      <tr><td>All contacts per 1,000 per weekday, 24 hours</td><td class="num">33.8</td><td class="num">33.5</td><td class="num">35.2</td></tr>
+      <tr><td>Appointments booked same day</td><td class="num">43.8%</td><td class="num">43.7%</td><td class="num">44.5%</td></tr>
+      <tr><td>Easy to get through by phone (GPPS), adjusted difference</td><td class="num">—</td><td class="num">+3.9pp</td><td class="num">+4.8pp <small>(+3.4 to +6.2)</small></td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Medians, except the 8–10am and team shares, which are pooled as in the sections above. Adjusted differences are against core hours, adjusted for deprivation, age, list size, region and OC volume. GPPS groups are taken from March 2026 OC data with the same broader rules.</p>
+  <p>The conclusions are the same. Practices open 24/7 receive a slightly smaller share of calls and OC at 8–10am, but their phone peak is no smaller, and their team handles as large a share of the week's contacts at the start of the day, with a heavier Monday. With all 24/7 practices together, the lower same-day booking seen in the 24/7 clinical group disappears: that difference belongs to the phone-first practices in that group rather than to 24/7 opening.</p>
+</section>
+
+<section>
   <h2>What this means</h2>
   <ul>
     <li><strong>Patients still send requests early.</strong> Even when OC is open around the clock, 8–9am is the busiest hour. The share of phone calls arriving at 8–10am is similar to that in other practices.</li>
@@ -285,7 +306,7 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
   </ul>
 </section>
 
-<footer>Code and data: <a href="https://github.com/amcunningham/gp-oc-dashboard/tree/main/research/scripts">GitHub</a> (<code>oc_hours_rush.py</code>, <code>oc_hours_extra.py</code>, <code>oc_hours_switchers.py</code>, <code>oc_hours_history.py</code>, <code>oc_hours_capacity.py</code>, <code>oc_timefix.py</code>; outputs in <code>research/data/oc_hours_sep26</code>). Sources: NHS England, Submissions via Online Consultation Systems in General Practice, By Day and Time (September 2026); Cloud Based Telephony Data in General Practice, By Day and Time (September 2026); OC By Day and Time (March 2026) for the survey groups; Appointments in General Practice, practice-level crosstab (September 2026); GP Patient Survey 2026; registered list sizes July 2026; Fingertips IMD 2025. Analysis by Anne Marie Cunningham with Claude. Association does not imply causation.</footer>
+<footer>Code and data: <a href="https://github.com/amcunningham/gp-oc-dashboard/tree/main/research/scripts">GitHub</a> (<code>oc_hours_rush.py</code>, <code>oc_hours_extra.py</code>, <code>oc_hours_switchers.py</code>, <code>oc_hours_history.py</code>, <code>oc_hours_capacity.py</code>, <code>oc_timefix.py</code>; outputs in <code>research/data/oc_hours_sep26</code>, broader groups in <code>research/data/oc_hours_sep26_broad</code>). Sources: NHS England, Submissions via Online Consultation Systems in General Practice, By Day and Time (September 2026); Cloud Based Telephony Data in General Practice, By Day and Time (September 2026); OC By Day and Time (March 2026) for the survey groups; Appointments in General Practice, practice-level crosstab (September 2026); GP Patient Survey 2026; registered list sizes July 2026; Fingertips IMD 2025. Analysis by Anne Marie Cunningham with Claude. Association does not imply causation.</footer>
 </div>
 
 <script>

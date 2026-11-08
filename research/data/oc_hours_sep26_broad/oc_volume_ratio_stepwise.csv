@@ -1,0 +1,9 @@
+adjusted_for,group,oc_ratio,lo,hi,n
+none,B,1.124,1.058,1.195,3023
+none,T,0.817,0.749,0.892,3023
++imd,B,1.128,1.06,1.2,3023
++imd,T,0.818,0.75,0.893,3023
++imd+age+list+region,B,1.137,1.068,1.21,3023
++imd+age+list+region,T,0.816,0.748,0.89,3023
++supplier,B,1.128,1.061,1.198,3023
++supplier,T,0.734,0.672,0.802,3023

@@ -35,6 +35,9 @@ p.add_argument("--list", default="research/data/list_jul26.csv")
 p.add_argument("--xsec", default="research/data/xsec_master.parquet")
 p.add_argument("--out", default="research/data/oc_hours")
 p.add_argument("--min-oc", type=int, default=300)
+p.add_argument("--grouping", choices=["standard", "broad"], default="standard",
+               help="broad: core hours absorbs practices with a trickle of out-of-hours requests (<2%% nights, <1%% weekends), "
+                    "early opening absorbs early openers with a weekend trickle, and all 24/7 practices form one group T")
 p.add_argument("--bank-holidays", default="", help="comma-separated YYYY-MM-DD dates to drop from the CBT month")
 a = p.parse_args()
 os.makedirs(a.out, exist_ok=True)
@@ -82,8 +85,24 @@ def grp(r):
         if r.wkend_cl_days >= 6: return "D"
         if r.wkend_cl_days <= 1 and r.cat_share >= 0.3: return "C"
     return None
-P["g"] = P.apply(grp, axis=1)
-NAMES = {"A": "Core hours only", "B": "Weekday early opening", "C": "24/7 admin only", "D": "24/7 incl. clinical"}
+def grp_broad(r):
+    """Standard groups, with 24/7 admin and clinical merged (T), plus the practices that fit no standard group:
+    a trickle of out-of-hours requests -> core hours; early opening with a weekend trickle -> early opening;
+    24/7 whose supplier does not record request type -> T."""
+    g = grp(r)
+    if g in ("C", "D"): return "T"
+    if g is not None or r.tot < a.min_oc: return g
+    ns, ws = r.night / r.tot, r.wkend / r.tot
+    if r.wkend_days >= 7 and r.night_days >= 18: return "T"
+    if r.night_days >= 18: return "B" if ws < 0.01 else None
+    if ns < 0.02 and ws < 0.01: return "A"
+    return None
+P["g"] = P.apply(grp_broad if a.grouping == "broad" else grp, axis=1)
+if a.grouping == "broad":
+    NAMES = {"A": "Core hours", "B": "Weekday early opening", "T": "24/7"}
+else:
+    NAMES = {"A": "Core hours only", "B": "Weekday early opening", "C": "24/7 admin only", "D": "24/7 incl. clinical"}
+GROUPS = list(NAMES); OTHERS = GROUPS[1:]
 
 # ---------------- CBT
 WE_CALLS = None
@@ -170,7 +189,7 @@ bands.to_csv(f"{a.out}/rates_by_band.csv")
 
 # ---------------- group summary incl. "work facing the team 8-10am"
 S = []
-for gk in "ABCD":
+for gk in GROUPS:
     oc_c, cl = ocr[gk], cr[gk]
     core_calls = cl[CBT_CORE].sum(); core_oc = oc_c[CBT_CORE].sum()
     ooh_oc = oc_c[["00:00-05:59", "06:00-07:59", "18:30-23:59"]].sum()
@@ -199,7 +218,7 @@ try:
     R = []
     for y in ["ph_rush", "oc_rush_core", "comb_rush", "comb_810_pk", "day24_pk"]:
         r = smf.ols(f"{y} ~ C(g) + loc + I(loc**2) + ll + imd_score + pct65plus + C(region)", d).fit(cov_type="HC3")
-        for gk in "BCD":
+        for gk in OTHERS:
             t = f"C(g)[T.{gk}]"
             R.append(dict(outcome=y, group=gk, coef=r.params[t], lo=r.conf_int().loc[t, 0], hi=r.conf_int().loc[t, 1], p=r.pvalues[t], n=int(r.nobs)))
     pd.DataFrame(R).round(4).to_csv(f"{a.out}/adjusted_models.csv", index=False)
@@ -210,7 +229,7 @@ try:
     R = []
     for nm, rhs in steps:
         r = smf.ols(f"day24_pk ~ C(g) {rhs}", d).fit(cov_type="HC3")
-        for gk in "BCD":
+        for gk in OTHERS:
             t = f"C(g)[T.{gk}]"
             R.append(dict(adjusted_for=nm, group=gk, coef=r.params[t], lo=r.conf_int().loc[t, 0], hi=r.conf_int().loc[t, 1], n=int(r.nobs)))
     pd.DataFrame(R).round(3).to_csv(f"{a.out}/day24_stepwise.csv", index=False)
@@ -224,7 +243,7 @@ try:
     for nm, rhs in [("none", ""), ("+imd", "+ imd_score"), ("+imd+age+list+region", "+ imd_score + pct65plus + ll + C(region)"),
                     ("+supplier", "+ imd_score + pct65plus + ll + C(region) + C(sup1)")]:
         r = smf.ols(f"loc ~ C(g) {rhs}", d).fit(cov_type="HC3")
-        for gk in "BCD":
+        for gk in OTHERS:
             t = f"C(g)[T.{gk}]"; lo, hi = r.conf_int().loc[t]
             R.append(dict(adjusted_for=nm, group=gk, oc_ratio=np.exp(r.params[t]), lo=np.exp(lo), hi=np.exp(hi), n=int(r.nobs)))
     pd.DataFrame(R).round(3).to_csv(f"{a.out}/oc_volume_ratio_stepwise.csv", index=False)
@@ -235,7 +254,7 @@ try:
     R = []
     for y in ["calls_24h_pk", "oc24_pk", "day24_pk"]:
         r = smf.ols(f"{y} ~ C(g) + imd_score + pct65plus + ll + C(region)", d).fit(cov_type="HC3")
-        for gk in "BCD":
+        for gk in OTHERS:
             t = f"C(g)[T.{gk}]"
             R.append(dict(outcome=y, group=gk, coef=r.params[t], lo=r.conf_int().loc[t, 0], hi=r.conf_int().loc[t, 1], n=int(r.nobs)))
     pd.DataFrame(R).round(3).to_csv(f"{a.out}/channel_mix_24h_adjusted.csv", index=False)
