@@ -150,15 +150,23 @@ def cbt_baseline(panel="research/data/panel"):
 
 def cbt_utc_practices(df, gp="gp_code", date="date", band="band", val="inbound", verbose=True, label=""):
     """Practices whose calls on BST dates look UTC-shifted relative to their own GMT baseline:
-    6-8am share up >10 points and 8-10am share down >5 points."""
+    6-8am share up >10 points and 8-10am share down >5 points. Practices with no GMT baseline are
+    flagged when their 6-8am share exceeds both their 8-10am share and 25%."""
     d = df[in_bst(df[date])]
     if d.empty:
         return set()
     s = _cbt_shares(d, gp, date, band, val)
+    s = s[s.n >= 500]
     base = cbt_baseline()
+    base = base[base.n >= 500]
     j = s.join(base, rsuffix="_gmt", how="inner")
-    j = j[(j.n >= 500) & (j.n_gmt >= 500)]
     flag = set(j.index[((j.e - j.e_gmt) > 0.10) & ((j.r - j.r_gmt) < -0.05)])
+    # Practices with no GMT baseline (e.g. about 17 Black Country practices, codes M87/M88/M91/M92, whose
+    # call data start in April 2026): flag when 6-8am calls outnumber 8-10am calls and are >25% of the
+    # weekday total. In GMT months only 8 of 4,915 practices have more 6-8am than 8-10am calls.
+    nb = s[~s.index.isin(base.index)]
+    flag_nb = set(nb.index[(nb.e > nb.r) & (nb.e > 0.25)])
     if verbose:
-        print(f"[timefix CBT {label}] {len(flag)} practices with UTC-shifted call times left out of time-of-day call measures")
-    return flag
+        print(f"[timefix CBT {label}] {len(flag)} practices with UTC-shifted call times "
+              f"(+{len(flag_nb)} with no GMT baseline) left out of time-of-day call measures")
+    return flag | flag_nb
