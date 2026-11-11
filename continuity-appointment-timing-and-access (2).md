@@ -1,6 +1,6 @@
 # Continuity, appointment timing and patients’ experience of access
 
-*Dr Anne Marie Cunningham, Clinical Lead for Data and Digital · Draft for RCGP internal use*
+*Dr Anne Marie Cunningham, Clinical Lead for Data and Digital · Draft*
 
 *This note examines the relationships between continuity, appointment timing, deprivation and patient experience using the 2026 GP Patient Survey and General Practice Appointments Data.*
 
