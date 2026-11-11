@@ -19,3 +19,6 @@ research/data/cbt_jun26/durations/
 research/data/cbt_jun26/*.zip
 research/data/cbt_jun26/*.xlsx
 research/data/rebuild_20260730/downloads/
+
+# Python bytecode caches
+__pycache__/

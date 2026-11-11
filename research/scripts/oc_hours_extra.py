@@ -25,8 +25,13 @@ p.add_argument("--list", default="research/data/list_jul26.csv")
 p.add_argument("--out", required=True)
 p.add_argument("--gpad", default=None, help="GPAD 'Practice Level Crosstab' zip; uses the files for the OC month")
 p.add_argument("--gpad-month", default=None, help="month tag in the crosstab filenames, e.g. Sep_26")
+p.add_argument("--grouping", choices=["standard", "broad"], default="standard", help="must match the --grouping used for --groups")
 a = p.parse_args()
-NAMES = {"A": "Core hours only", "B": "Weekday early opening", "C": "24/7 admin only", "D": "24/7 incl. clinical"}
+if a.grouping == "broad":
+    NAMES = {"A": "Core hours", "B": "Weekday early opening", "T": "24/7"}
+else:
+    NAMES = {"A": "Core hours only", "B": "Weekday early opening", "C": "24/7 admin only", "D": "24/7 incl. clinical"}
+GROUPS = list(NAMES); OTHERS = GROUPS[1:]; LAST = GROUPS[-1]
 DOW = ["Mon", "Tue", "Wed", "Thu", "Fri"]
 
 def zcsv(path, cols):
@@ -106,7 +111,7 @@ def models(df, ys, tag, extra=""):
         med = dd.groupby("g")[y].median()
         for spec, rhs in [("unadjusted", ""), ("adjusted", f"+ imd_score + pct65plus + ll + C(region) + loc + I(loc**2){extra}")]:
             r = smf.ols(f"{y} ~ C(g) {rhs}", dd).fit(cov_type="HC3")
-            for gk in "BCD":
+            for gk in OTHERS:
                 t = f"C(g)[T.{gk}]"
                 res.append(dict(analysis=tag, outcome=y, spec=spec, group=gk, coef=r.params[t], lo=r.conf_int().loc[t, 0],
                                 hi=r.conf_int().loc[t, 1], p=r.pvalues[t], n=int(r.nobs), median_A=med.get("A"), median_g=med.get(gk)))
@@ -125,6 +130,7 @@ G["core"] = g3[core].groupby("gp_code").TOTAL.sum(); G["core_cl"] = g3[core].gro
 G["wkend_days"] = g3[g3.wk & (g3.TOTAL > 0)].groupby("gp_code").date.nunique()
 G["night_days"] = g3[night & (g3.TOTAL > 0)].groupby("gp_code").date.nunique()
 G["wkend_cl_days"] = g3[g3.wk & (g3.CLINICAL > 0)].groupby("gp_code").date.nunique()
+G["night"] = g3[night].groupby("gp_code").TOTAL.sum(); G["wkend"] = g3[g3.wk].groupby("gp_code").TOTAL.sum()
 G = G.fillna(0)
 def grp(r):
     if r.tot < 300: return None
@@ -134,7 +140,15 @@ def grp(r):
         if r.wkend_cl_days >= 0.75 * nwe: return "D"
         if r.wkend_cl_days <= 1 and r.core and r.core_cl / r.core >= 0.3: return "C"
     return None
-G["g"] = G.apply(grp, axis=1)
+def grp_broad(r):
+    g = grp(r)
+    if g in ("C", "D"): return "T"
+    if g is not None or r.tot < 300: return g
+    if r.wkend_days >= 0.85 * nwe and r.night_days >= 0.8 * nwd: return "T"
+    if r.night_days >= 0.8 * nwd: return "B" if r.wkend / r.tot < 0.01 else None
+    if r.night / r.tot < 0.02 and r.wkend / r.tot < 0.01: return "A"
+    return None
+G["g"] = G.apply(grp_broad if a.grouping == "broad" else grp, axis=1)
 L = pd.read_csv(a.list).set_index("gp_code").iloc[:, 0].rename("list")
 S = G[G.g.notna()].join(L).join(X[["imd_score", "pct65plus", "region", "phone_easy_2026", "access_satisfaction_2026",
                                    "satisfaction_2026", "couldnt_contact_2026", "gpps_n_2026"]])
@@ -148,7 +162,7 @@ ys = ["satisfaction_2026", "access_satisfaction_2026", "phone_easy_2026", "could
 print(S.groupby("g")[ys].median().round(1))
 models(S, ys, "GPPS 2026 (groups from Mar 2026 OC)")
 R = pd.DataFrame(res).round(4); R.to_csv(f"{a.out}/phone_gpps_models.csv", index=False)
-print(R[R.group == "D"][["analysis", "outcome", "spec", "coef", "lo", "hi", "n", "median_A", "median_g"]].to_string())
+print(R[R.group == LAST][["analysis", "outcome", "spec", "coef", "lo", "hi", "n", "median_A", "median_g"]].to_string())
 
 # ------------------------------------------------ 4. appointments (GPAD), same month as the OC groups
 if a.gpad:
@@ -189,8 +203,8 @@ if a.gpad:
         for spec, rhs in [("unadjusted", ""), ("adjusted", "+ imd_score + pct65plus + ll + C(region)"),
                           ("adjusted + OC volume", "+ imd_score + pct65plus + ll + C(region) + loc + I(loc**2)")]:
             dd = d.dropna(subset=[y]); r = smf.ols(f"{y} ~ C(g) {rhs}", dd).fit(cov_type="HC3")
-            for gk in "BCD":
+            for gk in OTHERS:
                 t = f"C(g)[T.{gk}]"
                 R.append(dict(outcome=y, spec=spec, group=gk, coef=r.params[t], lo=r.conf_int().loc[t, 0], hi=r.conf_int().loc[t, 1], n=int(r.nobs)))
     R = pd.DataFrame(R).round(3); R.to_csv(f"{a.out}/appointments_models.csv", index=False)
-    print(R[R.group == "D"].to_string())
+    print(R[R.group == LAST].to_string())

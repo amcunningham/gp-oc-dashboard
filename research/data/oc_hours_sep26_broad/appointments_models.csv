@@ -1,0 +1,37 @@
+outcome,spec,group,coef,lo,hi,n
+sd_pct,unadjusted,B,-1.078,-2.286,0.129,3020
+sd_pct,unadjusted,T,-0.736,-1.981,0.508,3020
+sd_pct,adjusted,B,-0.675,-1.89,0.54,3020
+sd_pct,adjusted,T,-0.556,-1.803,0.69,3020
+sd_pct,adjusted + OC volume,B,-0.849,-2.06,0.362,3020
+sd_pct,adjusted + OC volume,T,-0.278,-1.517,0.961,3020
+gp_sd_pct,unadjusted,B,-0.29,-1.84,1.259,3020
+gp_sd_pct,unadjusted,T,-0.585,-2.212,1.042,3020
+gp_sd_pct,adjusted,B,0.365,-1.188,1.918,3020
+gp_sd_pct,adjusted,T,-0.511,-2.13,1.109,3020
+gp_sd_pct,adjusted + OC volume,B,0.317,-1.22,1.854,3020
+gp_sd_pct,adjusted + OC volume,T,-0.426,-2.04,1.188,3020
+appts_pk,unadjusted,B,12.454,-2.882,27.79,3020
+appts_pk,unadjusted,T,30.827,13.581,48.073,3020
+appts_pk,adjusted,B,13.864,-0.932,28.66,3020
+appts_pk,adjusted,T,24.226,8.222,40.231,3020
+appts_pk,adjusted + OC volume,B,10.021,-4.865,24.907,3020
+appts_pk,adjusted + OC volume,T,30.287,14.246,46.329,3020
+sd_pk,unadjusted,B,-1.444,-13.354,10.465,3020
+sd_pk,unadjusted,T,10.387,-3.053,23.827,3020
+sd_pk,adjusted,B,1.786,-10.309,13.882,3020
+sd_pk,adjusted,T,8.444,-4.798,21.686,3020
+sd_pk,adjusted + OC volume,B,-1.308,-13.437,10.821,3020
+sd_pk,adjusted + OC volume,T,13.352,0.188,26.517,3020
+gp_pk,unadjusted,B,0.712,-8.878,10.302,3020
+gp_pk,unadjusted,T,-1.165,-11.663,9.334,3020
+gp_pk,adjusted,B,3.009,-6.579,12.597,3020
+gp_pk,adjusted,T,0.684,-9.726,11.093,3020
+gp_pk,adjusted + OC volume,B,1.245,-8.381,10.871,3020
+gp_pk,adjusted + OC volume,T,3.456,-6.986,13.898,3020
+f2f_pct,unadjusted,B,0.948,-0.571,2.466,3020
+f2f_pct,unadjusted,T,0.362,-1.254,1.978,3020
+f2f_pct,adjusted,B,1.038,-0.479,2.556,3020
+f2f_pct,adjusted,T,-0.195,-1.818,1.429,3020
+f2f_pct,adjusted + OC volume,B,1.704,0.185,3.223,3020
+f2f_pct,adjusted + OC volume,T,-1.244,-2.83,0.342,3020

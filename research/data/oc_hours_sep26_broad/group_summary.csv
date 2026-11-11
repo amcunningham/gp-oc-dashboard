@@ -1,0 +1,4 @@
+group,name,practices,median_oc_core_pk,median_list,comb_810_pk,comb_core_pk,share_arriving_810,contacts_24h_pk_weekday,contacts_per_week_pk,weekend_calls_per_week_pk,weekend_oc_per_week_pk,share_facing_team_810,oc_share_facing_team_810
+A,Core hours,1981,8.6188,10520.0,10.0021,32.773,0.3052,33.9288,169.6543,1.5188,0.0104,0.3056,0.4012
+B,Weekday early opening,584,9.0174,11375.0,8.9064,31.5719,0.2821,33.4873,167.4672,1.5974,0.0306,0.3046,0.433
+T,24/7,474,6.8807,10584.0,9.4486,32.0542,0.2948,34.2375,173.0487,1.6375,1.8611,0.3229,0.4525
